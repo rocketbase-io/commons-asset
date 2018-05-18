@@ -88,6 +88,12 @@ SOFTWARE.
             <version>${thumbnailator.version}</version>
         </dependency>
 
+        <dependency>
+            <groupId>com.squareup</groupId>
+            <artifactId>pollexor</artifactId>
+            <version>${pollexor.version}</version>
+        </dependency>
+
         <!-- tests -->
         <dependency>
             <groupId>org.springframework.boot</groupId>

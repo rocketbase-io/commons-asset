@@ -29,6 +29,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.Resource;
 import javax.imageio.ImageIO;
+import javax.servlet.http.HttpServletRequest;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -39,7 +40,7 @@ import java.util.*;
 import java.util.concurrent.TimeUnit;
 
 @RestController
-@RequestMapping("/api/asset")
+@RequestMapping("${asset.api.endpoint:/api/asset}")
 @Slf4j
 public class AssetController implements BaseController {
 
@@ -58,7 +59,8 @@ public class AssetController implements BaseController {
 
     @RequestMapping(method = RequestMethod.POST)
     public AssetRead handleFileUpload(@RequestParam("file") MultipartFile file,
-                                      @RequestParam(value = "systemRefId", required = false) String systemRefId) {
+                                      @RequestParam(value = "systemRefId", required = false) String systemRefId,
+                                      HttpServletRequest request) {
         if (file.isEmpty()) {
             throw new EmptyFileException();
         }
@@ -91,7 +93,7 @@ public class AssetController implements BaseController {
                 AssetEntity asset = saveAndUploadAsset(assetType, tempFile, originalFilename, null, size, systemRefId);
                 log.debug("uploaded file {} with id: {}, took: {} ms", originalFilename, asset.getId(), stopwatch.elapsed(TimeUnit.MILLISECONDS));
 
-                return assetConverter.fromEntity(asset, getPreviewSizes(null));
+                return assetConverter.fromEntity(asset, getPreviewSizes(null), request);
             } finally {
                 tempFile.delete();
             }
@@ -102,14 +104,14 @@ public class AssetController implements BaseController {
     }
 
     @RequestMapping(method = RequestMethod.GET)
-    public PageableResult<AssetRead> findAll(@RequestParam(required = false) MultiValueMap<String, String> params) {
+    public PageableResult<AssetRead> findAll(@RequestParam(required = false) MultiValueMap<String, String> params, HttpServletRequest request) {
         Page<AssetEntity> pageResult = assetRepository.findAll(parsePageRequest(params));
-        return PageableResult.contentPage(assetConverter.fromEntities(pageResult.getContent(), getPreviewSizes(params)), pageResult);
+        return PageableResult.contentPage(assetConverter.fromEntities(pageResult.getContent(), getPreviewSizes(params), request), pageResult);
     }
 
     @RequestMapping(value = "/{sid}", method = RequestMethod.GET)
-    public AssetRead getAsset(@PathVariable("sid") String sid, @RequestParam(required = false) MultiValueMap<String, String> params) {
-        return assetConverter.fromEntity(assetRepository.getByIdOrSystemRefId(sid), getPreviewSizes(params));
+    public AssetRead getAsset(@PathVariable("sid") String sid, @RequestParam(required = false) MultiValueMap<String, String> params, HttpServletRequest request) {
+        return assetConverter.fromEntity(assetRepository.getByIdOrSystemRefId(sid), getPreviewSizes(params), request);
     }
 
     /**

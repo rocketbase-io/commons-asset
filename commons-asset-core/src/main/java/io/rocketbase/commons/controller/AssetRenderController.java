@@ -20,7 +20,7 @@ import java.io.ByteArrayOutputStream;
 import java.util.concurrent.TimeUnit;
 
 @RestController
-@RequestMapping("/get/asset")
+@RequestMapping("${asset.api.render:/get/asset}")
 @Slf4j
 public class AssetRenderController implements BaseController {
 
