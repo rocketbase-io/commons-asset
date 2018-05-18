@@ -1,0 +1,15 @@
+spring:
+  # database connection
+  data:
+    mongodb:
+      database: commons-asset-sample-test
+  # json configuration
+  jackson:
+    serialization:
+      WRITE_DATES_AS_TIMESTAMPS: false
+      INDENT_OUTPUT: true
+    default-property-inclusion: NON_NULL
+
+logging:
+  level:
+    io.rocketbase: TRACE
