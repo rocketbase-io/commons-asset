@@ -3,10 +3,19 @@
 ![logo](assets/commons-logo.svg)
 
 
+[![Build Status](https://travis-ci.org/rocketbase-io/commons-asset.svg?branch=master)](https://travis-ci.org/rocketbase-io/commons-asset)
+[![Maven Central](https://maven-badges.herokuapp.com/maven-central/io.rocketbase.commons/commons-asset/badge.svg)](https://maven-badges.herokuapp.com/maven-central/io.rocketbase.commons/commons-asset)
+
+
 Add a simple asset service with basic features to your spring-boot applications. 
 
 **Features:**
-* many is planned :)
+* api and controller to handle asset-uploads
+* works with jpeg, gif, png and as file pdf + zip
+* 2 different storage implementations (mongo-grif-fs / s3)
+* embedded thumb service (for mongo-grif-fs) or thumbor via s3 connector
+* java resource to communicate with api
+* combinable with commons-auth to protect endpoints
 
 ## commons-asset-api
 
