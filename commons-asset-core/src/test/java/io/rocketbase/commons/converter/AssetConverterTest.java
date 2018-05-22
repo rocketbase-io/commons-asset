@@ -8,9 +8,7 @@ import io.rocketbase.commons.dto.asset.Resolution;
 import io.rocketbase.commons.model.AssetEntity;
 import io.rocketbase.commons.service.MongoFileStorageService;
 import org.junit.Test;
-import org.mockito.Mockito;
 
-import javax.servlet.http.HttpServletRequest;
 import java.time.LocalDateTime;
 import java.util.Arrays;
 
@@ -27,16 +25,6 @@ public class AssetConverterTest {
         config.setApiEndpoint("/api/asset");
         config.setRenderEndpoint("/get/asset");
 
-        HttpServletRequest mockedRequest = Mockito.mock(HttpServletRequest.class);
-        Mockito.when(mockedRequest.getScheme())
-                .thenReturn("http");
-        Mockito.when(mockedRequest.getServerName())
-                .thenReturn("localhost");
-        Mockito.when(mockedRequest.getServerPort())
-                .thenReturn(8080);
-        Mockito.when(mockedRequest.getContextPath())
-                .thenReturn("/");
-
         String baseUrl = "http://localhost:8080" + config.getRenderEndpoint() + "/";
 
         AssetConverter converter = new AssetConverter(config, new MongoFileStorageService(null));
@@ -50,7 +38,7 @@ public class AssetConverterTest {
                 .type(AssetType.PNG)
                 .systemRefId("123")
                 .resolution(new Resolution(100, 200))
-                .build(), Arrays.asList(PreviewSize.S, PreviewSize.M, PreviewSize.L), mockedRequest);
+                .build(), Arrays.asList(PreviewSize.S, PreviewSize.M, PreviewSize.L), "http://localhost:8080/");
 
         // then
         assertThat(assetRead, notNullValue());

@@ -1,6 +1,7 @@
 package io.rocketbase.commons.dto.asset;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -25,5 +26,10 @@ public class AssetRead extends AssetReference {
 
     public String toString() {
         return "AssetRead(id=" + this.getId() + ", systemRefId=" + this.getSystemRefId() + ", urlPath=" + this.getUrlPath() + ", type=" + this.getType() + ", meta=" + this.getMeta() + ", previews=" + this.getPreviews() + ")";
+    }
+
+    @JsonIgnore
+    public AssetReference toReference() {
+        return (AssetReference) this;
     }
 }

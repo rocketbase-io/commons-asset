@@ -2,17 +2,13 @@ package io.rocketbase.commons.converter;
 
 import com.squareup.pollexor.Thumbor;
 import io.rocketbase.commons.config.AssetConfiguration;
-import io.rocketbase.commons.dto.asset.AssetMeta;
-import io.rocketbase.commons.dto.asset.AssetPreviews;
-import io.rocketbase.commons.dto.asset.AssetRead;
-import io.rocketbase.commons.dto.asset.PreviewSize;
+import io.rocketbase.commons.dto.asset.*;
 import io.rocketbase.commons.model.AssetEntity;
 import io.rocketbase.commons.service.FileStorageService;
 import io.rocketbase.commons.service.MongoFileStorageService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import javax.servlet.http.HttpServletRequest;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -39,7 +35,7 @@ public class AssetConverter {
         return fileStorageService instanceof MongoFileStorageService;
     }
 
-    public AssetRead fromEntity(AssetEntity entity, List<PreviewSize> sizes, HttpServletRequest request) {
+    public AssetRead fromEntity(AssetEntity entity, List<PreviewSize> sizes, String baseUrl) {
         if (entity == null) {
             return null;
         }
@@ -49,7 +45,7 @@ public class AssetConverter {
 
         ((sizes == null || sizes.isEmpty()) ? defaultSizes : sizes)
                 .forEach(s -> assetPreviews.getPreviewMap()
-                        .put(s, getPreviewUrl(entity, s, request)));
+                        .put(s, getPreviewUrl(entity.getId(), entity.getUrlPath(), s, baseUrl)));
 
         return AssetRead.builderRead()
                 .id(entity.getId())
@@ -67,18 +63,47 @@ public class AssetConverter {
                 .build();
     }
 
-    public List<AssetRead> fromEntities(List<AssetEntity> entities, List<PreviewSize> sizes, HttpServletRequest request) {
+    public List<AssetRead> fromEntities(List<AssetEntity> entities, List<PreviewSize> sizes, String baseUrl) {
         if (entities == null) {
             return null;
         }
-        return entities.stream().map(v -> fromEntity(v, sizes, request)).collect(Collectors.toList());
+        return entities.stream().map(v -> fromEntity(v, sizes, baseUrl)).collect(Collectors.toList());
     }
 
-    private String getPreviewUrl(AssetEntity entity, PreviewSize size, HttpServletRequest request) {
+    public AssetRead toRead(AssetReference reference, String baseUrl) {
+        return toRead(reference, null, baseUrl);
+    }
+
+    public AssetRead toRead(AssetReference reference, List<PreviewSize> sizes, String baseUrl) {
+        if (reference == null) {
+            return null;
+        }
+        AssetPreviews assetPreviews = AssetPreviews.builder()
+                .previewMap(new HashMap<>())
+                .build();
+
+        ((sizes == null || sizes.isEmpty()) ? defaultSizes : sizes)
+                .forEach(s -> assetPreviews.getPreviewMap()
+                        .put(s, getPreviewUrl(reference.getId(), reference.getUrlPath(), s, baseUrl)));
+
+        return AssetRead.builderRead()
+                .id(reference.getId())
+                .systemRefId(reference.getSystemRefId())
+                .urlPath(reference.getUrlPath())
+                .type(reference.getType())
+                .meta(reference.getMeta())
+                .previews(assetPreviews)
+                .build();
+    }
+
+    private String getPreviewUrl(String id, String urlPath, PreviewSize size, String baseUrl) {
         if (useLocalEndpoint()) {
-            return getBaseUrl(request) + assetConfiguration.getRenderEndpoint() + "/" + entity.getId() + "/" + size.name().toLowerCase();
+            if (baseUrl.endsWith("/")) {
+                baseUrl = baseUrl.substring(0, baseUrl.length() - 1);
+            }
+            return baseUrl + assetConfiguration.getRenderEndpoint() + "/" + id + "/" + size.name().toLowerCase();
         } else {
-            return getThumbor().buildImage(entity.getUrlPath())
+            return getThumbor().buildImage(urlPath)
                     .resize(size.getMaxWidth(), size.getMaxHeight())
                     .fitIn()
                     .toUrl();
@@ -95,18 +120,5 @@ public class AssetConverter {
             }
         }
         return thumbor;
-    }
-
-    private String getBaseUrl(HttpServletRequest request) {
-        String result = request.getScheme() + "://" + request.getServerName();
-        int serverPort = request.getServerPort();
-        if (serverPort != 80 && serverPort != 443) {
-            result += ":" + serverPort;
-        }
-        result += request.getContextPath();
-        if (result.endsWith("/")) {
-            result = result.substring(0, result.length() - 1);
-        }
-        return result;
     }
 }

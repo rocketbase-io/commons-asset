@@ -1,5 +1,7 @@
 package io.rocketbase.commons.model;
 
+import io.rocketbase.commons.dto.asset.AssetMeta;
+import io.rocketbase.commons.dto.asset.AssetReference;
 import io.rocketbase.commons.dto.asset.AssetType;
 import io.rocketbase.commons.dto.asset.Resolution;
 import lombok.AllArgsConstructor;
@@ -7,6 +9,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.Id;
+import org.springframework.data.annotation.Transient;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 
@@ -51,5 +54,22 @@ public class AssetEntity {
      */
     @Indexed
     private String referenceUrl;
+
+    @Transient
+    public AssetReference toReference() {
+        return AssetReference.builder()
+                .id(getId())
+                .systemRefId(getSystemRefId())
+                .urlPath(getUrlPath())
+                .type(getType())
+                .meta(AssetMeta.builder()
+                        .created(getCreated())
+                        .fileSize(getFileSize())
+                        .originalFilename(getOriginalFilename())
+                        .resolution(getResolution())
+                        .referenceUrl(getReferenceUrl())
+                        .build())
+                .build();
+    }
 
 }
