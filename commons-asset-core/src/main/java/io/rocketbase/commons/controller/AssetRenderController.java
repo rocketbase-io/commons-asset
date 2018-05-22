@@ -8,6 +8,7 @@ import io.rocketbase.commons.service.FileStorageService;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import net.coobird.thumbnailator.Thumbnails;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.CacheControl;
 import org.springframework.http.MediaType;
@@ -20,6 +21,7 @@ import java.io.ByteArrayOutputStream;
 import java.util.concurrent.TimeUnit;
 
 @RestController
+@ConditionalOnProperty(value = "${asset.render.enabled}", matchIfMissing = true)
 @RequestMapping("${asset.api.render:/get/asset}")
 @Slf4j
 public class AssetRenderController implements BaseController {
