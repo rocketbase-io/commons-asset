@@ -47,27 +47,31 @@ public class AssetService {
                                 .lastIndexOf('.'));
             }
             File tempFile = File.createTempFile("asset", suffix);
-            AssetType assetType = null;
-            try {
-                IOUtils.copy(inputStream, new FileOutputStream(tempFile));
+            IOUtils.copy(inputStream, new FileOutputStream(tempFile));
 
-                String contentType = tika.detect(tempFile);
-                assetType = AssetType.findByContentType(contentType);
-                if (assetType == null) {
-                    log.info("detected contentType: {}", contentType);
-                    throw new InvalidContentTypeException(contentType);
-                }
+            AssetEntity asset = storeAndDeleteFile(tempFile, originalFilename, size, systemRefId, null);
 
-                AssetEntity asset = saveAndUploadAsset(assetType, tempFile, originalFilename, null, size, systemRefId);
-                log.debug("uploaded file {} with id: {}, took: {} ms", originalFilename, asset.getId(), stopwatch.elapsed(TimeUnit.MILLISECONDS));
+            log.debug("store file {} with id: {}, took: {} ms", originalFilename, asset.getId(), stopwatch.elapsed(TimeUnit.MILLISECONDS));
 
-                return asset;
-            } finally {
-                tempFile.delete();
-            }
+            return asset;
         } catch (IOException e) {
             log.error("handleFileUpload error: {}", e.getMessage());
             throw new UnprocessableAssetException();
+        }
+    }
+
+    public AssetEntity storeAndDeleteFile(File file, String originalFilename, long size, String systemRefId, String referenceUrl) throws IOException {
+        try {
+            String contentType = tika.detect(file);
+            AssetType assetType = AssetType.findByContentType(contentType);
+            if (assetType == null) {
+                log.info("detected contentType: {}", contentType);
+                throw new InvalidContentTypeException(contentType);
+            }
+            AssetEntity asset = saveAndUploadAsset(assetType, file, originalFilename, referenceUrl, size, systemRefId);
+            return asset;
+        } finally {
+            file.delete();
         }
     }
 

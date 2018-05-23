@@ -4,25 +4,32 @@ import io.rocketbase.commons.converter.AssetConverter;
 import io.rocketbase.commons.dto.PageableResult;
 import io.rocketbase.commons.dto.asset.AssetRead;
 import io.rocketbase.commons.dto.asset.PreviewSize;
+import io.rocketbase.commons.dto.batch.AssetBatchResult;
+import io.rocketbase.commons.dto.batch.AssetBatchWrite;
+import io.rocketbase.commons.dto.batch.AssetBatchWriteEntry;
+import io.rocketbase.commons.exception.AssetErrorCodes;
 import io.rocketbase.commons.exception.EmptyFileException;
+import io.rocketbase.commons.exception.InvalidContentTypeException;
 import io.rocketbase.commons.model.AssetEntity;
 import io.rocketbase.commons.service.AssetRepository;
 import io.rocketbase.commons.service.AssetService;
+import io.rocketbase.commons.service.DownloadService;
 import io.rocketbase.commons.service.FileStorageService;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.tika.Tika;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.MultiValueMap;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
+import javax.validation.constraints.NotNull;
 import java.util.*;
 
 @RestController
@@ -41,6 +48,9 @@ public class AssetController implements BaseController {
 
     @Resource
     private AssetService assetService;
+
+    @Resource
+    private DownloadService downloadService;
 
     @SneakyThrows
     @RequestMapping(method = RequestMethod.POST)
@@ -91,6 +101,29 @@ public class AssetController implements BaseController {
         assetService.deleteByIdOrSystemRefId(sid);
 
         return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    @SneakyThrows
+    @RequestMapping(value = "/batch", method = RequestMethod.POST)
+    public AssetBatchResult processBatchFileUrls(@RequestBody @NotNull @Validated AssetBatchWrite assetBatch,
+                                                 @RequestParam(required = false) MultiValueMap<String, String> params,
+                                                 HttpServletRequest request) {
+
+        AssetBatchResult.AssetBatchResultBuilder builder = AssetBatchResult.builder();
+        for (AssetBatchWriteEntry entry : assetBatch.getEntries()) {
+            try {
+                DownloadService.TempDownload download = downloadService.downloadUrl(entry.getUrl());
+                AssetEntity asset = assetService.storeAndDeleteFile(download.getFile(), download.getFilename(), download.getFile().length(), entry.getSystemRefId(), entry.getUrl());
+                builder.success(entry.getUrl(), assetConverter.fromEntity(asset, getPreviewSizes(params), getBaseUrl(request)));
+            } catch (DownloadService.DownloadError e) {
+                builder.failure(entry.getUrl(), e.getErrorCode());
+            } catch (InvalidContentTypeException e) {
+                builder.failure(entry.getUrl(), AssetErrorCodes.INVALID_CONTENT_TYPE);
+            } catch (Exception e) {
+                builder.failure(entry.getUrl(), AssetErrorCodes.UNPROCESSABLE_ASSET);
+            }
+        }
+        return builder.build();
     }
 
 

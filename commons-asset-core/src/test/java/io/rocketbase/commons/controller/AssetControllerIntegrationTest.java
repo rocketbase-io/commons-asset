@@ -4,6 +4,9 @@ import io.rocketbase.commons.BaseIntegrationTest;
 import io.rocketbase.commons.dto.asset.AssetRead;
 import io.rocketbase.commons.dto.asset.AssetType;
 import io.rocketbase.commons.dto.asset.Resolution;
+import io.rocketbase.commons.dto.batch.AssetBatchResult;
+import io.rocketbase.commons.dto.batch.AssetBatchWrite;
+import io.rocketbase.commons.dto.batch.AssetBatchWriteEntry;
 import io.rocketbase.commons.exception.AssetErrorCodes;
 import io.rocketbase.commons.exception.BadRequestException;
 import io.rocketbase.commons.resource.AssetResource;
@@ -139,6 +142,30 @@ public class AssetControllerIntegrationTest extends BaseIntegrationTest {
         } catch (BadRequestException e) {
             assertThat(e.getErrorResponse().getStatus(), equalTo(AssetErrorCodes.INVALID_CONTENT_TYPE.getStatus()));
         }
+    }
+
+    @SneakyThrows
+    @Test
+    public void testBatch() {
+        //
+        AssetResource assetResource = getAssetResource();
+        String success = "https://cdn.rocketbase.io/assets/signature/rocketbase-signature-20179.png";
+        String failure = "https://gitlab.com/notfound.jpg";
+
+        // when
+        AssetBatchResult result = assetResource.processBatchFileUrls(AssetBatchWrite.builder()
+                .entry(new AssetBatchWriteEntry(success))
+                .entry(new AssetBatchWriteEntry(failure))
+                .build());
+        //
+        assertThat(result, notNullValue());
+        assertThat(result.getSucceeded().size(), equalTo(1));
+        assertThat(result.getSucceeded().get(success).getType(), equalTo(AssetType.PNG));
+        assertThat(result.getSucceeded().get(success).getMeta().getReferenceUrl(), equalTo(success));
+        assertThat(result.getFailed().size(), equalTo(1));
+        // gitlab response with 404 html page that is text/plain detected
+        assertThat(result.getFailed().get(failure), equalTo(AssetErrorCodes.INVALID_CONTENT_TYPE));
+
     }
 
     @Nonnull

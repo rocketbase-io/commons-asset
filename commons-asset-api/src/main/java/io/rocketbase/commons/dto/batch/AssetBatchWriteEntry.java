@@ -1,17 +1,17 @@
 package io.rocketbase.commons.dto.batch;
 
 
-import com.fasterxml.jackson.annotation.JsonCreator;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.hibernate.validator.constraints.URL;
-import org.springframework.context.annotation.Bean;
 
 import javax.validation.constraints.NotNull;
-import java.util.Set;
 
 
 @Data
-@AllArgsConstructor(onConstructor = @_(@JsonCreator))
+@NoArgsConstructor
+@AllArgsConstructor
 public class AssetBatchWriteEntry {
 
     @NotNull
@@ -19,5 +19,9 @@ public class AssetBatchWriteEntry {
     private String url;
 
     private String systemRefId;
+
+    public AssetBatchWriteEntry(String url) {
+        this.url = url;
+    }
 
 }

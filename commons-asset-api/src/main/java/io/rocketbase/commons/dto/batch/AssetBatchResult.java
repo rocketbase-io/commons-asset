@@ -1,21 +1,22 @@
 package io.rocketbase.commons.dto.batch;
 
-import com.fasterxml.jackson.annotation.JsonCreator;
 import io.rocketbase.commons.dto.asset.AssetRead;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.Singular;
+import io.rocketbase.commons.exception.AssetErrorCodes;
+import lombok.*;
 
 import java.io.Serializable;
 import java.util.Map;
 
 @Data
 @Builder
-@AllArgsConstructor(onConstructor = @_(@JsonCreator))
+@NoArgsConstructor
+@AllArgsConstructor
 public class AssetBatchResult implements Serializable {
 
-    @Singular("resultEntry")
-    private Map<String, AssetRead> result;
+    @Singular("success")
+    private Map<String, AssetRead> succeeded;
+
+    @Singular("failure")
+    private Map<String, AssetErrorCodes> failed;
 
 }

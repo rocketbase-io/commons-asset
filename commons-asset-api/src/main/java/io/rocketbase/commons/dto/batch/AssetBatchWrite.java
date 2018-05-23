@@ -1,10 +1,6 @@
 package io.rocketbase.commons.dto.batch;
 
-import com.fasterxml.jackson.annotation.JsonCreator;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.Singular;
+import lombok.*;
 
 import javax.validation.constraints.NotNull;
 import java.io.Serializable;
@@ -12,7 +8,8 @@ import java.util.List;
 
 @Data
 @Builder
-@AllArgsConstructor(onConstructor = @_(@JsonCreator))
+@NoArgsConstructor
+@AllArgsConstructor
 public class AssetBatchWrite implements Serializable {
 
     @Singular
