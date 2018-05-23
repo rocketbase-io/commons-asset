@@ -42,20 +42,6 @@ public class AssetResource {
         return query(uriBuilder);
     }
 
-    /**
-     * @param queryString context, auditor (id or name), tag
-     * @param page        start's with 0
-     * @param pagesize    max 50
-     * @return
-     */
-    public PageableResult<AssetRead> findAllByQuery(String queryString, int page, int pagesize) {
-        UriComponentsBuilder uriBuilder = getUriBuilder()
-                .queryParam("page", page)
-                .queryParam("size", pagesize)
-                .queryParam("queryString", queryString);
-        return query(uriBuilder);
-    }
-
     private PageableResult<AssetRead> query(UriComponentsBuilder uriBuilder) {
         ResponseEntity<PageableResult<AssetRead>> response = restTemplate.exchange(uriBuilder.toUriString(),
                 HttpMethod.GET,
@@ -102,7 +88,6 @@ public class AssetResource {
                 HttpMethod.DELETE,
                 null, Void.class);
     }
-
 
     /**
      * upload binary file to asset endpoint
