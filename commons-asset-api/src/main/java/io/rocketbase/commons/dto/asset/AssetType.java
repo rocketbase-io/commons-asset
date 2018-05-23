@@ -46,6 +46,8 @@ public enum AssetType {
             for (AssetType type : values()) {
                 if (fileExtensions.equalsIgnoreCase(type.getFileExtension())) {
                     return type;
+                } else if (type.equals(JPEG) && fileExtensions.equalsIgnoreCase("jpeg")) {
+                    return type;
                 }
             }
         }
