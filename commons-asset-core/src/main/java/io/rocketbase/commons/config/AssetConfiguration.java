@@ -1,39 +1,42 @@
 package io.rocketbase.commons.config;
 
-import io.rocketbase.commons.service.FileStorageService;
-import io.rocketbase.commons.service.MongoFileStorageService;
+import io.rocketbase.commons.dto.asset.AssetType;
 import lombok.Data;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
-import org.springframework.context.annotation.Bean;
+import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.data.mongodb.gridfs.GridFsTemplate;
 
-import javax.annotation.Resource;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.EnumSet;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Data
 @Configuration
+@EnableConfigurationProperties
+@ConfigurationProperties(prefix = "asset")
 public class AssetConfiguration {
 
-    @Value("${asset.api.endpoint:/api/asset}")
-    private String apiEndpoint;
+    private String apiEndpoint = "/api/asset";
 
-    @Value("${asset.api.render:/get/asset}")
-    private String renderEndpoint;
+    private String renderEndpoint = "/get/asset";
 
-    @Value(value = "${asset.thumbor.host:http://localhost}")
-    private String thumborHost;
+    private String thumborHost = "http://localhost";
 
-    @Value(value = "${asset.thumbor.key:}")
-    private String thumborKey;
+    private String thumborKey = "";
 
-    @Resource
-    private GridFsTemplate gridFsTemplate;
+    private List<String> allowedTypes = new ArrayList<>();
 
-    @Bean
-    @ConditionalOnMissingBean
-    public FileStorageService fileStorageService() {
-        return new MongoFileStorageService(gridFsTemplate);
+    public List<AssetType> getAllowedAssetTypes() {
+        List<AssetType> allowed = new ArrayList<>(EnumSet.allOf(AssetType.class));
+        if (allowedTypes != null && !allowedTypes.isEmpty() && !allowedTypes.equals(Arrays.asList(""))) {
+            allowed = allowedTypes.stream()
+                    .map(v -> AssetType.valueOf(v.toUpperCase()))
+                    .collect(Collectors.toList());
+        }
+        return allowed;
     }
+
 
 }
