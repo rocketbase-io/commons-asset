@@ -9,7 +9,15 @@ import java.util.Set;
 
 public enum AssetType {
 
-    JPEG("image/jpeg"), PNG("image/png"), GIF("image/gif"), PDF("application/pdf"), ZIP("application/zip");
+    JPEG("image/jpeg"),
+    PNG("image/png"),
+    GIF("image/gif"),
+    PDF("application/pdf"),
+    ZIP("application/zip"),
+    XLS("application/msexcel"),
+    XLSX("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"),
+    DOC("application/msword"),
+    DOCX("application/vnd.openxmlformats-officedocument.wordprocessingml.document");
 
     @Getter
     private String contentType;

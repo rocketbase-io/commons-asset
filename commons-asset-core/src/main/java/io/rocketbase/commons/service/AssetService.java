@@ -4,9 +4,11 @@ import com.google.common.base.Stopwatch;
 import io.rocketbase.commons.dto.asset.AssetType;
 import io.rocketbase.commons.dto.asset.Resolution;
 import io.rocketbase.commons.exception.InvalidContentTypeException;
+import io.rocketbase.commons.exception.NotAllowedAssetTypeException;
 import io.rocketbase.commons.exception.SystemRefIdAlreadyUsedException;
 import io.rocketbase.commons.exception.UnprocessableAssetException;
 import io.rocketbase.commons.model.AssetEntity;
+import io.rocketbase.commons.service.AssetTypeFilterService.AssetUploadDetail;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.IOUtils;
 import org.apache.tika.Tika;
@@ -34,6 +36,9 @@ public class AssetService {
 
     @Resource
     private AssetRepository assetRepository;
+
+    @Resource
+    private AssetTypeFilterService assetTypeFilterService;
 
     public AssetEntity store(InputStream inputStream, String originalFilename, long size, String systemRefId) {
         try {
@@ -67,6 +72,9 @@ public class AssetService {
             if (assetType == null) {
                 log.info("detected contentType: {}", contentType);
                 throw new InvalidContentTypeException(contentType);
+            } else if (!assetTypeFilterService.isAllowed(assetType, new AssetUploadDetail(file, originalFilename, size, systemRefId, referenceUrl))) {
+                log.info("got assetType: {} that is not within allowed list: {}", assetType, assetTypeFilterService.getAllowedAssetTypes());
+                throw new NotAllowedAssetTypeException(assetType);
             }
             AssetEntity asset = saveAndUploadAsset(assetType, file, originalFilename, referenceUrl, size, systemRefId);
             return asset;
