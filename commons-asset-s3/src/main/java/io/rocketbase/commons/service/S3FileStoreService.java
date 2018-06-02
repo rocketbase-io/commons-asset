@@ -1,5 +1,6 @@
 package io.rocketbase.commons.service;
 
+import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.model.CannedAccessControlList;
 import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.amazonaws.services.s3.model.PutObjectRequest;
@@ -7,21 +8,19 @@ import com.amazonaws.services.s3.transfer.Download;
 import com.amazonaws.services.s3.transfer.TransferManager;
 import com.amazonaws.services.s3.transfer.TransferManagerBuilder;
 import com.amazonaws.services.s3.transfer.Upload;
-import io.rocketbase.commons.config.S3Configuration;
 import io.rocketbase.commons.model.AssetEntity;
+import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import org.springframework.core.io.InputStreamResource;
-import org.springframework.stereotype.Service;
 
-import javax.annotation.Resource;
 import java.io.File;
 import java.io.FileInputStream;
 
-@Service
+@RequiredArgsConstructor
 public class S3FileStoreService implements FileStorageService {
 
-    @Resource
-    private S3Configuration s3Configuration;
+    private final String bucket;
+    private final AmazonS3 amazonS3;
 
     @SneakyThrows
     @Override
@@ -32,10 +31,10 @@ public class S3FileStoreService implements FileStorageService {
                 .toLowerCase());
 
         TransferManager transferManager = TransferManagerBuilder.standard()
-                .withS3Client(s3Configuration.getS3Client())
+                .withS3Client(amazonS3)
                 .build();
         ObjectMetadata objectMetadata = generateObjectMeta(entity);
-        Upload upload = transferManager.upload(new PutObjectRequest(s3Configuration.getBucketName(),
+        Upload upload = transferManager.upload(new PutObjectRequest(bucket,
                 entity.getUrlPath(), new FileInputStream(file), objectMetadata)
                 .withCannedAcl(CannedAccessControlList.BucketOwnerRead));
 
@@ -51,9 +50,9 @@ public class S3FileStoreService implements FileStorageService {
         tempFile.deleteOnExit();
 
         TransferManager transferManager = TransferManagerBuilder.standard()
-                .withS3Client(s3Configuration.getS3Client())
+                .withS3Client(amazonS3)
                 .build();
-        Download download = transferManager.download(s3Configuration.getBucketName(), entity.getUrlPath(), tempFile);
+        Download download = transferManager.download(bucket, entity.getUrlPath(), tempFile);
         download.waitForCompletion();
 
         return new InputStreamResource(new FileInputStream(tempFile));
@@ -61,7 +60,7 @@ public class S3FileStoreService implements FileStorageService {
 
     @Override
     public void delete(AssetEntity entity) {
-        s3Configuration.getS3Client().deleteObject(s3Configuration.getBucketName(), entity.getUrlPath());
+        amazonS3.deleteObject(bucket, entity.getUrlPath());
     }
 
     private ObjectMetadata generateObjectMeta(AssetEntity entity) {

@@ -1,35 +1,32 @@
 package io.rocketbase.commons.converter;
 
 import com.squareup.pollexor.Thumbor;
-import io.rocketbase.commons.config.AssetConfiguration;
+import io.rocketbase.commons.config.ApiProperties;
+import io.rocketbase.commons.config.ThumborProperties;
 import io.rocketbase.commons.dto.asset.*;
 import io.rocketbase.commons.model.AssetEntity;
 import io.rocketbase.commons.service.FileStorageService;
 import io.rocketbase.commons.service.MongoFileStorageService;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
+import lombok.RequiredArgsConstructor;
 
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.stream.Collectors;
 
-@Service
+@RequiredArgsConstructor
 public class AssetConverter {
 
-    private AssetConfiguration assetConfiguration;
+    private final ThumborProperties thumborProperties;
 
-    private FileStorageService fileStorageService;
+    private final ApiProperties apiProperties;
+
+    private final FileStorageService fileStorageService;
 
     private Thumbor thumbor;
 
     private List<PreviewSize> defaultSizes = Arrays.asList(PreviewSize.S, PreviewSize.M, PreviewSize.L);
 
-    @Autowired
-    public AssetConverter(AssetConfiguration assetConfiguration, FileStorageService fileStorageService) {
-        this.assetConfiguration = assetConfiguration;
-        this.fileStorageService = fileStorageService;
-    }
 
     private boolean useLocalEndpoint() {
         return fileStorageService instanceof MongoFileStorageService;
@@ -101,7 +98,7 @@ public class AssetConverter {
             if (baseUrl.endsWith("/")) {
                 baseUrl = baseUrl.substring(0, baseUrl.length() - 1);
             }
-            return baseUrl + assetConfiguration.getRenderEndpoint() + "/" + id + "/" + size.name().toLowerCase();
+            return baseUrl + apiProperties.getPath() + "/" + id + "/" + size.name().toLowerCase();
         } else {
             return getThumbor().buildImage(urlPath)
                     .resize(size.getMaxWidth(), size.getMaxHeight())
@@ -112,11 +109,11 @@ public class AssetConverter {
 
     private Thumbor getThumbor() {
         if (thumbor == null) {
-            String thumborKey = assetConfiguration.getThumborKey();
+            String thumborKey = thumborProperties.getKey();
             if (thumborKey.isEmpty()) {
-                thumbor = Thumbor.create(assetConfiguration.getThumborHost());
+                thumbor = Thumbor.create(thumborProperties.getHost());
             } else {
-                thumbor = Thumbor.create(assetConfiguration.getThumborHost(), thumborKey);
+                thumbor = Thumbor.create(thumborProperties.getHost(), thumborKey);
             }
         }
         return thumbor;

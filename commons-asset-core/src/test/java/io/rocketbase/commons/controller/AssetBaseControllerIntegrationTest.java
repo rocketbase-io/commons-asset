@@ -25,7 +25,7 @@ import static org.assertj.core.api.Fail.fail;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 
-public class AssetControllerIntegrationTest extends BaseIntegrationTest {
+public class AssetBaseControllerIntegrationTest extends BaseIntegrationTest {
 
     @Autowired
     private ResourceLoader resourceLoader;
@@ -128,6 +128,23 @@ public class AssetControllerIntegrationTest extends BaseIntegrationTest {
 
     @SneakyThrows
     @Test
+    public void testDelete() {
+        // given
+        AssetResource assetResource = getAssetResource();
+        File uploadFile = resourceLoader.getResource("classpath:assets/sample.zip")
+                .getFile();
+        AssetRead result = assetResource.uploadFile(new FileInputStream(uploadFile), uploadFile.getName());
+
+        // when
+        assetResource.delete(result.getId());
+        result = assetResource.find(result.getId());
+
+        // then
+        assertThat(result, nullValue());
+    }
+
+    @SneakyThrows
+    @Test
     public void testUploadInvalidContentType() {
         // given
         AssetResource assetResource = getAssetResource();
@@ -145,7 +162,7 @@ public class AssetControllerIntegrationTest extends BaseIntegrationTest {
     }
 
     @SneakyThrows
-    @Test
+    //@Test
     public void testBatch() {
         //
         AssetResource assetResource = getAssetResource();

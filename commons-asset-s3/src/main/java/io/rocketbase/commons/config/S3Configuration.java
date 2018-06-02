@@ -2,10 +2,13 @@ package io.rocketbase.commons.config;
 
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.S3ClientOptions;
-import lombok.Getter;
+import io.rocketbase.commons.service.FileStorageService;
+import io.rocketbase.commons.service.S3FileStoreService;
+import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
-import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.ApplicationContext;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 import javax.annotation.Resource;
@@ -13,28 +16,23 @@ import java.lang.reflect.Field;
 
 
 @Configuration
+@EnableConfigurationProperties({S3Properties.class})
+@RequiredArgsConstructor
 public class S3Configuration {
+
+    private final S3Properties s3Properties;
 
     @Resource
     private ApplicationContext applicationContext;
 
     private AmazonS3 s3Client;
 
-    @Getter
-    @Value(value = "${asset.s3.bucket}")
-    private String bucketName;
-
-    /**
-     * in case we use minio or other services with different endpoints
-     */
-    @Value("${asset.s3.endpoint:}")
-    private String endpoint;
 
     @SneakyThrows
     public AmazonS3 getS3Client() {
         if (s3Client == null) {
             s3Client = applicationContext.getBean(AmazonS3.class);
-            if (!endpoint.isEmpty()) {
+            if (!s3Properties.getEndpoint().isEmpty()) {
                 Class<? extends AmazonS3> s3ClientClass = s3Client.getClass();
                 Field isImmutable = s3ClientClass.getSuperclass()
                         .getDeclaredField("isImmutable");
@@ -46,10 +44,15 @@ public class S3Configuration {
                         .setPathStyleAccess(true)
                         .build());
 
-                s3Client.setEndpoint(endpoint);
+                s3Client.setEndpoint(s3Properties.getEndpoint());
             }
         }
         return s3Client;
+    }
+
+    @Bean
+    public FileStorageService fileStorageService() {
+        return new S3FileStoreService(s3Properties.getBucket(), getS3Client());
     }
 
 }

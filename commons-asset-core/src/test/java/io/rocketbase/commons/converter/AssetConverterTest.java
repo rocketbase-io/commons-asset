@@ -1,6 +1,7 @@
 package io.rocketbase.commons.converter;
 
-import io.rocketbase.commons.config.AssetConfiguration;
+import io.rocketbase.commons.config.ApiProperties;
+import io.rocketbase.commons.config.ThumborProperties;
 import io.rocketbase.commons.dto.asset.AssetRead;
 import io.rocketbase.commons.dto.asset.AssetType;
 import io.rocketbase.commons.dto.asset.PreviewSize;
@@ -21,13 +22,10 @@ public class AssetConverterTest {
     @Test
     public void testFromEntityWithLocalRender() {
         // given
-        AssetConfiguration config = new AssetConfiguration();
-        config.setApiEndpoint("/api/asset");
-        config.setRenderEndpoint("/get/asset");
+        ApiProperties apiProperties = new ApiProperties();
+        String baseUrl = "http://localhost:8080" + apiProperties.getPath() + "/";
 
-        String baseUrl = "http://localhost:8080" + config.getRenderEndpoint() + "/";
-
-        AssetConverter converter = new AssetConverter(config, new MongoFileStorageService(null));
+        AssetConverter converter = new AssetConverter(new ThumborProperties(), apiProperties, new MongoFileStorageService(null));
         // when
         AssetRead assetRead = converter.fromEntity(AssetEntity.builder()
                 .id("1235678")
