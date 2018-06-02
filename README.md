@@ -12,7 +12,7 @@ Add a simple asset service with basic features to your spring-boot applications.
 **Features:**
 * api and controller to handle asset-uploads
 * works with jpeg, gif, png and files like pdf, excel, word and zip
-* you can configure the allowed contentTypes via property *("asset.allowed-asset-types")*
+* you can configure the allowed contentTypes via property *("asset.api.types")*
 * 2 different storage implementations (mongo-grif-fs / aws-s3)
 * embedded thumb service (for mongo-grif-fs) or thumbor via s3 connector
 * java resource to communicate with api
