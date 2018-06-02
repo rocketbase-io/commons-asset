@@ -69,13 +69,13 @@ You need to provide all required credentials that [spring-cloud](https://cloud.s
 
 ```yaml
 cloud:
-	aws:
-		credentials:
-			accessKey: KEY
-			secretKey: SECRET
-			instanceProfile: true
-		region:
-			static: eu-central-1
+  aws:
+    credentials:
+      accessKey: KEY
+        secretKey: SECRET
+        instanceProfile: true
+      region:
+        static: eu-central-1
 ```
 
 | property          | default      | explanation                                                  |
