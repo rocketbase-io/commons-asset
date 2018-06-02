@@ -3,8 +3,10 @@ package io.rocketbase.commons.resource;
 import com.google.common.io.ByteStreams;
 import io.rocketbase.commons.dto.PageableResult;
 import io.rocketbase.commons.dto.asset.AssetRead;
+import io.rocketbase.commons.dto.asset.QueryAsset;
 import io.rocketbase.commons.dto.batch.AssetBatchResult;
 import io.rocketbase.commons.dto.batch.AssetBatchWrite;
+import io.rocketbase.commons.exception.NotFoundException;
 import lombok.SneakyThrows;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.ParameterizedTypeReference;
@@ -16,6 +18,7 @@ import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import java.io.InputStream;
+import java.time.format.DateTimeFormatter;
 
 public class AssetResource {
 
@@ -39,6 +42,37 @@ public class AssetResource {
         UriComponentsBuilder uriBuilder = getUriBuilder()
                 .queryParam("page", page)
                 .queryParam("size", pagesize);
+        return query(uriBuilder);
+    }
+
+    /**
+     * list all available assets
+     *
+     * @param page     starts by 0
+     * @param pagesize max 50
+     * @return pageable assetData
+     */
+    public PageableResult<AssetRead> findAll(int page, int pagesize, QueryAsset query) {
+        UriComponentsBuilder uriBuilder = getUriBuilder()
+                .queryParam("page", page)
+                .queryParam("size", pagesize);
+        if (query != null) {
+            if (query.getBefore() != null) {
+                uriBuilder.queryParam("before", DateTimeFormatter.ISO_LOCAL_DATE_TIME.format(query.getBefore()));
+            }
+            if (query.getAfter() != null) {
+                uriBuilder.queryParam("after", DateTimeFormatter.ISO_LOCAL_DATE_TIME.format(query.getAfter()));
+            }
+            if (query.getOriginalFilename() != null) {
+                uriBuilder.queryParam("originalFilename", query.getOriginalFilename());
+            }
+            if (query.getReferenceUrl() != null) {
+                uriBuilder.queryParam("referenceUrl", query.getReferenceUrl());
+            }
+            if (query.getTypes() != null) {
+                uriBuilder.queryParam("type", query.getTypes());
+            }
+        }
         return query(uriBuilder);
     }
 
@@ -72,6 +106,8 @@ public class AssetResource {
             } else {
                 throw e;
             }
+        } catch (NotFoundException e) {
+            return null;
         }
 
         return response.getBody();
@@ -83,7 +119,7 @@ public class AssetResource {
      * @param id assetId
      */
     public void delete(String id) {
-        ResponseEntity<Void> response = restTemplate.exchange(getUriBuilder().path(id)
+        ResponseEntity<Void> response = restTemplate.exchange(getUriBuilder().path("/" + id)
                         .toUriString(),
                 HttpMethod.DELETE,
                 null, Void.class);
