@@ -38,28 +38,28 @@ public class AssetBaseController implements BaseAssetController {
     @SneakyThrows
     @RequestMapping(method = RequestMethod.POST)
     public AssetRead handleFileUpload(@RequestParam("file") MultipartFile file,
-                                      @RequestParam(value = "systemRefId", required = false) String systemRefId,
-                                      HttpServletRequest request) {
+                                      @RequestParam(value = "systemRefId", required = false) String systemRefId) {
         if (file.isEmpty()) {
             throw new EmptyFileException();
         }
 
         AssetEntity asset = assetService.store(file.getInputStream(), file.getOriginalFilename(), file.getSize(), systemRefId);
 
-        return assetConverter.fromEntity(asset, getPreviewSizes(null), getBaseUrl(request));
+
+        return assetConverter.fromEntityByRequestContext(asset, getPreviewSizes(null));
     }
 
     @RequestMapping(method = RequestMethod.GET)
-    public PageableResult<AssetRead> findAll(@RequestParam(required = false) MultiValueMap<String, String> params, HttpServletRequest request) {
+    public PageableResult<AssetRead> findAll(@RequestParam(required = false) MultiValueMap<String, String> params) {
 
         Page<AssetEntity> pageResult = assetRepository.findAll(queryAssetConverter.fromParams(params), parsePageRequest(params));
 
-        return PageableResult.contentPage(assetConverter.fromEntities(pageResult.getContent(), getPreviewSizes(params), getBaseUrl(request)), pageResult);
+        return PageableResult.contentPage(assetConverter.fromEntitiesByRequestContext(pageResult.getContent(), getPreviewSizes(params)), pageResult);
     }
 
     @RequestMapping(value = "/{sid}", method = RequestMethod.GET)
-    public AssetRead getAsset(@PathVariable("sid") String sid, @RequestParam(required = false) MultiValueMap<String, String> params, HttpServletRequest request) {
-        return assetConverter.fromEntity(assetService.getByIdOrSystemRefId(sid), getPreviewSizes(params), getBaseUrl(request));
+    public AssetRead getAsset(@PathVariable("sid") String sid, @RequestParam(required = false) MultiValueMap<String, String> params) {
+        return assetConverter.fromEntityByRequestContext(assetService.getByIdOrSystemRefId(sid), getPreviewSizes(params));
     }
 
 

@@ -17,7 +17,6 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
-import javax.servlet.http.HttpServletRequest;
 import javax.validation.constraints.NotNull;
 
 @RestController
@@ -38,15 +37,14 @@ public class AssetBatchController implements BaseAssetController {
     @SneakyThrows
     @RequestMapping(value = "/batch", method = RequestMethod.POST)
     public AssetBatchResult processBatchFileUrls(@RequestBody @NotNull @Validated AssetBatchWrite assetBatch,
-                                                 @RequestParam(required = false) MultiValueMap<String, String> params,
-                                                 HttpServletRequest request) {
+                                                 @RequestParam(required = false) MultiValueMap<String, String> params) {
 
         AssetBatchResult.AssetBatchResultBuilder builder = AssetBatchResult.builder();
         for (AssetBatchWriteEntry entry : assetBatch.getEntries()) {
             try {
                 DownloadService.TempDownload download = downloadService.downloadUrl(entry.getUrl());
                 AssetEntity asset = assetService.storeAndDeleteFile(download.getFile(), download.getFilename(), download.getFile().length(), entry.getSystemRefId(), entry.getUrl());
-                builder.success(entry.getUrl(), assetConverter.fromEntity(asset, getPreviewSizes(params), getBaseUrl(request)));
+                builder.success(entry.getUrl(), assetConverter.fromEntityByRequestContext(asset, getPreviewSizes(params)));
             } catch (DownloadService.DownloadError e) {
                 builder.failure(entry.getUrl(), e.getErrorCode());
             } catch (InvalidContentTypeException e) {

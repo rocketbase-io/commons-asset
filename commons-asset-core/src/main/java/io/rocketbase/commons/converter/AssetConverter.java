@@ -8,6 +8,7 @@ import io.rocketbase.commons.model.AssetEntity;
 import io.rocketbase.commons.service.FileStorageService;
 import io.rocketbase.commons.service.MongoFileStorageService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.util.Arrays;
 import java.util.HashMap;
@@ -30,6 +31,13 @@ public class AssetConverter {
 
     private boolean useLocalEndpoint() {
         return fileStorageService instanceof MongoFileStorageService;
+    }
+
+    /**
+     * extract baseUrl from RequestContextHolder - so in case there is no RequestContext you get errors!
+     */
+    public AssetRead fromEntityByRequestContext(AssetEntity entity, List<PreviewSize> sizes) {
+        return fromEntity(entity, sizes, ServletUriComponentsBuilder.fromCurrentContextPath().toUriString());
     }
 
     public AssetRead fromEntity(AssetEntity entity, List<PreviewSize> sizes, String baseUrl) {
@@ -60,11 +68,25 @@ public class AssetConverter {
                 .build();
     }
 
+    /**
+     * extract baseUrl from RequestContextHolder - so in case there is no RequestContext you get errors!
+     */
+    public List<AssetRead> fromEntitiesByRequestContext(List<AssetEntity> entities, List<PreviewSize> sizes) {
+        return fromEntities(entities, sizes, ServletUriComponentsBuilder.fromCurrentContextPath().toUriString());
+    }
+
     public List<AssetRead> fromEntities(List<AssetEntity> entities, List<PreviewSize> sizes, String baseUrl) {
         if (entities == null) {
             return null;
         }
         return entities.stream().map(v -> fromEntity(v, sizes, baseUrl)).collect(Collectors.toList());
+    }
+
+    /**
+     * extract baseUrl from RequestContextHolder - so in case there is no RequestContext you get errors!
+     */
+    public AssetRead toReadByRequestContext(AssetReference reference) {
+        return toRead(reference, null, ServletUriComponentsBuilder.fromCurrentContextPath().toUriString());
     }
 
     public AssetRead toRead(AssetReference reference, String baseUrl) {
