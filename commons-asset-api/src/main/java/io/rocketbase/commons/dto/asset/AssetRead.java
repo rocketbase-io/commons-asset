@@ -5,16 +5,17 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
 
 import javax.validation.constraints.NotNull;
 
 @Data
-@NoArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 public class AssetRead extends AssetReference {
 
     private AssetPreviews previews;
+
+    public AssetRead() {
+    }
 
     @JsonCreator
     @java.beans.ConstructorProperties({"id", "systemRefId", "urlPath", "type", "meta", "previews"})

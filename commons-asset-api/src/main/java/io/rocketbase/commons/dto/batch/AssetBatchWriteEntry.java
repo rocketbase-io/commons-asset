@@ -3,14 +3,12 @@ package io.rocketbase.commons.dto.batch;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 import org.hibernate.validator.constraints.URL;
 
 import javax.validation.constraints.NotNull;
 
 
 @Data
-@NoArgsConstructor
 @AllArgsConstructor
 public class AssetBatchWriteEntry {
 
@@ -19,6 +17,9 @@ public class AssetBatchWriteEntry {
     private String url;
 
     private String systemRefId;
+
+    public AssetBatchWriteEntry() {
+    }
 
     public AssetBatchWriteEntry(String url) {
         this.url = url;
