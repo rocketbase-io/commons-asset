@@ -10,12 +10,10 @@ import io.rocketbase.commons.dto.batch.AssetBatchWriteEntry;
 import io.rocketbase.commons.exception.AssetErrorCodes;
 import io.rocketbase.commons.exception.BadRequestException;
 import io.rocketbase.commons.resource.AssetResource;
-import io.rocketbase.commons.resource.BasicResponseErrorHandler;
 import lombok.SneakyThrows;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ResourceLoader;
-import org.springframework.web.client.RestTemplate;
 
 import javax.annotation.Nonnull;
 import java.io.File;
@@ -187,9 +185,7 @@ public class AssetBaseControllerIntegrationTest extends BaseIntegrationTest {
 
     @Nonnull
     private AssetResource getAssetResource() {
-        RestTemplate restTemplate = new RestTemplate();
-        restTemplate.setErrorHandler(new BasicResponseErrorHandler());
-        return new AssetResource(restTemplate, getBaseUrl());
+        return new AssetResource(getBaseUrl());
     }
 
 }

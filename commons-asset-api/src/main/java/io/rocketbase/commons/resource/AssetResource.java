@@ -8,10 +8,10 @@ import io.rocketbase.commons.dto.batch.AssetBatchResult;
 import io.rocketbase.commons.dto.batch.AssetBatchWrite;
 import io.rocketbase.commons.exception.NotFoundException;
 import lombok.SneakyThrows;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.http.*;
+import org.springframework.util.Assert;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
@@ -22,13 +22,25 @@ import java.time.format.DateTimeFormatter;
 
 public class AssetResource {
 
-    private RestTemplate restTemplate;
+    protected RestTemplate restTemplate;
+    protected String baseUrl;
 
-    private String baseDomain;
+    public AssetResource(String baseUrl) {
+        this(baseUrl, null);
+    }
 
-    public AssetResource(RestTemplate restTemplate, @Value("${asset.rest.url:}") String baseDomain) {
+    public AssetResource(String baseUrl, RestTemplate restTemplate) {
+        Assert.hasText(baseUrl, "baseUrl is required");
+        this.baseUrl = baseUrl;
         this.restTemplate = restTemplate;
-        this.baseDomain = baseDomain;
+    }
+
+    protected RestTemplate getRestTemplate() {
+        if (restTemplate == null) {
+            restTemplate = new RestTemplate();
+            restTemplate.setErrorHandler(new BasicResponseErrorHandler());
+        }
+        return restTemplate;
     }
 
     /**
@@ -77,7 +89,7 @@ public class AssetResource {
     }
 
     private PageableResult<AssetRead> query(UriComponentsBuilder uriBuilder) {
-        ResponseEntity<PageableResult<AssetRead>> response = restTemplate.exchange(uriBuilder.toUriString(),
+        ResponseEntity<PageableResult<AssetRead>> response = getRestTemplate().exchange(uriBuilder.toUriString(),
                 HttpMethod.GET,
                 null,
                 new ParameterizedTypeReference<PageableResult<AssetRead>>() {
@@ -95,7 +107,7 @@ public class AssetResource {
     public AssetRead find(String sid) {
         ResponseEntity<AssetRead> response;
         try {
-            response = restTemplate.exchange(getUriBuilder().path("/" + sid)
+            response = getRestTemplate().exchange(getUriBuilder().path("/" + sid)
                             .toUriString(),
                     HttpMethod.GET,
                     null,
@@ -119,7 +131,7 @@ public class AssetResource {
      * @param id assetId
      */
     public void delete(String id) {
-        ResponseEntity<Void> response = restTemplate.exchange(getUriBuilder().path("/" + id)
+        ResponseEntity<Void> response = getRestTemplate().exchange(getUriBuilder().path("/" + id)
                         .toUriString(),
                 HttpMethod.DELETE,
                 null, Void.class);
@@ -163,7 +175,7 @@ public class AssetResource {
         headers.setContentType(MediaType.MULTIPART_FORM_DATA);
 
         HttpEntity<LinkedMultiValueMap<String, Object>> requestEntity = new HttpEntity<>(form, headers);
-        ResponseEntity<AssetRead> response = restTemplate.exchange(getUriBuilder().toUriString(),
+        ResponseEntity<AssetRead> response = getRestTemplate().exchange(getUriBuilder().toUriString(),
                 HttpMethod.POST,
                 requestEntity,
                 AssetRead.class);
@@ -178,7 +190,7 @@ public class AssetResource {
      * @return AssetBatchResultData
      */
     public AssetBatchResult processBatchFileUrls(AssetBatchWrite assetBatch) {
-        ResponseEntity<AssetBatchResult> response = restTemplate.exchange(getUriBuilder().path("/batch")
+        ResponseEntity<AssetBatchResult> response = getRestTemplate().exchange(getUriBuilder().path("/batch")
                         .toUriString(),
                 HttpMethod.POST,
                 new HttpEntity<>(assetBatch),
@@ -189,7 +201,7 @@ public class AssetResource {
 
 
     protected UriComponentsBuilder getUriBuilder() {
-        return UriComponentsBuilder.fromUriString(baseDomain)
+        return UriComponentsBuilder.fromUriString(baseUrl)
                 .path("/api/asset");
     }
 }
