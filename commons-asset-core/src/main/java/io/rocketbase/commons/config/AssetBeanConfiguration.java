@@ -14,11 +14,12 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.data.mongodb.gridfs.GridFsTemplate;
 
 import javax.annotation.Resource;
+import java.io.Serializable;
 
 @Configuration
 @EnableConfigurationProperties({ApiProperties.class, ThumborProperties.class})
 @RequiredArgsConstructor
-public class AssetBeanConfiguration {
+public class AssetBeanConfiguration implements Serializable {
 
     private final ApiProperties apiProperties;
     private final ThumborProperties thumborProperties;

@@ -6,11 +6,12 @@ import lombok.Data;
 import org.hibernate.validator.constraints.URL;
 
 import javax.validation.constraints.NotNull;
+import java.io.Serializable;
 
 
 @Data
 @AllArgsConstructor
-public class AssetBatchWriteEntry {
+public class AssetBatchWriteEntry implements Serializable {
 
     @NotNull
     @URL
