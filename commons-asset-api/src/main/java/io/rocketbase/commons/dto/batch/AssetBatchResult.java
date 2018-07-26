@@ -13,9 +13,15 @@ import java.util.Map;
 @AllArgsConstructor
 public class AssetBatchResult implements Serializable {
 
+    /**
+     * key holds the given url
+     */
     @Singular("success")
     private Map<String, AssetRead> succeeded;
 
+    /**
+     * key holds the given url
+     */
     @Singular("failure")
     private Map<String, AssetErrorCodes> failed;
 

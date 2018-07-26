@@ -44,13 +44,22 @@ public class AssetConverter {
         if (entity == null) {
             return null;
         }
-        AssetPreviews assetPreviews = AssetPreviews.builder()
+        AssetRead result = fromEntityWithoutPreviews(entity);
+        result.setPreviews(AssetPreviews.builder()
                 .previewMap(new HashMap<>())
-                .build();
+                .build());
 
         ((sizes == null || sizes.isEmpty()) ? defaultSizes : sizes)
-                .forEach(s -> assetPreviews.getPreviewMap()
+                .forEach(s -> result.getPreviews().getPreviewMap()
                         .put(s, getPreviewUrl(entity.getId(), entity.getUrlPath(), s, baseUrl)));
+
+        return result;
+    }
+
+    public AssetRead fromEntityWithoutPreviews(AssetEntity entity) {
+        if (entity == null) {
+            return null;
+        }
 
         return AssetRead.builderRead()
                 .id(entity.getId())
@@ -64,7 +73,6 @@ public class AssetConverter {
                         .resolution(entity.getResolution())
                         .referenceUrl(entity.getReferenceUrl())
                         .build())
-                .previews(assetPreviews)
                 .build();
     }
 
@@ -117,6 +125,9 @@ public class AssetConverter {
 
     private String getPreviewUrl(String id, String urlPath, PreviewSize size, String baseUrl) {
         if (useLocalEndpoint()) {
+            if (baseUrl == null) {
+                baseUrl = "";
+            }
             if (baseUrl.endsWith("/")) {
                 baseUrl = baseUrl.substring(0, baseUrl.length() - 1);
             }

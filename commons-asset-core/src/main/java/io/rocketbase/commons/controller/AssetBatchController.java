@@ -9,6 +9,7 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
 import org.springframework.util.MultiValueMap;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import javax.annotation.Resource;
 import javax.validation.constraints.NotNull;
@@ -26,7 +27,7 @@ public class AssetBatchController implements BaseAssetController {
     @RequestMapping(value = "/batch", method = RequestMethod.POST)
     public AssetBatchResult processBatchFileUrls(@RequestBody @NotNull @Validated AssetBatchWrite assetBatch,
                                                  @RequestParam(required = false) MultiValueMap<String, String> params) {
-        return assetBatchService.batch(assetBatch, getPreviewSizes(params));
+        return assetBatchService.batch(assetBatch, getPreviewSizes(params), ServletUriComponentsBuilder.fromCurrentContextPath().toUriString());
     }
 
 
