@@ -27,6 +27,11 @@ public class AssetMeta implements Serializable {
     private Resolution resolution;
 
     /**
+     * only filled in case of image asset
+     */
+    private ColorPalette colorPalette;
+
+    /**
      * only filled in case of batch downloaded image
      */
     private String referenceUrl;

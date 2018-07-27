@@ -71,6 +71,7 @@ public class AssetConverter {
                         .fileSize(entity.getFileSize())
                         .originalFilename(entity.getOriginalFilename())
                         .resolution(entity.getResolution())
+                        .colorPalette(entity.getColorPalette())
                         .referenceUrl(entity.getReferenceUrl())
                         .build())
                 .build();

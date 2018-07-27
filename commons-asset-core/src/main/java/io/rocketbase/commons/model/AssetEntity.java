@@ -1,9 +1,6 @@
 package io.rocketbase.commons.model;
 
-import io.rocketbase.commons.dto.asset.AssetMeta;
-import io.rocketbase.commons.dto.asset.AssetReference;
-import io.rocketbase.commons.dto.asset.AssetType;
-import io.rocketbase.commons.dto.asset.Resolution;
+import io.rocketbase.commons.dto.asset.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -48,6 +45,11 @@ public class AssetEntity {
      * only filled in case of image asset
      */
     private Resolution resolution;
+
+    /**
+     * only filled in case of image asset
+     */
+    private ColorPalette colorPalette;
 
     /**
      * only filled in case of batch downloaded image

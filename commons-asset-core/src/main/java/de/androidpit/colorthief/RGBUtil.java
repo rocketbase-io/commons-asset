@@ -82,7 +82,7 @@ public class RGBUtil {
      *
      * @return the string representation
      */
-    private static String createRGBString(int[] rgb) {
+    public static String createRGBString(int[] rgb) {
         return "rgb(" + rgb[0] + "," + rgb[1] + "," + rgb[2] + ")";
     }
 
@@ -94,7 +94,7 @@ public class RGBUtil {
      *
      * @return the HTML hex color code
      */
-    private static String createRGBHexString(int[] rgb) {
+    public static String createRGBHexString(int[] rgb) {
         String rgbHex = Integer.toHexString(rgb[0] << 16 | rgb[1] << 8 | rgb[2]);
 
         // Left-pad with 0s
