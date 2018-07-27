@@ -17,6 +17,7 @@ Add a simple asset service with basic features to your spring-boot applications.
 * embedded thumb service (for mongo-grif-fs) or thumbor via s3 connector
 * java resource to communicate with api
 * batch downloading urls and storing them
+* intergrated [color-thief](https://github.com/SvenWoltmann/color-thief-java) in order to get primary and other colors from photo
 
 ## commons-asset-api
 
@@ -37,6 +38,10 @@ The main Objects are: **AssetReference** that is used to store in MongoDb in cas
         "resolution": {
             "width": 4094,
             "height": 2730
+        },
+        "colorPalette": {
+            "primary": "#395427",
+            "colors": ["#ced5dd", "#80c9f3", "#74a043"]
         }
     }
 }
