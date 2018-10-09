@@ -69,6 +69,7 @@ public class AssetEntity {
                         .fileSize(getFileSize())
                         .originalFilename(getOriginalFilename())
                         .resolution(getResolution())
+                        .colorPalette(getColorPalette())
                         .referenceUrl(getReferenceUrl())
                         .build())
                 .build();
