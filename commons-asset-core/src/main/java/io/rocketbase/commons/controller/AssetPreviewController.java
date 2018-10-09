@@ -3,7 +3,7 @@ package io.rocketbase.commons.controller;
 import io.rocketbase.commons.dto.asset.PreviewSize;
 import io.rocketbase.commons.exception.NotFoundException;
 import io.rocketbase.commons.model.AssetEntity;
-import io.rocketbase.commons.service.AssetRepository;
+import io.rocketbase.commons.service.AssetService;
 import io.rocketbase.commons.service.FileStorageService;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
@@ -30,15 +30,16 @@ public class AssetPreviewController implements BaseAssetController {
     private FileStorageService fileStorageService;
 
     @Resource
-    private AssetRepository assetRepository;
+    private AssetService assetService;
 
     @SneakyThrows
     @RequestMapping(value = "/{sid}/{size}", method = RequestMethod.GET)
     @ResponseBody
     public ResponseEntity<InputStreamResource> getPreview(@PathVariable("sid") String sid, @PathVariable("size") String size) {
         PreviewSize previewSize = PreviewSize.getByName(size, PreviewSize.S);
+        AssetEntity entity = assetService.findByIdOrSystemRefId(sid)
+                .orElseThrow(() -> new NotFoundException());
 
-        AssetEntity entity = assetRepository.getByIdOrSystemRefId(sid);
         if (!entity.getType().isImage()) {
             throw new NotFoundException();
         }

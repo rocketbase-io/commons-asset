@@ -7,10 +7,7 @@ import de.androidpit.colorthief.RGBUtil;
 import io.rocketbase.commons.dto.asset.AssetType;
 import io.rocketbase.commons.dto.asset.ColorPalette;
 import io.rocketbase.commons.dto.asset.Resolution;
-import io.rocketbase.commons.exception.InvalidContentTypeException;
-import io.rocketbase.commons.exception.NotAllowedAssetTypeException;
-import io.rocketbase.commons.exception.SystemRefIdAlreadyUsedException;
-import io.rocketbase.commons.exception.UnprocessableAssetException;
+import io.rocketbase.commons.exception.*;
 import io.rocketbase.commons.model.AssetEntity;
 import io.rocketbase.commons.service.AssetTypeFilterService.AssetUploadDetail;
 import lombok.extern.slf4j.Slf4j;
@@ -28,6 +25,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
@@ -89,12 +87,13 @@ public class AssetService {
         }
     }
 
-    public AssetEntity getByIdOrSystemRefId(String sid) {
-        return assetRepository.getByIdOrSystemRefId(sid);
+    public Optional<AssetEntity> findByIdOrSystemRefId(String sid) {
+        return assetRepository.findByIdOrSystemRefId(sid);
     }
 
     public void deleteByIdOrSystemRefId(String sid) {
-        AssetEntity asset = assetRepository.getByIdOrSystemRefId(sid);
+        AssetEntity asset = assetRepository.findByIdOrSystemRefId(sid)
+                .orElseThrow(() -> new NotFoundException());
 
         fileStorageService.delete(asset);
         assetRepository.delete(asset.getId());

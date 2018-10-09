@@ -5,6 +5,7 @@ import io.rocketbase.commons.converter.QueryAssetConverter;
 import io.rocketbase.commons.dto.PageableResult;
 import io.rocketbase.commons.dto.asset.AssetRead;
 import io.rocketbase.commons.exception.EmptyFileException;
+import io.rocketbase.commons.exception.NotFoundException;
 import io.rocketbase.commons.model.AssetEntity;
 import io.rocketbase.commons.service.AssetRepository;
 import io.rocketbase.commons.service.AssetService;
@@ -16,7 +17,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.Resource;
-import javax.servlet.http.HttpServletRequest;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("${asset.api:/api/asset}")
@@ -59,7 +60,9 @@ public class AssetBaseController implements BaseAssetController {
 
     @RequestMapping(value = "/{sid}", method = RequestMethod.GET)
     public AssetRead getAsset(@PathVariable("sid") String sid, @RequestParam(required = false) MultiValueMap<String, String> params) {
-        return assetConverter.fromEntityByRequestContext(assetService.getByIdOrSystemRefId(sid), getPreviewSizes(params));
+        AssetEntity entity = assetService.findByIdOrSystemRefId(sid)
+                .orElseThrow(() -> new NotFoundException());
+        return assetConverter.fromEntityByRequestContext(entity, getPreviewSizes(params));
     }
 
 

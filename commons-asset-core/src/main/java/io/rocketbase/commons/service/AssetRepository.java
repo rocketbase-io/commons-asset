@@ -2,7 +2,6 @@ package io.rocketbase.commons.service;
 
 import com.mongodb.client.result.DeleteResult;
 import io.rocketbase.commons.dto.asset.QueryAsset;
-import io.rocketbase.commons.exception.NotFoundException;
 import io.rocketbase.commons.model.AssetEntity;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -14,6 +13,7 @@ import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class AssetRepository {
@@ -24,23 +24,25 @@ public class AssetRepository {
     /**
      * search first by id, when not found by systemRefId
      *
-     * @param sid databsae id or systemRefId
-     * @return will throw NotFoundException when not found
+     * @param sid database id or systemRefId
      */
-    public AssetEntity getByIdOrSystemRefId(String sid) {
-        AssetEntity entity = mongoTemplate.findOne(getIdQuery(sid), AssetEntity.class);
-        if (entity == null) {
-            entity = findBySystemRefId(sid);
-            if (entity == null) {
-                throw new NotFoundException();
-            }
+    public Optional<AssetEntity> findByIdOrSystemRefId(String sid) {
+        Optional<AssetEntity> optional = findById(sid);
+        if (!optional.isPresent()) {
+            return findBySystemRefId(sid);
         }
-        return entity;
+        return optional;
     }
 
-    public AssetEntity findBySystemRefId(String systemRefId) {
-        return mongoTemplate.findOne(new Query(Criteria.where("systemRefId")
+    public Optional<AssetEntity> findById(String sid) {
+        AssetEntity entity = mongoTemplate.findOne(getIdQuery(sid), AssetEntity.class);
+        return entity != null ? Optional.of(entity) : Optional.empty();
+    }
+
+    public Optional<AssetEntity> findBySystemRefId(String systemRefId) {
+        AssetEntity entity = mongoTemplate.findOne(new Query(Criteria.where("systemRefId")
                 .is(systemRefId)), AssetEntity.class);
+        return entity != null ? Optional.of(entity) : Optional.empty();
     }
 
     public boolean delete(String id) {
@@ -56,7 +58,7 @@ public class AssetRepository {
         List<AssetEntity> assetEntities = mongoTemplate.find(getQuery(query).with(pageable), AssetEntity.class);
         long totalCount = mongoTemplate.count(getQuery(query), AssetEntity.class);
 
-        return new PageImpl<AssetEntity>(assetEntities, pageable, totalCount);
+        return new PageImpl<>(assetEntities, pageable, totalCount);
     }
 
     private Query getIdQuery(String id) {

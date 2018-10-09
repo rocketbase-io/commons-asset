@@ -1,7 +1,8 @@
 package io.rocketbase.commons.controller;
 
+import io.rocketbase.commons.exception.NotFoundException;
 import io.rocketbase.commons.model.AssetEntity;
-import io.rocketbase.commons.service.AssetRepository;
+import io.rocketbase.commons.service.AssetService;
 import io.rocketbase.commons.service.FileStorageService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
@@ -22,7 +23,7 @@ public class AssetDownloadController implements BaseAssetController {
     private FileStorageService fileStorageService;
 
     @Resource
-    private AssetRepository assetRepository;
+    private AssetService assetService;
 
     /**
      * used to get raw content
@@ -33,7 +34,8 @@ public class AssetDownloadController implements BaseAssetController {
     @RequestMapping(value = "/{sid}/b", method = RequestMethod.GET)
     @ResponseBody
     public ResponseEntity<InputStreamResource> downloadAsset(@PathVariable("sid") String sid) {
-        AssetEntity entity = assetRepository.getByIdOrSystemRefId(sid);
+        AssetEntity entity = assetService.findByIdOrSystemRefId(sid)
+                .orElseThrow(() -> new NotFoundException());
         InputStreamResource streamResource = fileStorageService.download(entity);
 
         return ResponseEntity.ok()
