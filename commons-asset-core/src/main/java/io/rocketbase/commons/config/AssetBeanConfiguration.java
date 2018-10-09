@@ -1,12 +1,7 @@
 package io.rocketbase.commons.config;
 
-import io.rocketbase.commons.converter.AssetConverter;
-import io.rocketbase.commons.converter.AssetPreviewService;
-import io.rocketbase.commons.converter.DefaultAssetPreviewService;
-import io.rocketbase.commons.service.AssetTypeFilterService;
-import io.rocketbase.commons.service.FileStorageService;
-import io.rocketbase.commons.service.MongoFileStorageService;
-import io.rocketbase.commons.service.SimpleAssetTypeFilterService;
+import io.rocketbase.commons.converter.*;
+import io.rocketbase.commons.service.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
@@ -28,6 +23,9 @@ public class AssetBeanConfiguration implements Serializable {
 
     @Resource
     private GridFsTemplate gridFsTemplate;
+
+    @Resource
+    private AssetService assetService;
 
     @Bean
     @ConditionalOnMissingBean
@@ -51,5 +49,11 @@ public class AssetBeanConfiguration implements Serializable {
     @Bean
     public AssetConverter assetConverter(@Autowired AssetPreviewService assetPreviewService) {
         return new AssetConverter(assetPreviewService);
+    }
+
+    @Bean
+    @ConditionalOnMissingBean
+    public AssetIdLoader assetIdLoader(@Autowired AssetConverter assetConverter) {
+        return new DefaultAssetIdLoader(assetService, assetConverter);
     }
 }

@@ -91,6 +91,10 @@ public class AssetService {
         return assetRepository.findByIdOrSystemRefId(sid);
     }
 
+    public Optional<AssetEntity> findById(String id) {
+        return assetRepository.findById(id);
+    }
+
     public void deleteByIdOrSystemRefId(String sid) {
         AssetEntity asset = assetRepository.findByIdOrSystemRefId(sid)
                 .orElseThrow(() -> new NotFoundException());
