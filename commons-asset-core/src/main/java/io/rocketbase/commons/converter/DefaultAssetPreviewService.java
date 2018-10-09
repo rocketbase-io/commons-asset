@@ -4,8 +4,6 @@ import com.squareup.pollexor.Thumbor;
 import io.rocketbase.commons.config.ApiProperties;
 import io.rocketbase.commons.config.ThumborProperties;
 import io.rocketbase.commons.dto.asset.PreviewSize;
-import io.rocketbase.commons.service.FileStorageService;
-import io.rocketbase.commons.service.MongoFileStorageService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
@@ -17,14 +15,9 @@ public class DefaultAssetPreviewService implements AssetPreviewService {
 
     private final ApiProperties apiProperties;
 
-    private final FileStorageService fileStorageService;
+    private final boolean localEndpoint;
 
     private Thumbor thumbor;
-
-
-    private boolean useLocalEndpoint() {
-        return fileStorageService instanceof MongoFileStorageService;
-    }
 
 
     protected String getBaseUrl() {
@@ -36,7 +29,7 @@ public class DefaultAssetPreviewService implements AssetPreviewService {
     }
 
     public String getPreviewUrl(String id, String urlPath, PreviewSize size) {
-        if (useLocalEndpoint()) {
+        if (localEndpoint) {
             String baseUrl = getBaseUrl();
             if (baseUrl == null) {
                 baseUrl = "";

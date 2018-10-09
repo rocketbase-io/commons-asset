@@ -45,7 +45,7 @@ public class AssetBeanConfiguration implements Serializable {
     @Bean
     @ConditionalOnMissingBean
     public AssetPreviewService assetPreviewService(@Autowired FileStorageService fileStorageService) {
-        return new DefaultAssetPreviewService(thumborProperties, apiProperties, fileStorageService);
+        return new DefaultAssetPreviewService(thumborProperties, apiProperties, fileStorageService instanceof MongoFileStorageService);
     }
 
     @Bean

@@ -25,7 +25,7 @@ public class AssetConverterTest {
         ApiProperties apiProperties = new ApiProperties();
         apiProperties.setBaseUrl("http://localhost:8080");
 
-        AssetConverter converter = new AssetConverter(new DefaultAssetPreviewService(new ThumborProperties(), apiProperties, new MongoFileStorageService(null)));
+        AssetConverter converter = new AssetConverter(new DefaultAssetPreviewService(new ThumborProperties(), apiProperties, true));
         // when
         AssetRead assetRead = converter.fromEntity(AssetEntity.builder()
                 .id("1235678")
