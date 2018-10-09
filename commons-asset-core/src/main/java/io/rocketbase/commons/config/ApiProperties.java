@@ -14,6 +14,8 @@ import java.util.List;
 @ConfigurationProperties(prefix = "asset.api")
 public class ApiProperties implements Serializable {
 
+    private String baseUrl = "";
+
     private String path = "/api/asset";
 
     private List<AssetType> types = new ArrayList<>(EnumSet.allOf(AssetType.class));

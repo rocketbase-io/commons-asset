@@ -23,28 +23,29 @@ public class AssetConverterTest {
     public void testFromEntityWithLocalRender() {
         // given
         ApiProperties apiProperties = new ApiProperties();
-        String baseUrl = "http://localhost:8080" + apiProperties.getPath() + "/";
+        apiProperties.setBaseUrl("http://localhost:8080");
 
-        AssetConverter converter = new AssetConverter(new ThumborProperties(), apiProperties, new MongoFileStorageService(null));
+        AssetConverter converter = new AssetConverter(new DefaultAssetPreviewService(new ThumborProperties(), apiProperties, new MongoFileStorageService(null)));
         // when
         AssetRead assetRead = converter.fromEntity(AssetEntity.builder()
                 .id("1235678")
                 .urlPath("12345678")
                 .fileSize(1234L)
                 .created(LocalDateTime.now())
-                .originalFilename("originial.png")
+                .originalFilename("original.png")
                 .type(AssetType.PNG)
                 .systemRefId("123")
                 .resolution(new Resolution(100, 200))
-                .build(), Arrays.asList(PreviewSize.S, PreviewSize.M, PreviewSize.L), "http://localhost:8080/");
+                .build(), Arrays.asList(PreviewSize.S, PreviewSize.M, PreviewSize.L));
 
         // then
         assertThat(assetRead, notNullValue());
         assertThat(assetRead.getPreviews(), notNullValue());
         assertThat(assetRead.getPreviews().getPreviewMap().size(), equalTo(3));
-        assertThat(assetRead.getPreviews().getPreviewMap().get(PreviewSize.S), equalTo(baseUrl + assetRead.getId() + "/s"));
-        assertThat(assetRead.getPreviews().getPreviewMap().get(PreviewSize.M), equalTo(baseUrl + assetRead.getId() + "/m"));
-        assertThat(assetRead.getPreviews().getPreviewMap().get(PreviewSize.L), equalTo(baseUrl + assetRead.getId() + "/l"));
+        String baseWithApi = apiProperties.getBaseUrl() + apiProperties.getPath() + "/";
+        assertThat(assetRead.getPreviews().getPreviewMap().get(PreviewSize.S), equalTo(baseWithApi + assetRead.getId() + "/s"));
+        assertThat(assetRead.getPreviews().getPreviewMap().get(PreviewSize.M), equalTo(baseWithApi + assetRead.getId() + "/m"));
+        assertThat(assetRead.getPreviews().getPreviewMap().get(PreviewSize.L), equalTo(baseWithApi + assetRead.getId() + "/l"));
 
     }
 }

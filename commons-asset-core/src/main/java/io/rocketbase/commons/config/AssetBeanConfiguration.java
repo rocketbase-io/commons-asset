@@ -1,6 +1,8 @@
 package io.rocketbase.commons.config;
 
 import io.rocketbase.commons.converter.AssetConverter;
+import io.rocketbase.commons.converter.AssetPreviewService;
+import io.rocketbase.commons.converter.DefaultAssetPreviewService;
 import io.rocketbase.commons.service.AssetTypeFilterService;
 import io.rocketbase.commons.service.FileStorageService;
 import io.rocketbase.commons.service.MongoFileStorageService;
@@ -41,7 +43,13 @@ public class AssetBeanConfiguration implements Serializable {
     }
 
     @Bean
-    public AssetConverter assetConverter(@Autowired FileStorageService fileStorageService) {
-        return new AssetConverter(thumborProperties, apiProperties, fileStorageService);
+    @ConditionalOnMissingBean
+    public AssetPreviewService assetPreviewService(@Autowired FileStorageService fileStorageService) {
+        return new DefaultAssetPreviewService(thumborProperties, apiProperties, fileStorageService);
+    }
+
+    @Bean
+    public AssetConverter assetConverter(@Autowired AssetPreviewService assetPreviewService) {
+        return new AssetConverter(assetPreviewService);
     }
 }

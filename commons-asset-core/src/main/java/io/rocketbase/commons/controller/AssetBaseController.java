@@ -55,7 +55,7 @@ public class AssetBaseController implements BaseAssetController {
 
         Page<AssetEntity> pageResult = assetRepository.findAll(queryAssetConverter.fromParams(params), parsePageRequest(params));
 
-        return PageableResult.contentPage(assetConverter.fromEntitiesByRequestContext(pageResult.getContent(), getPreviewSizes(params)), pageResult);
+        return PageableResult.contentPage(assetConverter.fromEntities(pageResult.getContent(), getPreviewSizes(params)), pageResult);
     }
 
     @RequestMapping(value = "/{sid}", method = RequestMethod.GET)
