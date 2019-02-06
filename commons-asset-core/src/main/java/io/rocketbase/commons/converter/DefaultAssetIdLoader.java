@@ -5,16 +5,17 @@ import io.rocketbase.commons.dto.asset.AssetRead;
 import io.rocketbase.commons.dto.asset.AssetReference;
 import io.rocketbase.commons.model.AssetEntity;
 import io.rocketbase.commons.service.AssetService;
-import lombok.RequiredArgsConstructor;
 
+import javax.annotation.Resource;
 import java.util.Optional;
 
-@RequiredArgsConstructor
 public class DefaultAssetIdLoader implements AssetIdLoader {
 
-    private final AssetService assetService;
+    @Resource
+    private AssetService assetService;
 
-    private final AssetConverter assetConverter;
+    @Resource
+    private AssetConverter assetConverter;
 
     @Override
     public AssetRead toRead(AssetId assetId) {

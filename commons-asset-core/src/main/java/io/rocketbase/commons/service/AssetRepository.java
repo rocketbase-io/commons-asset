@@ -3,6 +3,7 @@ package io.rocketbase.commons.service;
 import com.mongodb.client.result.DeleteResult;
 import io.rocketbase.commons.dto.asset.QueryAsset;
 import io.rocketbase.commons.model.AssetEntity;
+import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
@@ -15,11 +16,10 @@ import javax.annotation.Resource;
 import java.util.List;
 import java.util.Optional;
 
-@Service
+@RequiredArgsConstructor
 public class AssetRepository {
 
-    @Resource
-    private MongoTemplate mongoTemplate;
+    private final MongoTemplate mongoTemplate;
 
     /**
      * search first by id, when not found by systemRefId

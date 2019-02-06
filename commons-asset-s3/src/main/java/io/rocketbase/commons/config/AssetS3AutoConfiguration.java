@@ -6,6 +6,7 @@ import io.rocketbase.commons.service.FileStorageService;
 import io.rocketbase.commons.service.S3FileStoreService;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
+import org.springframework.boot.autoconfigure.AutoConfigureBefore;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
@@ -17,8 +18,9 @@ import java.lang.reflect.Field;
 
 @Configuration
 @EnableConfigurationProperties({S3Properties.class})
+@AutoConfigureBefore(AssetCoreAutoConfiguration.class)
 @RequiredArgsConstructor
-public class S3Configuration {
+public class AssetS3AutoConfiguration {
 
     private final S3Properties s3Properties;
 

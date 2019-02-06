@@ -20,7 +20,6 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.concurrent.TimeUnit;
 
-@Service
 public class DownloadService {
 
     private final Tika tika = new Tika();
