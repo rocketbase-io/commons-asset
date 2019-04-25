@@ -10,6 +10,8 @@ import io.rocketbase.commons.exception.NotFoundException;
 import lombok.SneakyThrows;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.core.io.ByteArrayResource;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.*;
 import org.springframework.util.Assert;
 import org.springframework.util.LinkedMultiValueMap;
@@ -20,7 +22,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 import java.io.InputStream;
 import java.time.format.DateTimeFormatter;
 
-public class AssetResource {
+public class AssetResource implements BaseRestResource {
 
     protected RestTemplate restTemplate;
     protected String baseUrl;
@@ -51,23 +53,22 @@ public class AssetResource {
      * @return pageable assetData
      */
     public PageableResult<AssetRead> findAll(int page, int pagesize) {
-        UriComponentsBuilder uriBuilder = getUriBuilder()
-                .queryParam("page", page)
-                .queryParam("size", pagesize);
-        return query(uriBuilder);
+        return findAll(page, pagesize, null);
     }
 
     /**
-     * list all available assets
+     * list all available assets found by query
      *
      * @param page     starts by 0
      * @param pagesize max 50
      * @return pageable assetData
      */
     public PageableResult<AssetRead> findAll(int page, int pagesize, QueryAsset query) {
-        UriComponentsBuilder uriBuilder = getUriBuilder()
-                .queryParam("page", page)
-                .queryParam("size", pagesize);
+        return findAll(PageRequest.of(page, pagesize), query);
+    }
+
+    public PageableResult<AssetRead> findAll(Pageable pageable, QueryAsset query) {
+        UriComponentsBuilder uriBuilder = appendParams(getUriBuilder(), pageable);
         if (query != null) {
             if (query.getBefore() != null) {
                 uriBuilder.queryParam("before", DateTimeFormatter.ISO_LOCAL_DATE_TIME.format(query.getBefore()));
@@ -87,6 +88,7 @@ public class AssetResource {
         }
         return query(uriBuilder);
     }
+
 
     private PageableResult<AssetRead> query(UriComponentsBuilder uriBuilder) {
         ResponseEntity<PageableResult<AssetRead>> response = getRestTemplate().exchange(uriBuilder.toUriString(),
