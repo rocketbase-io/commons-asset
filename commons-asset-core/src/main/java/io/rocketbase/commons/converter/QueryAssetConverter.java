@@ -7,15 +7,6 @@ import org.springframework.util.MultiValueMap;
 
 public class QueryAssetConverter implements BaseController {
 
-    /*
-
-    private LocalDateTime before;
-    private LocalDateTime after;
-    private String originalFilename;
-    private String referenceUrl;
-    @Singular
-    private List<AssetType> types;
-     */
     public QueryAsset fromParams(MultiValueMap<String, String> params) {
         if (params == null) {
             return null;
