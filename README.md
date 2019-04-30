@@ -63,9 +63,15 @@ Containing an implementation for storing asset references...
 | asset.api.delete   | true              | when false no delete is possible                             |
 | asset.api.batch    | true              | you can disable batch endpoint                               |
 | asset.api.preview  | true              | should only been taken in case of mongo-storage<br />please consider also using outside caching |
+| asset.api.detectResolution    | true              | you can disable image resolution detection                              |
+| asset.api.detectColor    | true              | you can disable image colorThief                              |
 | asset.api.baseUrl  | ""                | used for previewUrls in case of mongo-storage, will get used as fallback |
 | asset.thumbor.host | *required for s3* | base url of your thumbor service                             |
 | asset.thumbor.key  | *optional*        | secure your thumbor urls                                     |
+
+## commons-asset-server
+
+Containing an all controllers for the rest implementation...
 
 ## commons-asset-s3
 

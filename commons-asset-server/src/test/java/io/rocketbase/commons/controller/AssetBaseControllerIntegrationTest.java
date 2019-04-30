@@ -11,6 +11,7 @@ import io.rocketbase.commons.exception.AssetErrorCodes;
 import io.rocketbase.commons.exception.BadRequestException;
 import io.rocketbase.commons.resource.AssetResource;
 import lombok.SneakyThrows;
+import org.assertj.core.api.Fail;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ResourceLoader;
@@ -153,7 +154,7 @@ public class AssetBaseControllerIntegrationTest extends BaseIntegrationTest {
         try {
             // then
             AssetRead result = assetResource.uploadFile(new FileInputStream(uploadFile), uploadFile.getName());
-            fail("txt shouldn't be able to proceed");
+            Fail.fail("txt shouldn't be able to proceed");
         } catch (BadRequestException e) {
             assertThat(e.getErrorResponse().getStatus(), equalTo(AssetErrorCodes.INVALID_CONTENT_TYPE.getStatus()));
         }

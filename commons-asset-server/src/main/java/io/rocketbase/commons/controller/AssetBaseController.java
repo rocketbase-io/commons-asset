@@ -17,7 +17,6 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.Resource;
-import java.util.Optional;
 
 @RestController
 @RequestMapping("${asset.api:/api/asset}")
@@ -32,7 +31,6 @@ public class AssetBaseController implements BaseAssetController {
 
     @Resource
     private AssetService assetService;
-
 
     private QueryAssetConverter queryAssetConverter = new QueryAssetConverter();
 

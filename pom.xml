@@ -42,6 +42,7 @@ SOFTWARE.
         <module>commons-asset-api</module>
         <module>commons-asset-core</module>
         <module>commons-asset-s3</module>
+        <module>commons-asset-server</module>
     </modules>
 
     <licenses>
