@@ -53,7 +53,7 @@ public class AssetCoreAutoConfiguration implements Serializable {
 
     @Bean
     public AssetService assetService() {
-        return new AssetService();
+        return new AssetService(apiProperties);
     }
 
     @Bean

@@ -4,17 +4,18 @@ import com.google.common.base.Stopwatch;
 import de.androidpit.colorthief.ColorThief;
 import de.androidpit.colorthief.MMCQ;
 import de.androidpit.colorthief.RGBUtil;
+import io.rocketbase.commons.config.ApiProperties;
 import io.rocketbase.commons.dto.asset.AssetType;
 import io.rocketbase.commons.dto.asset.ColorPalette;
 import io.rocketbase.commons.dto.asset.Resolution;
 import io.rocketbase.commons.exception.*;
 import io.rocketbase.commons.model.AssetEntity;
 import io.rocketbase.commons.service.AssetTypeFilterService.AssetUploadDetail;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.IOUtils;
 import org.apache.tika.Tika;
 import org.bson.types.ObjectId;
-import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
 import javax.imageio.ImageIO;
@@ -29,10 +30,12 @@ import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
+@RequiredArgsConstructor
 @Slf4j
 public class AssetService {
 
     private final Tika tika = new Tika();
+    private final ApiProperties apiProperties;
 
     @Resource
     private FileStorageService fileStorageService;
@@ -120,22 +123,25 @@ public class AssetService {
                 .created(LocalDateTime.now())
                 .build();
 
-        if (type.isImage()) {
+        if (type.isImage() && (apiProperties.isDetectResolution() || apiProperties.isDetectColors())) {
             try {
                 BufferedImage bufferedImage = ImageIO.read(file);
-                if (bufferedImage != null) {
-                    entity.setResolution(new Resolution(bufferedImage.getWidth(), bufferedImage.getHeight()));
-                } else {
-                    log.trace("file not readable");
+                if (apiProperties.isDetectResolution()) {
+                    if (bufferedImage != null) {
+                        entity.setResolution(new Resolution(bufferedImage.getWidth(), bufferedImage.getHeight()));
+                    } else {
+                        log.trace("file not readable");
+                    }
                 }
-                MMCQ.CMap colorMap = ColorThief.getColorMap(bufferedImage, 4);
-                if (colorMap != null && !colorMap.vboxes.isEmpty()) {
-                    List<String> colors = colorMap.vboxes.stream()
-                            .map(v -> RGBUtil.createRGBHexString(v.avg(false)))
-                            .collect(Collectors.toList());
-                    entity.setColorPalette(new ColorPalette(colors.get(0), colors.size() > 1 ? colors.subList(1, colors.size() - 1) : null));
+                if (apiProperties.isDetectColors()) {
+                    MMCQ.CMap colorMap = ColorThief.getColorMap(bufferedImage, 4);
+                    if (colorMap != null && !colorMap.vboxes.isEmpty()) {
+                        List<String> colors = colorMap.vboxes.stream()
+                                .map(v -> RGBUtil.createRGBHexString(v.avg(false)))
+                                .collect(Collectors.toList());
+                        entity.setColorPalette(new ColorPalette(colors.get(0), colors.size() > 1 ? colors.subList(1, colors.size() - 1) : null));
+                    }
                 }
-
             } catch (Exception e) {
                 log.error("could not read file information from entity {}", entity);
             }

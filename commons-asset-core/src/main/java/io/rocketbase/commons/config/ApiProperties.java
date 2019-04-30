@@ -28,4 +28,8 @@ public class ApiProperties implements Serializable {
 
     private boolean preview = true;
 
+    private boolean detectResolution = true;
+
+    private boolean detectColors = true;
+
 }
