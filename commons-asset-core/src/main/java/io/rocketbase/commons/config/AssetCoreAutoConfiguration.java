@@ -5,6 +5,8 @@ import io.rocketbase.commons.service.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnNotWebApplication;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnWebApplication;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -38,9 +40,17 @@ public class AssetCoreAutoConfiguration implements Serializable {
     }
 
     @Bean
-    @ConditionalOnMissingBean
+    @ConditionalOnMissingBean(value = AssetPreviewService.class)
+    @ConditionalOnNotWebApplication
     public AssetPreviewService assetPreviewService(@Autowired FileStorageService fileStorageService) {
         return new DefaultAssetPreviewService(thumborProperties, apiProperties, fileStorageService instanceof MongoFileStorageService);
+    }
+
+    @Bean
+    @ConditionalOnMissingBean(value = AssetPreviewService.class)
+    @ConditionalOnWebApplication
+    public AssetPreviewService webAssetPreviewService(@Autowired FileStorageService fileStorageService) {
+        return new ServletAssetPreviewService(thumborProperties, apiProperties, fileStorageService instanceof MongoFileStorageService);
     }
 
     @Bean
@@ -71,8 +81,9 @@ public class AssetCoreAutoConfiguration implements Serializable {
     }
 
     @Bean
+    @ConditionalOnMissingBean
     public DownloadService downloadService() {
-        return new DownloadService();
+        return new DefaultDownloadService();
     }
 
 }
