@@ -23,7 +23,6 @@ public class AssetCoreAutoConfiguration implements Serializable {
 
     private final ApiProperties apiProperties;
     private final ThumborProperties thumborProperties;
-
     @Resource
     private GridFsTemplate gridFsTemplate;
 
@@ -83,7 +82,7 @@ public class AssetCoreAutoConfiguration implements Serializable {
     @Bean
     @ConditionalOnMissingBean
     public DownloadService downloadService() {
-        return new DefaultDownloadService();
+        return new DefaultDownloadService(apiProperties.getDownloadHeaders());
     }
 
 }

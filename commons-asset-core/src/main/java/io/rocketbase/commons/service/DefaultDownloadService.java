@@ -2,6 +2,7 @@ package io.rocketbase.commons.service;
 
 import io.rocketbase.commons.dto.asset.AssetType;
 import io.rocketbase.commons.exception.AssetErrorCodes;
+import lombok.RequiredArgsConstructor;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
@@ -14,9 +15,14 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
+@RequiredArgsConstructor
 public class DefaultDownloadService implements DownloadService {
+
+
+    private final Map<String, String> headerConfig;
 
     protected CloseableHttpClient httpClient = initHttpClient();
 
@@ -33,12 +39,21 @@ public class DefaultDownloadService implements DownloadService {
 
         try {
             HttpGet getRequest = new HttpGet(new URI(url));
+            addHeaders(getRequest);
             HttpResponse response = httpClient.execute(getRequest);
             processResponse(response, filename, type, tempFile);
         } catch (IOException | URISyntaxException e) {
             throw new DownloadError(AssetErrorCodes.NOT_DOWNLOADABLE);
         }
         return new TempDownload(tempFile, filename, type);
+    }
+
+    protected void addHeaders(HttpGet getRequest) {
+        if (headerConfig != null && !headerConfig.isEmpty()) {
+            for (Map.Entry<String, String> header : headerConfig.entrySet()) {
+                getRequest.addHeader(header.getKey(), header.getValue());
+            }
+        }
     }
 
     protected void processResponse(HttpResponse response, String filename, AssetType type, File tempFile) throws IOException {

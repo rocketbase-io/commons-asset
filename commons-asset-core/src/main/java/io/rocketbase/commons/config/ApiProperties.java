@@ -6,9 +6,7 @@ import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.EnumSet;
-import java.util.List;
+import java.util.*;
 
 @Data
 @ConfigurationProperties(prefix = "asset.api")
@@ -31,5 +29,7 @@ public class ApiProperties implements Serializable {
     private boolean detectResolution = true;
 
     private boolean detectColors = true;
+
+    private Map<String, String> downloadHeaders = new HashMap<>();
 
 }
