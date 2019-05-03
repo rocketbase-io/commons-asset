@@ -7,7 +7,6 @@ import io.rocketbase.commons.dto.asset.AssetType;
 import io.rocketbase.commons.dto.asset.PreviewSize;
 import io.rocketbase.commons.dto.asset.Resolution;
 import io.rocketbase.commons.model.AssetEntity;
-import io.rocketbase.commons.service.MongoFileStorageService;
 import org.junit.Test;
 
 import java.time.LocalDateTime;

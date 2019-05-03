@@ -9,7 +9,6 @@ import io.rocketbase.commons.dto.batch.AssetBatchWriteEntry;
 import io.rocketbase.commons.exception.AssetErrorCodes;
 import io.rocketbase.commons.exception.InvalidContentTypeException;
 import io.rocketbase.commons.model.AssetEntity;
-import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
 import java.util.List;
@@ -36,10 +35,10 @@ public class AssetBatchService {
         AssetBatchResult.AssetBatchResultBuilder builder = AssetBatchResult.builder();
         for (AssetBatchWriteEntry entry : assetBatch.getEntries()) {
             try {
-                DownloadService.TempDownload download = downloadService.downloadUrl(entry.getUrl());
+                DefaultDownloadService.TempDownload download = downloadService.downloadUrl(entry.getUrl());
                 AssetEntity asset = assetService.storeAndDeleteFile(download.getFile(), download.getFilename(), download.getFile().length(), entry.getSystemRefId(), entry.getUrl());
                 builder.success(entry.getUrl(), assetConverter.fromEntity(asset, previewSizes));
-            } catch (DownloadService.DownloadError e) {
+            } catch (DefaultDownloadService.DownloadError e) {
                 builder.failure(entry.getUrl(), e.getErrorCode());
             } catch (InvalidContentTypeException e) {
                 builder.failure(entry.getUrl(), AssetErrorCodes.INVALID_CONTENT_TYPE);
@@ -60,10 +59,10 @@ public class AssetBatchService {
         AssetBatchResultWithoutPreviews.AssetBatchResultWithoutPreviewsBuilder builder = AssetBatchResultWithoutPreviews.builder();
         for (AssetBatchWriteEntry entry : assetBatch.getEntries()) {
             try {
-                DownloadService.TempDownload download = downloadService.downloadUrl(entry.getUrl());
+                DefaultDownloadService.TempDownload download = downloadService.downloadUrl(entry.getUrl());
                 AssetEntity asset = assetService.storeAndDeleteFile(download.getFile(), download.getFilename(), download.getFile().length(), entry.getSystemRefId(), entry.getUrl());
                 builder.success(entry.getUrl(), assetConverter.fromEntityWithoutPreviews(asset));
-            } catch (DownloadService.DownloadError e) {
+            } catch (DefaultDownloadService.DownloadError e) {
                 builder.failure(entry.getUrl(), e.getErrorCode());
             } catch (InvalidContentTypeException e) {
                 builder.failure(entry.getUrl(), AssetErrorCodes.INVALID_CONTENT_TYPE);
