@@ -3,8 +3,7 @@ package io.rocketbase.commons.service;
 import io.rocketbase.commons.dto.asset.AssetType;
 import io.rocketbase.commons.exception.AssetErrorCodes;
 import lombok.*;
-import org.apache.http.Header;
-import org.apache.http.HttpResponse;
+import okhttp3.Response;
 
 import java.io.File;
 
@@ -16,10 +15,10 @@ public interface DownloadService {
      */
     TempDownload downloadUrl(String url);
 
-    default String extractFilename(HttpResponse response) {
-        Header firstHeader = response.getFirstHeader("Content-Disposition");
-        if (firstHeader != null) {
-            return firstHeader.getValue().replaceFirst("(?i)^.*filename=\"?([^\"]+)\"?.*$", "$1");
+    default String extractFilename(Response response) {
+        String contentDisposition = response.headers().get("Content-Disposition");
+        if (contentDisposition != null) {
+            return contentDisposition.replaceFirst("(?i)^.*filename=\"?([^\"]+)\"?.*$", "$1");
         }
         return null;
     }
