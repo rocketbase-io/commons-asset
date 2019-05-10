@@ -108,7 +108,7 @@ public class AssetService {
     private AssetEntity saveAndUploadAsset(AssetType type, File file, String originalFilename, String referenceUrl, long size, String systemRefId) {
 
         if (systemRefId != null) {
-            if (assetRepository.findBySystemRefId(systemRefId) != null) {
+            if (assetRepository.findBySystemRefId(systemRefId).isPresent()) {
                 throw new SystemRefIdAlreadyUsedException();
             }
         }
