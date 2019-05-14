@@ -7,6 +7,7 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 
 import javax.validation.constraints.NotNull;
+import java.beans.ConstructorProperties;
 
 @Data
 @EqualsAndHashCode(callSuper = true)
@@ -18,7 +19,7 @@ public class AssetRead extends AssetReference {
     }
 
     @JsonCreator
-    @java.beans.ConstructorProperties({"id", "systemRefId", "urlPath", "type", "meta", "previews"})
+    @ConstructorProperties({"id", "systemRefId", "urlPath", "type", "meta", "previews"})
     @Builder(builderMethodName = "builderRead")
     public AssetRead(@NotNull String id, String systemRefId, String urlPath, AssetType type, AssetMeta meta, AssetPreviews previews) {
         super(id, systemRefId, urlPath, type, meta);

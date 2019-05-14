@@ -36,13 +36,13 @@ public class AssetRepository {
 
     public Optional<AssetEntity> findById(String sid) {
         AssetEntity entity = mongoTemplate.findOne(getIdQuery(sid), AssetEntity.class);
-        return entity != null ? Optional.of(entity) : Optional.empty();
+        return Optional.ofNullable(entity);
     }
 
     public Optional<AssetEntity> findBySystemRefId(String systemRefId) {
         AssetEntity entity = mongoTemplate.findOne(new Query(Criteria.where("systemRefId")
                 .is(systemRefId)), AssetEntity.class);
-        return entity != null ? Optional.of(entity) : Optional.empty();
+        return Optional.ofNullable(entity);
     }
 
     public boolean delete(String id) {
