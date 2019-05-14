@@ -47,6 +47,10 @@ public class AssetService {
     private AssetTypeFilterService assetTypeFilterService;
 
     public AssetEntity store(InputStream inputStream, String originalFilename, long size, String systemRefId) {
+        return store(inputStream, originalFilename, size, systemRefId, null);
+    }
+
+    public AssetEntity store(InputStream inputStream, String originalFilename, long size, String systemRefId, String referenceUrl) {
         try {
             Stopwatch stopwatch = Stopwatch.createStarted();
 
@@ -60,7 +64,7 @@ public class AssetService {
             File tempFile = File.createTempFile("asset", suffix);
             IOUtils.copy(inputStream, new FileOutputStream(tempFile));
 
-            AssetEntity asset = storeAndDeleteFile(tempFile, originalFilename, size, systemRefId, null);
+            AssetEntity asset = storeAndDeleteFile(tempFile, originalFilename, size, systemRefId, referenceUrl);
 
             log.debug("store file {} with id: {}, took: {} ms", originalFilename, asset.getId(), stopwatch.elapsed(TimeUnit.MILLISECONDS));
 
