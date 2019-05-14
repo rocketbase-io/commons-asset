@@ -69,7 +69,7 @@ Containing an implementation for storing asset references...
 | asset.thumbor.host | *required for s3* | base url of your thumbor service                             |
 | asset.thumbor.key  | *optional*        | secure your thumbor urls                                     |
 
-## commons-asset-server
+## commons-asset-rest
 
 Containing an all controllers for the rest implementation...
 

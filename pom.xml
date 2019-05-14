@@ -42,7 +42,7 @@ SOFTWARE.
         <module>commons-asset-api</module>
         <module>commons-asset-core</module>
         <module>commons-asset-s3</module>
-        <module>commons-asset-server</module>
+        <module>commons-asset-rest</module>
     </modules>
 
     <licenses>
@@ -96,9 +96,9 @@ SOFTWARE.
         <maven.javadoc.failOnError>false</maven.javadoc.failOnError>
 
         <spring-boot.version>2.1.4.RELEASE</spring-boot.version>
-        <spring-cloud-dependencies.version>Finchley.SR2</spring-cloud-dependencies.version>
+        <spring-cloud-dependencies.version>Greenwich.RELEASE</spring-cloud-dependencies.version>
 
-        <commons-rest.version>1.4.2</commons-rest.version>
+        <commons-rest.version>1.5.0</commons-rest.version>
         <guava.version>27.1-jre</guava.version>
         <pollexor.version>2.0.4</pollexor.version>
         <commons-fileupload.version>1.4</commons-fileupload.version>
