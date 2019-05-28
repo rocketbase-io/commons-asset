@@ -10,7 +10,7 @@
         <version>LATEST-SNAPSHOT</version>
     </parent>
 
-    <artifactId>commons-asset-server</artifactId>
+    <artifactId>commons-asset-rest</artifactId>
 
     <dependencies>
         <dependency>
