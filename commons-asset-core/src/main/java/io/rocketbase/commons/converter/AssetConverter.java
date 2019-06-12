@@ -46,9 +46,11 @@ public class AssetConverter {
                 .previewMap(new HashMap<>())
                 .build());
 
-        ((sizes == null || sizes.isEmpty()) ? defaultSizes : sizes)
-                .forEach(s -> result.getPreviews().getPreviewMap()
-                        .put(s, assetPreviewService.getPreviewUrl(entity.getId(), entity.getUrlPath(), s)));
+        if (entity.getType() != null && entity.getType().isImage()) {
+            ((sizes == null || sizes.isEmpty()) ? defaultSizes : sizes)
+                    .forEach(s -> result.getPreviews().getPreviewMap()
+                            .put(s, assetPreviewService.getPreviewUrl(entity.getId(), entity.getUrlPath(), s)));
+        }
 
         return result;
     }
