@@ -7,6 +7,7 @@ import io.rocketbase.commons.service.FileStorageService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
 import org.springframework.core.io.InputStreamResource;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -40,6 +41,7 @@ public class AssetDownloadController implements BaseAssetController {
 
         return ResponseEntity.ok()
                 .contentLength(entity.getFileSize())
+                .header(HttpHeaders.CONTENT_DISPOSITION, String.format("attachment;filename=%s", entity.getOriginalFilename()))
                 .contentType(MediaType.parseMediaType(entity.getType().getContentType()))
                 .body(streamResource);
     }
