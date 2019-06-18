@@ -102,12 +102,6 @@ SOFTWARE.
         </dependency>
 
         <dependency>
-            <groupId>net.coobird</groupId>
-            <artifactId>thumbnailator</artifactId>
-            <version>${thumbnailator.version}</version>
-        </dependency>
-
-        <dependency>
             <groupId>com.squareup</groupId>
             <artifactId>pollexor</artifactId>
             <version>${pollexor.version}</version>
