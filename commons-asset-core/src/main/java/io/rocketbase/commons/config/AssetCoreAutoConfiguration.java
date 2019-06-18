@@ -55,7 +55,7 @@ public class AssetCoreAutoConfiguration implements Serializable {
     @Bean
     @ConditionalOnMissingBean
     public AssetConverter assetConverter(@Autowired AssetPreviewService assetPreviewService) {
-        return new AssetConverter(assetPreviewService);
+        return new AssetConverter(apiProperties, assetPreviewService);
     }
 
     @Bean

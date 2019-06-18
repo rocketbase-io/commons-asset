@@ -15,6 +15,11 @@ public class AssetRead extends AssetReference {
 
     private AssetPreviews previews;
 
+    /**
+     * optional property to receive the downloadUrl
+     */
+    private String download;
+
     public AssetRead() {
     }
 
