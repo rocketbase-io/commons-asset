@@ -35,10 +35,10 @@ public class AssetBatchService {
         AssetBatchResult.AssetBatchResultBuilder builder = AssetBatchResult.builder();
         for (AssetBatchWriteEntry entry : assetBatch.getEntries()) {
             try {
-                DefaultDownloadService.TempDownload download = downloadService.downloadUrl(entry.getUrl());
+                DownloadService.TempDownload download = downloadService.downloadUrl(entry.getUrl());
                 AssetEntity asset = assetService.storeAndDeleteFile(download.getFile(), download.getFilename(), download.getFile().length(), entry.getSystemRefId(), entry.getUrl());
                 builder.success(entry.getUrl(), assetConverter.fromEntity(asset, previewSizes));
-            } catch (DefaultDownloadService.DownloadError e) {
+            } catch (DownloadService.DownloadError e) {
                 builder.failure(entry.getUrl(), e.getErrorCode());
             } catch (InvalidContentTypeException e) {
                 builder.failure(entry.getUrl(), AssetErrorCodes.INVALID_CONTENT_TYPE);
@@ -59,10 +59,10 @@ public class AssetBatchService {
         AssetBatchResultWithoutPreviews.AssetBatchResultWithoutPreviewsBuilder builder = AssetBatchResultWithoutPreviews.builder();
         for (AssetBatchWriteEntry entry : assetBatch.getEntries()) {
             try {
-                DefaultDownloadService.TempDownload download = downloadService.downloadUrl(entry.getUrl());
+                DownloadService.TempDownload download = downloadService.downloadUrl(entry.getUrl());
                 AssetEntity asset = assetService.storeAndDeleteFile(download.getFile(), download.getFilename(), download.getFile().length(), entry.getSystemRefId(), entry.getUrl());
                 builder.success(entry.getUrl(), assetConverter.fromEntityWithoutPreviews(asset));
-            } catch (DefaultDownloadService.DownloadError e) {
+            } catch (DownloadService.DownloadError e) {
                 builder.failure(entry.getUrl(), e.getErrorCode());
             } catch (InvalidContentTypeException e) {
                 builder.failure(entry.getUrl(), AssetErrorCodes.INVALID_CONTENT_TYPE);
