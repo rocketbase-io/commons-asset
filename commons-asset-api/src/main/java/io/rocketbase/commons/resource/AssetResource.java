@@ -15,10 +15,13 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.*;
 import org.springframework.util.Assert;
 import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.StreamUtils;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.time.format.DateTimeFormatter;
 
@@ -201,6 +204,15 @@ public class AssetResource implements BaseRestResource {
         return response.getBody();
     }
 
+    public File downloadAsset(String sid) {
+        File file = getRestTemplate().execute(getUriBuilder().path("/" + sid).path("/b")
+                .toUriString(), HttpMethod.GET, null, clientHttpResponse -> {
+            File ret = File.createTempFile("download", "tmp");
+            StreamUtils.copy(clientHttpResponse.getBody(), new FileOutputStream(ret));
+            return ret;
+        });
+        return file;
+    }
 
     protected UriComponentsBuilder getUriBuilder() {
         return UriComponentsBuilder.fromUriString(baseUrl)
