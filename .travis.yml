@@ -1,23 +1,22 @@
 language: java
 jdk:
-- openjdk8
+  - openjdk8
 services:
-- mongodb
+  - mongodb
 ## gpg stuff
 before_install:
-    - echo $GPG_SECRET_KEYS | base64 --decode | $GPG_EXECUTABLE --import
-    - echo $GPG_OWNERTRUST | base64 --decode | $GPG_EXECUTABLE --import-ownertrust
+  - echo $GPG_SECRET_KEYS | base64 --decode | $GPG_EXECUTABLE --import
+  - echo $GPG_OWNERTRUST | base64 --decode | $GPG_EXECUTABLE --import-ownertrust
 ## default build
 script: mvn --settings .travis/settings.xml -U clean verify
 ## release on tag
 deploy:
-- provider: script
-  script: ".travis/deploy.sh"
-  skip_cleanup: true
-  on:
-    repo: rocketbase-io/commons-asset
-    tags: true
-    jdk: oraclejdk8
+  - provider: script
+    script: ".travis/deploy.sh"
+    skip_cleanup: true
+    on:
+      tags: true
+      jdk: oraclejdk8
 ## disable emailing
 notifications:
-    email: false
+  email: false
