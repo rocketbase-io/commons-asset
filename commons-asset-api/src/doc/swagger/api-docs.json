@@ -1,0 +1,615 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "description": "Provides services + rest-controller to handle asset with different storage engines.",
+    "version": "1.7.0",
+    "title": "commons-asset api",
+    "contact": {
+      "name": "rocketbase.io",
+      "url": "https://www.rocketbase.io",
+      "email": "info@rocketbase.io"
+    }
+  },
+  "tags": [
+    {
+      "name": "base",
+      "description": "Upload assets and query."
+    },
+    {
+      "name": "batch",
+      "description": "Batching downloads."
+    },
+    {
+      "name": "delete",
+      "description": "Delete asset from datastore + db"
+    },
+    {
+      "name": "download",
+      "description": "Download original binary."
+    },
+    {
+      "name": "preview",
+      "description": "Simple preview service."
+    }
+  ],
+  "paths": {
+    "/api/asset": {
+      "get": {
+        "tags": [
+          "base"
+        ],
+        "summary": "findAll",
+        "description": "page thew asset-list with optional filter parameters.",
+        "operationId": "findAllUsingGET",
+        "produces": [
+          "*/*"
+        ],
+        "parameters": [
+          {
+            "name": "pageSize",
+            "in": "query",
+            "description": "default 25 max is 200",
+            "required": false,
+            "type": "integer"
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "description": "default is 1",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "before",
+            "in": "query",
+            "description": "created before date (example 2011-12-03T10:15:30)",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "after",
+            "in": "query",
+            "description": "created after date (example 2011-12-03T10:15:30)",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "originalFilename",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "referenceUrl",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "type",
+            "in": "query",
+            "description": "possible types JPEG, PNG, GIF, PDF, ZIP, XLS, XLSX, DOC, DOCX. allows to use multiple types for a list...",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/PageableResult-AssetRead"
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        },
+        "deprecated": false
+      },
+      "post": {
+        "tags": [
+          "base"
+        ],
+        "summary": "upload asset",
+        "description": "stores given asset within datastore and read meta-information.",
+        "operationId": "handleFileUploadUsingPOST",
+        "consumes": [
+          "multipart/form-data"
+        ],
+        "produces": [
+          "*/*"
+        ],
+        "parameters": [
+          {
+            "name": "file",
+            "in": "formData",
+            "description": "MultipartFile upload",
+            "required": true,
+            "type": "file"
+          },
+          {
+            "name": "systemRefId",
+            "in": "query",
+            "description": "allows to store reference id from different system",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/AssetRead"
+            }
+          },
+          "201": {
+            "description": "Created"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        },
+        "deprecated": false
+      }
+    },
+    "/api/asset/batch": {
+      "post": {
+        "tags": [
+          "batch"
+        ],
+        "summary": "proccess a batch download",
+        "description": "download given urls and stores them",
+        "operationId": "processBatchFileUrlsUsingPOST",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "*/*"
+        ],
+        "parameters": [
+          {
+            "in": "body",
+            "name": "assetBatch",
+            "description": "assetBatch",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/AssetBatchWrite"
+            }
+          },
+          {
+            "name": "size",
+            "in": "query",
+            "description": "allows to specify required preview-url. allow multiple times. values could be XS, S, M, L, XL",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/AssetBatchResult"
+            }
+          },
+          "201": {
+            "description": "Created"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        },
+        "deprecated": false
+      }
+    },
+    "/api/asset/{sid}": {
+      "get": {
+        "tags": [
+          "base"
+        ],
+        "summary": "get asset",
+        "operationId": "getAssetUsingGET",
+        "produces": [
+          "*/*"
+        ],
+        "parameters": [
+          {
+            "name": "size",
+            "in": "query",
+            "description": "allows to specify required preview-url. allow multiple times. values could be XS, S, M, L, XL",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "sid",
+            "in": "path",
+            "description": "id or systemRefId (you've given optionally within upload process)",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/AssetRead"
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        },
+        "deprecated": false
+      },
+      "delete": {
+        "tags": [
+          "delete"
+        ],
+        "summary": "delete",
+        "description": "removes entity from database + asset from datastore",
+        "operationId": "deleteAssetUsingDELETE",
+        "produces": [
+          "*/*"
+        ],
+        "parameters": [
+          {
+            "name": "sid",
+            "in": "path",
+            "description": "id or systemRefId (you've given optionally within upload process)",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "204": {
+            "description": "No Content"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          }
+        },
+        "deprecated": false
+      }
+    },
+    "/api/asset/{sid}/b": {
+      "get": {
+        "tags": [
+          "download"
+        ],
+        "summary": "download",
+        "description": "response with the original asset binaries",
+        "operationId": "downloadAssetUsingGET",
+        "produces": [
+          "*/*"
+        ],
+        "parameters": [
+          {
+            "name": "sid",
+            "in": "path",
+            "description": "id or systemRefId (you've given optionally within upload process)",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        },
+        "deprecated": false
+      }
+    },
+    "/api/asset/{sid}/{size}": {
+      "get": {
+        "tags": [
+          "preview"
+        ],
+        "summary": "getPreview",
+        "operationId": "getPreviewUsingGET",
+        "produces": [
+          "*/*"
+        ],
+        "parameters": [
+          {
+            "name": "sid",
+            "in": "path",
+            "description": "id or systemRefId (you've given optionally within upload process)",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "size",
+            "in": "path",
+            "description": "allows to specify required preview-url. values could be XS, S, M, L, XL",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        },
+        "deprecated": false
+      }
+    }
+  },
+  "definitions": {
+    "AssetBatchResult": {
+      "type": "object",
+      "properties": {
+        "failed": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          }
+        },
+        "succeeded": {
+          "type": "object",
+          "additionalProperties": {
+            "$ref": "#/definitions/AssetRead"
+          }
+        }
+      },
+      "title": "AssetBatchResult"
+    },
+    "AssetBatchWrite": {
+      "type": "object",
+      "properties": {
+        "entries": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/AssetBatchWriteEntry"
+          }
+        }
+      },
+      "title": "AssetBatchWrite"
+    },
+    "AssetBatchWriteEntry": {
+      "type": "object",
+      "properties": {
+        "systemRefId": {
+          "type": "string"
+        },
+        "url": {
+          "type": "string"
+        }
+      },
+      "title": "AssetBatchWriteEntry"
+    },
+    "AssetMeta": {
+      "type": "object",
+      "properties": {
+        "colorPalette": {
+          "$ref": "#/definitions/ColorPalette"
+        },
+        "created": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "fileSize": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "originalFilename": {
+          "type": "string"
+        },
+        "referenceUrl": {
+          "type": "string"
+        },
+        "resolution": {
+          "$ref": "#/definitions/Resolution"
+        }
+      },
+      "title": "AssetMeta"
+    },
+    "AssetPreviews": {
+      "type": "object",
+      "properties": {
+        "previewMap": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          }
+        }
+      },
+      "title": "AssetPreviews"
+    },
+    "AssetRead": {
+      "type": "object",
+      "properties": {
+        "download": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "meta": {
+          "$ref": "#/definitions/AssetMeta"
+        },
+        "previews": {
+          "$ref": "#/definitions/AssetPreviews"
+        },
+        "systemRefId": {
+          "type": "string"
+        },
+        "type": {
+          "type": "string",
+          "enum": [
+            "JPEG",
+            "PNG",
+            "GIF",
+            "PDF",
+            "ZIP",
+            "XLS",
+            "XLSX",
+            "DOC",
+            "DOCX"
+          ]
+        },
+        "urlPath": {
+          "type": "string"
+        }
+      },
+      "title": "AssetRead"
+    },
+    "ColorPalette": {
+      "type": "object",
+      "properties": {
+        "colors": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "primary": {
+          "type": "string"
+        }
+      },
+      "title": "ColorPalette"
+    },
+    "File": {
+      "type": "object",
+      "properties": {
+        "absolute": {
+          "type": "boolean"
+        },
+        "absoluteFile": {
+          "$ref": "#/definitions/File"
+        },
+        "absolutePath": {
+          "type": "string"
+        },
+        "canonicalFile": {
+          "$ref": "#/definitions/File"
+        },
+        "canonicalPath": {
+          "type": "string"
+        },
+        "directory": {
+          "type": "boolean"
+        },
+        "file": {
+          "type": "boolean"
+        },
+        "freeSpace": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "hidden": {
+          "type": "boolean"
+        },
+        "name": {
+          "type": "string"
+        },
+        "parent": {
+          "type": "string"
+        },
+        "parentFile": {
+          "$ref": "#/definitions/File"
+        },
+        "path": {
+          "type": "string"
+        },
+        "totalSpace": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "usableSpace": {
+          "type": "integer",
+          "format": "int64"
+        }
+      },
+      "title": "File"
+    },
+    "PageableResult-AssetRead": {
+      "type": "object",
+      "properties": {
+        "content": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/AssetRead"
+          }
+        },
+        "page": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "pageSize": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "totalElements": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "totalPages": {
+          "type": "integer",
+          "format": "int32"
+        }
+      },
+      "title": "PageableResult-AssetRead"
+    },
+    "Resolution": {
+      "type": "object",
+      "properties": {
+        "height": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "width": {
+          "type": "integer",
+          "format": "int32"
+        }
+      },
+      "title": "Resolution"
+    }
+  }
+}

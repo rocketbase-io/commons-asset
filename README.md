@@ -10,6 +10,9 @@
 
 Add a simple asset service with basic features to your spring-boot applications. 
 
+I've added a swagger api-documentation. You can find it within [src](./commons-asset-api/src/doc/swagger) of [swaggerHub](https://app.swaggerhub.com/apis/melistik/commons-asset/1.7.0)
+
+
 **Features:**
 * api and controller to handle asset-uploads
 * works with jpeg, gif, png and files like pdf, excel, word and zip
