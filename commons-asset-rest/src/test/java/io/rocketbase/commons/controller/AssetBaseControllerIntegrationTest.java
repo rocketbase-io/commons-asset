@@ -16,11 +16,9 @@ import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ResourceLoader;
 
-import javax.annotation.Nonnull;
 import java.io.File;
 import java.io.FileInputStream;
 
-import static org.assertj.core.api.Fail.fail;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 
@@ -184,7 +182,6 @@ public class AssetBaseControllerIntegrationTest extends BaseIntegrationTest {
 
     }
 
-    @Nonnull
     private AssetResource getAssetResource() {
         return new AssetResource(getBaseUrl());
     }

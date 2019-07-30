@@ -22,16 +22,18 @@ import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 @Slf4j
-@RequiredArgsConstructor
 public class DefaultDownloadService implements DownloadService {
 
     private final Headers headers;
 
     protected OkHttpClient httpClient;
 
+    public DefaultDownloadService() {
+        this.headers = new Headers.Builder().build();
+    }
+
     public DefaultDownloadService(Map<String, String> config) {
         this.headers = convertHeaders(config);
-
     }
 
     @SneakyThrows

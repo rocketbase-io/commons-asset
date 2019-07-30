@@ -11,6 +11,7 @@ import io.rocketbase.commons.dto.asset.Resolution;
 import io.rocketbase.commons.exception.*;
 import io.rocketbase.commons.model.AssetEntity;
 import io.rocketbase.commons.service.AssetTypeFilterService.AssetUploadDetail;
+import io.rocketbase.commons.tooling.ColorDetection;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.IOUtils;
@@ -138,13 +139,7 @@ public class AssetService {
                     }
                 }
                 if (apiProperties.isDetectColors()) {
-                    MMCQ.CMap colorMap = ColorThief.getColorMap(bufferedImage, 4);
-                    if (colorMap != null && !colorMap.vboxes.isEmpty()) {
-                        List<String> colors = colorMap.vboxes.stream()
-                                .map(v -> RGBUtil.createRGBHexString(v.avg(false)))
-                                .collect(Collectors.toList());
-                        entity.setColorPalette(new ColorPalette(colors.get(0), colors.size() > 1 ? colors.subList(1, colors.size() - 1) : null));
-                    }
+                        entity.setColorPalette(ColorDetection.detect(bufferedImage));
                 }
             } catch (Exception e) {
                 log.error("could not read file information from entity {}", entity);
