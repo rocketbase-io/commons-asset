@@ -12,6 +12,7 @@ public enum AssetType {
     JPEG("image/jpeg"),
     PNG("image/png"),
     GIF("image/gif"),
+    TIFF("image/tiff"),
     PDF("application/pdf"),
     ZIP("application/zip"),
     XLS("application/msexcel"),
@@ -57,6 +58,8 @@ public enum AssetType {
                 if (fileExtensions.equalsIgnoreCase(type.getFileExtension())) {
                     return type;
                 } else if (type.equals(JPEG) && fileExtensions.equalsIgnoreCase("jpeg")) {
+                    return type;
+                }else if (type.equals(TIFF) && fileExtensions.equalsIgnoreCase("tif")) {
                     return type;
                 }
             }
