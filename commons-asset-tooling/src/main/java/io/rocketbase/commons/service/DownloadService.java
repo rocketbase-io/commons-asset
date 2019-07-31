@@ -35,6 +35,9 @@ public interface DownloadService {
     class TempDownload {
         private File file;
         private String filename;
+        /**
+         * detected type by filename extension
+         */
         private AssetType type;
     }
 }

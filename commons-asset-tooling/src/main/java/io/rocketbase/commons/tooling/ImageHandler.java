@@ -14,35 +14,38 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 
-public final class ImageSourceHandling {
+public final class ImageHandler {
 
     public static final DefaultDownloadService DEFAULT_DOWNLOAD_SERVICE = new DefaultDownloadService();
     private static final Tika TIKA = new Tika();
 
-    public static ImageHandlingBuilder start(String url) {
+    public static ImageHandlingBuilder download(String url) {
         return new ImageHandlingBuilder(url);
     }
 
     @SneakyThrows
-    static ImageHandlingResult build(DownloadService downloadService, String url, Integer width, Integer height) {
-        DownloadService.TempDownload tempDownload = downloadService.downloadUrl(url);
-        String contentType = TIKA.detect(tempDownload.getFile());
-        AssetType assetType = AssetType.findByContentType(contentType);
+    static ImageHandlingResult build(ImageHandlingBuilder config) {
+        DownloadService.TempDownload tempDownload = config.downloadService.downloadUrl(config.url);
+        if (config.enforceTika || tempDownload.getType() == null) {
+            String contentType = TIKA.detect(tempDownload.getFile());
+            tempDownload.setType(AssetType.findByContentType(contentType));
+        }
 
-        if (!assetType.isImage()) {
+
+        if (tempDownload.getType() == null || !tempDownload.getType().isImage()) {
             throw new RuntimeException("Source is not an image!");
         }
 
-        if (width != null || height != null) {
+        if (config.width != null || config.height != null) {
             Thumbnails.Builder<File> thumbBuilder = Thumbnails.of(tempDownload.getFile());
-            if (width == null || height == null) {
-                if (width != null) {
-                    thumbBuilder.width(width);
+            if (config.width == null || config.height == null) {
+                if (config.width != null) {
+                    thumbBuilder.width(config.width);
                 } else {
-                    thumbBuilder.height(height);
+                    thumbBuilder.height(config.height);
                 }
             } else {
-                thumbBuilder.scale(width, height);
+                thumbBuilder.scale(config.width, config.height);
             }
             ByteArrayOutputStream thumbOs = new ByteArrayOutputStream();
             thumbBuilder.toOutputStream(thumbOs);
@@ -50,9 +53,9 @@ public final class ImageSourceHandling {
             // delete temp file
             tempDownload.getFile().delete();
 
-            return new ImageHandlingResult(thumbOs.toByteArray(), assetType);
+            return new ImageHandlingResult(thumbOs.toByteArray(), tempDownload.getType());
         } else {
-            return new ImageHandlingResult(IOUtils.toByteArray(new FileInputStream(tempDownload.getFile())), assetType);
+            return new ImageHandlingResult(IOUtils.toByteArray(new FileInputStream(tempDownload.getFile())), tempDownload.getType());
         }
     }
 
@@ -80,15 +83,36 @@ public final class ImageSourceHandling {
         private final String url;
         private Integer width;
         private Integer height;
+        private boolean enforceTika;
         private DownloadService downloadService = DEFAULT_DOWNLOAD_SERVICE;
 
+        /**
+         * allows to resize source - when height not it will get auto calculated<br>
+         * when both width + height are set image will get sized to fit in box-size<br>
+         * always the aspect ratio of the original image will be preserved
+         */
         public ImageHandlingBuilder width(int width) {
             this.width = width;
             return this;
         }
 
+        /**
+         * allows to resize source - when width not it will get auto calculated<br>
+         * when both width + height are set image will get sized to fit in box-size<br>
+         * always the aspect ratio of the original image will be preserved
+         */
         public ImageHandlingBuilder height(int height) {
             this.height = height;
+            return this;
+        }
+
+        /**
+         * by default for better speed image-type detection will get done if possible by filename extension<br>
+         * tika will only get used in case no type could be detected via extensions <br>
+         * you can enforce this detection...
+         */
+        public ImageHandlingBuilder enforceTika() {
+            this.enforceTika = true;
             return this;
         }
 
@@ -100,8 +124,11 @@ public final class ImageSourceHandling {
             return this;
         }
 
+        /**
+         * download source and returns different options
+         */
         public ImageHandlingResult process() {
-            return ImageSourceHandling.build(downloadService, url, width, height);
+            return ImageHandler.build(this);
         }
     }
 }

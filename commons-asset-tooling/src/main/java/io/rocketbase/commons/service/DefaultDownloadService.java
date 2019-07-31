@@ -74,7 +74,7 @@ public class DefaultDownloadService implements DownloadService {
 
             if (log.isDebugEnabled()) {
                 HttpLoggingInterceptor logging = new HttpLoggingInterceptor();
-                logging.setLevel(log.isTraceEnabled() ? HttpLoggingInterceptor.Level.BODY : HttpLoggingInterceptor.Level.BASIC);
+                logging.level(log.isTraceEnabled() ? HttpLoggingInterceptor.Level.HEADERS : HttpLoggingInterceptor.Level.BASIC);
                 builder.addInterceptor(logging);
             }
             builder.callTimeout(30, TimeUnit.SECONDS);
@@ -117,10 +117,6 @@ public class DefaultDownloadService implements DownloadService {
                 filename = extractedFilename;
             }
             AssetType type = AssetType.findByFileExtension(FilenameUtils.getExtension(filename));
-            if (type == null) {
-                // store at first as jpeg later it will get checked by tika during store
-                type = AssetType.JPEG;
-            }
             File tempFile = File.createTempFile("asset-", "." + type.getFileExtension());
             FileOutputStream outputStream = new FileOutputStream(tempFile);
             IOUtils.copy(response.body().byteStream(), outputStream);
