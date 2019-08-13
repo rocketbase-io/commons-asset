@@ -96,7 +96,7 @@ SOFTWARE.
         <maven.compiler.target>1.8</maven.compiler.target>
         <maven.javadoc.failOnError>false</maven.javadoc.failOnError>
 
-        <spring-boot.version>2.1.6.RELEASE</spring-boot.version>
+        <spring-boot.version>2.1.7.RELEASE</spring-boot.version>
         <spring-cloud-dependencies.version>Greenwich.RELEASE</spring-cloud-dependencies.version>
 
         <commons-rest.version>1.6.1</commons-rest.version>
@@ -104,9 +104,9 @@ SOFTWARE.
         <pollexor.version>2.0.4</pollexor.version>
         <commons-fileupload.version>1.4</commons-fileupload.version>
         <commons-io.version>2.6</commons-io.version>
-        <tika-core.version>1.21</tika-core.version>
+        <tika-core.version>1.22</tika-core.version>
         <thumbnailator.version>0.4.8</thumbnailator.version>
-        <okhttp.version>4.0.1</okhttp.version>
+        <okhttp.version>4.1.0</okhttp.version>
         <jacoco.version>0.8.4</jacoco.version>
     </properties>
 
