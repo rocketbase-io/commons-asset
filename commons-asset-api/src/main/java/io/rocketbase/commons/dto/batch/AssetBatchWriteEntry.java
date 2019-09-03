@@ -3,7 +3,6 @@ package io.rocketbase.commons.dto.batch;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
-import org.hibernate.validator.constraints.URL;
 
 import javax.validation.constraints.NotNull;
 import java.io.Serializable;
@@ -14,7 +13,6 @@ import java.io.Serializable;
 public class AssetBatchWriteEntry implements Serializable {
 
     @NotNull
-    @URL
     private String url;
 
     private String systemRefId;

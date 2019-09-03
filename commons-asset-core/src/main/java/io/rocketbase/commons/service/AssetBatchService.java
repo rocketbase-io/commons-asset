@@ -1,11 +1,9 @@
 package io.rocketbase.commons.service;
 
 import io.rocketbase.commons.converter.AssetConverter;
+import io.rocketbase.commons.dto.asset.AssetMeta;
 import io.rocketbase.commons.dto.asset.PreviewSize;
-import io.rocketbase.commons.dto.batch.AssetBatchResult;
-import io.rocketbase.commons.dto.batch.AssetBatchResultWithoutPreviews;
-import io.rocketbase.commons.dto.batch.AssetBatchWrite;
-import io.rocketbase.commons.dto.batch.AssetBatchWriteEntry;
+import io.rocketbase.commons.dto.batch.*;
 import io.rocketbase.commons.exception.AssetErrorCodes;
 import io.rocketbase.commons.exception.InvalidContentTypeException;
 import io.rocketbase.commons.model.AssetEntity;
@@ -68,6 +66,30 @@ public class AssetBatchService {
                 builder.failure(entry.getUrl(), AssetErrorCodes.INVALID_CONTENT_TYPE);
             } catch (Exception e) {
                 builder.failure(entry.getUrl(), AssetErrorCodes.UNPROCESSABLE_ASSET);
+            }
+        }
+        return builder.build();
+    }
+
+    /**
+     * will download given urls and analyse content. downloads will get deleted afterwards
+     *
+     * @param urls list of urls
+     * @return divided in succeeded and failed with key of url
+     */
+    public AssetBatchAnalyseResult batchAnalyse(List<String> urls) {
+        AssetBatchAnalyseResult.AssetBatchAnalyseResultBuilder builder = AssetBatchAnalyseResult.builder();
+        for (String url : urls) {
+            try {
+                DownloadService.TempDownload download = downloadService.downloadUrl(url);
+                AssetMeta meta = assetService.analyse(download.getFile());
+                builder.success(url, meta);
+            } catch (DownloadService.DownloadError e) {
+                builder.failure(url, e.getErrorCode());
+            } catch (InvalidContentTypeException e) {
+                builder.failure(url, AssetErrorCodes.INVALID_CONTENT_TYPE);
+            } catch (Exception e) {
+                builder.failure(url, AssetErrorCodes.UNPROCESSABLE_ASSET);
             }
         }
         return builder.build();

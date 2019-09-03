@@ -2,6 +2,7 @@ package io.rocketbase.commons.service;
 
 import com.google.common.base.Stopwatch;
 import io.rocketbase.commons.config.ApiProperties;
+import io.rocketbase.commons.dto.asset.AssetMeta;
 import io.rocketbase.commons.dto.asset.AssetType;
 import io.rocketbase.commons.dto.asset.ColorPalette;
 import io.rocketbase.commons.dto.asset.Resolution;
@@ -50,7 +51,10 @@ public class AssetService {
 
     public AssetEntity store(InputStream inputStream, String originalFilename, long size, String systemRefId, String context, String referenceUrl) {
         try {
-            Stopwatch stopwatch = Stopwatch.createStarted();
+            Stopwatch stopwatch = null;
+            if (log.isDebugEnabled()) {
+                stopwatch = Stopwatch.createStarted();
+            }
 
             String suffix = "";
             if (originalFilename
@@ -64,7 +68,9 @@ public class AssetService {
 
             AssetEntity asset = storeAndDeleteFile(tempFile, originalFilename, size, systemRefId, context, referenceUrl);
 
-            log.debug("store file {} with id: {}, took: {} ms", originalFilename, asset.getId(), stopwatch.elapsed(TimeUnit.MILLISECONDS));
+            if (log.isDebugEnabled()) {
+                log.debug("store file {} with id: {}, took: {} ms", originalFilename, asset.getId(), stopwatch.elapsed(TimeUnit.MILLISECONDS));
+            }
 
             return asset;
         } catch (IOException e) {
@@ -75,20 +81,25 @@ public class AssetService {
 
     public AssetEntity storeAndDeleteFile(File file, String originalFilename, long size, String systemRefId, String context, String referenceUrl) throws IOException {
         try {
-            String contentType = tika.detect(file);
-            AssetType assetType = AssetType.findByContentType(contentType);
-            if (assetType == null) {
-                log.info("detected contentType: {}", contentType);
-                throw new InvalidContentTypeException(contentType);
-            } else if (!assetTypeFilterService.isAllowed(assetType, new AssetUploadDetail(file, originalFilename, size, systemRefId, context, referenceUrl))) {
-                log.info("got assetType: {} that is not within allowed list: {}", assetType, assetTypeFilterService.getAllowedAssetTypes());
-                throw new NotAllowedAssetTypeException(assetType);
-            }
+            AssetType assetType = detectAssetTypeWithChecks(file, originalFilename, size, systemRefId, context, referenceUrl);
             AssetEntity asset = saveAndUploadAsset(assetType, file, originalFilename, size, systemRefId, context, referenceUrl);
             return asset;
         } finally {
             file.delete();
         }
+    }
+
+    private AssetType detectAssetTypeWithChecks(File file, String originalFilename, long size, String systemRefId, String context, String referenceUrl) throws IOException {
+        String contentType = tika.detect(file);
+        AssetType assetType = AssetType.findByContentType(contentType);
+        if (assetType == null) {
+            log.info("detected contentType: {}", contentType);
+            throw new InvalidContentTypeException(contentType);
+        } else if (!assetTypeFilterService.isAllowed(assetType, new AssetUploadDetail(file, originalFilename, size, systemRefId, context, referenceUrl))) {
+            log.info("got assetType: {} that is not within allowed list: {}", assetType, assetTypeFilterService.getAllowedAssetTypes());
+            throw new NotAllowedAssetTypeException(assetType);
+        }
+        return assetType;
     }
 
     public Optional<AssetEntity> findByIdOrSystemRefId(String sid) {
@@ -139,6 +150,25 @@ public class AssetService {
         }
 
         return entity;
+    }
+
+    public AssetMeta analyse(File file) {
+        AssetMeta result = null;
+        try {
+            long fileSize = file.length();
+            AssetType assetType = detectAssetTypeWithChecks(file, null, fileSize, null, null, null);
+            AssetAnalyse analyse = analyse(assetType, file);
+
+            result = AssetMeta.builder()
+                    .fileSize(fileSize)
+                    .resolution(analyse.getResolution())
+                    .colorPalette(analyse.getColorPalette())
+                    .created(LocalDateTime.now())
+                    .build();
+        } catch (Exception e) {
+            log.error("couldn't analyse inputStream");
+        }
+        return result;
     }
 
     private AssetAnalyse analyse(AssetType type, File file) {
