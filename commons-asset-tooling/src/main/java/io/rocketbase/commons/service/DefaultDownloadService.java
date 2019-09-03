@@ -2,14 +2,12 @@ package io.rocketbase.commons.service;
 
 import io.rocketbase.commons.dto.asset.AssetType;
 import io.rocketbase.commons.exception.AssetErrorCodes;
-import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import okhttp3.Headers;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
-import okhttp3.logging.HttpLoggingInterceptor;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
 
@@ -19,7 +17,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.security.cert.CertificateException;
 import java.util.Map;
-import java.util.concurrent.TimeUnit;
 
 @Slf4j
 public class DefaultDownloadService implements DownloadService {
@@ -72,12 +69,7 @@ public class DefaultDownloadService implements DownloadService {
                 }
             });
 
-            if (log.isDebugEnabled()) {
-                HttpLoggingInterceptor logging = new HttpLoggingInterceptor();
-                logging.level(log.isTraceEnabled() ? HttpLoggingInterceptor.Level.HEADERS : HttpLoggingInterceptor.Level.BASIC);
-                builder.addInterceptor(logging);
-            }
-            builder.callTimeout(30, TimeUnit.SECONDS);
+            // builder.callTimeout(Duration.ofSeconds(30));
 
             httpClient = builder.build();
         }
