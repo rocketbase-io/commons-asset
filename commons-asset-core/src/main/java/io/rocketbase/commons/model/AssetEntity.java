@@ -35,6 +35,13 @@ public class AssetEntity {
 
     private AssetType type;
 
+    /**
+     * allows to store individual grouping for assets to find all picture of a flexible type<br>
+     * for example all avatar images or backgrounds...
+     */
+    @Indexed
+    private String context;
+
     private LocalDateTime created;
 
     private String originalFilename;

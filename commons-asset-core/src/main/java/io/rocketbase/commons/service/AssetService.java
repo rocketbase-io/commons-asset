@@ -1,9 +1,6 @@
 package io.rocketbase.commons.service;
 
 import com.google.common.base.Stopwatch;
-import de.androidpit.colorthief.ColorThief;
-import de.androidpit.colorthief.MMCQ;
-import de.androidpit.colorthief.RGBUtil;
 import io.rocketbase.commons.config.ApiProperties;
 import io.rocketbase.commons.dto.asset.AssetType;
 import io.rocketbase.commons.dto.asset.ColorPalette;
@@ -12,6 +9,8 @@ import io.rocketbase.commons.exception.*;
 import io.rocketbase.commons.model.AssetEntity;
 import io.rocketbase.commons.service.AssetTypeFilterService.AssetUploadDetail;
 import io.rocketbase.commons.tooling.ColorDetection;
+import lombok.Builder;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.IOUtils;
@@ -26,10 +25,8 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.time.LocalDateTime;
-import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
-import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
 @Slf4j
@@ -47,11 +44,11 @@ public class AssetService {
     @Resource
     private AssetTypeFilterService assetTypeFilterService;
 
-    public AssetEntity store(InputStream inputStream, String originalFilename, long size, String systemRefId) {
-        return store(inputStream, originalFilename, size, systemRefId, null);
+    public AssetEntity store(InputStream inputStream, String originalFilename, long size, String systemRefId, String context) {
+        return store(inputStream, originalFilename, size, systemRefId, context, null);
     }
 
-    public AssetEntity store(InputStream inputStream, String originalFilename, long size, String systemRefId, String referenceUrl) {
+    public AssetEntity store(InputStream inputStream, String originalFilename, long size, String systemRefId, String context, String referenceUrl) {
         try {
             Stopwatch stopwatch = Stopwatch.createStarted();
 
@@ -65,7 +62,7 @@ public class AssetService {
             File tempFile = File.createTempFile("asset", suffix);
             IOUtils.copy(inputStream, new FileOutputStream(tempFile));
 
-            AssetEntity asset = storeAndDeleteFile(tempFile, originalFilename, size, systemRefId, referenceUrl);
+            AssetEntity asset = storeAndDeleteFile(tempFile, originalFilename, size, systemRefId, context, referenceUrl);
 
             log.debug("store file {} with id: {}, took: {} ms", originalFilename, asset.getId(), stopwatch.elapsed(TimeUnit.MILLISECONDS));
 
@@ -76,18 +73,18 @@ public class AssetService {
         }
     }
 
-    public AssetEntity storeAndDeleteFile(File file, String originalFilename, long size, String systemRefId, String referenceUrl) throws IOException {
+    public AssetEntity storeAndDeleteFile(File file, String originalFilename, long size, String systemRefId, String context, String referenceUrl) throws IOException {
         try {
             String contentType = tika.detect(file);
             AssetType assetType = AssetType.findByContentType(contentType);
             if (assetType == null) {
                 log.info("detected contentType: {}", contentType);
                 throw new InvalidContentTypeException(contentType);
-            } else if (!assetTypeFilterService.isAllowed(assetType, new AssetUploadDetail(file, originalFilename, size, systemRefId, referenceUrl))) {
+            } else if (!assetTypeFilterService.isAllowed(assetType, new AssetUploadDetail(file, originalFilename, size, systemRefId, context, referenceUrl))) {
                 log.info("got assetType: {} that is not within allowed list: {}", assetType, assetTypeFilterService.getAllowedAssetTypes());
                 throw new NotAllowedAssetTypeException(assetType);
             }
-            AssetEntity asset = saveAndUploadAsset(assetType, file, originalFilename, referenceUrl, size, systemRefId);
+            AssetEntity asset = saveAndUploadAsset(assetType, file, originalFilename, size, systemRefId, context, referenceUrl);
             return asset;
         } finally {
             file.delete();
@@ -110,7 +107,7 @@ public class AssetService {
         assetRepository.delete(asset.getId());
     }
 
-    private AssetEntity saveAndUploadAsset(AssetType type, File file, String originalFilename, String referenceUrl, long size, String systemRefId) {
+    private AssetEntity saveAndUploadAsset(AssetType type, File file, String originalFilename, long size, String systemRefId, String context, String referenceUrl) {
 
         if (systemRefId != null) {
             if (assetRepository.findBySystemRefId(systemRefId).isPresent()) {
@@ -118,33 +115,20 @@ public class AssetService {
             }
         }
 
+        AssetAnalyse analyse = analyse(type, file);
+
         AssetEntity entity = AssetEntity.builder()
                 .id(ObjectId.get().toHexString())
                 .type(type)
                 .originalFilename(originalFilename)
                 .referenceUrl(referenceUrl)
                 .systemRefId(systemRefId)
+                .context(context)
                 .fileSize(size)
                 .created(LocalDateTime.now())
+                .resolution(analyse.getResolution())
+                .colorPalette(analyse.getColorPalette())
                 .build();
-
-        if (type.isImage() && (apiProperties.isDetectResolution() || apiProperties.isDetectColors())) {
-            try {
-                BufferedImage bufferedImage = ImageIO.read(file);
-                if (apiProperties.isDetectResolution()) {
-                    if (bufferedImage != null) {
-                        entity.setResolution(new Resolution(bufferedImage.getWidth(), bufferedImage.getHeight()));
-                    } else {
-                        log.trace("file not readable");
-                    }
-                }
-                if (apiProperties.isDetectColors()) {
-                        entity.setColorPalette(ColorDetection.detect(bufferedImage));
-                }
-            } catch (Exception e) {
-                log.error("could not read file information from entity {}", entity);
-            }
-        }
 
         try {
             fileStorageService.upload(entity, file);
@@ -155,5 +139,34 @@ public class AssetService {
         }
 
         return entity;
+    }
+
+    private AssetAnalyse analyse(AssetType type, File file) {
+        AssetAnalyse.AssetAnalyseBuilder builder = AssetAnalyse.builder();
+        if (type.isImage() && (apiProperties.isDetectResolution() || apiProperties.isDetectColors())) {
+            try {
+                BufferedImage bufferedImage = ImageIO.read(file);
+                if (apiProperties.isDetectResolution()) {
+                    if (bufferedImage != null) {
+                        builder.resolution(new Resolution(bufferedImage.getWidth(), bufferedImage.getHeight()));
+                    } else {
+                        log.trace("file not readable");
+                    }
+                }
+                if (apiProperties.isDetectColors()) {
+                    builder.colorPalette(ColorDetection.detect(bufferedImage));
+                }
+            } catch (Exception e) {
+                log.error("could not read file information from file {}", file.getPath());
+            }
+        }
+        return builder.build();
+    }
+
+    @Builder
+    @Getter
+    public static class AssetAnalyse {
+        private Resolution resolution;
+        private ColorPalette colorPalette;
     }
 }

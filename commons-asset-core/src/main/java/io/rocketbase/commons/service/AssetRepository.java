@@ -11,6 +11,7 @@ import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
 import javax.annotation.Resource;
 import java.util.List;
@@ -78,11 +79,14 @@ public class AssetRepository {
                 }
                 result.addCriteria(criteria);
             }
-            if (query.getOriginalFilename() != null) {
-                result.addCriteria(Criteria.where("originalFilename").regex(query.getOriginalFilename(), "i"));
+            if (!StringUtils.isEmpty(query.getOriginalFilename())) {
+                result.addCriteria(Criteria.where("originalFilename").regex(query.getOriginalFilename().trim(), "i"));
             }
-            if (query.getReferenceUrl() != null) {
-                result.addCriteria(Criteria.where("referenceUrl").regex(query.getReferenceUrl(), "i"));
+            if (!StringUtils.isEmpty(query.getReferenceUrl())) {
+                result.addCriteria(Criteria.where("referenceUrl").regex(query.getReferenceUrl().trim(), "i"));
+            }
+            if (!StringUtils.isEmpty(query.getContext())) {
+                result.addCriteria(Criteria.where("context").is(query.getContext()));
             }
             if (query.getTypes() != null && !query.getTypes().isEmpty()) {
                 result.addCriteria(Criteria.where("type").in(query.getTypes()));

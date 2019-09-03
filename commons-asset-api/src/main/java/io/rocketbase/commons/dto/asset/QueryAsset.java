@@ -16,6 +16,7 @@ public class QueryAsset implements Serializable {
     private LocalDateTime after;
     private String originalFilename;
     private String referenceUrl;
+    private String context;
     @Singular
     private List<AssetType> types;
 }

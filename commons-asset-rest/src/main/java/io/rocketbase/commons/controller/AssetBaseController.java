@@ -37,12 +37,13 @@ public class AssetBaseController implements BaseAssetController {
     @SneakyThrows
     @RequestMapping(method = RequestMethod.POST)
     public AssetRead handleFileUpload(@RequestParam("file") MultipartFile file,
-                                      @RequestParam(value = "systemRefId", required = false) String systemRefId) {
+                                      @RequestParam(value = "systemRefId", required = false) String systemRefId,
+                                      @RequestParam(value = "context", required = false) String context) {
         if (file.isEmpty()) {
             throw new EmptyFileException();
         }
 
-        AssetEntity asset = assetService.store(file.getInputStream(), file.getOriginalFilename(), file.getSize(), systemRefId);
+        AssetEntity asset = assetService.store(file.getInputStream(), file.getOriginalFilename(), file.getSize(), context, systemRefId);
 
 
         return assetConverter.fromEntityByRequestContext(asset, getPreviewSizes(null));

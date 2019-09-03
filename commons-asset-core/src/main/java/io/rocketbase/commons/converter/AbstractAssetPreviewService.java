@@ -3,6 +3,7 @@ package io.rocketbase.commons.converter;
 import com.squareup.pollexor.Thumbor;
 import io.rocketbase.commons.config.ApiProperties;
 import io.rocketbase.commons.config.ThumborProperties;
+import io.rocketbase.commons.dto.asset.AssetReference;
 import io.rocketbase.commons.dto.asset.PreviewSize;
 import lombok.RequiredArgsConstructor;
 
@@ -19,7 +20,7 @@ public abstract class AbstractAssetPreviewService implements AssetPreviewService
 
     protected abstract String getBaseUrl();
 
-    public String getPreviewUrl(String id, String urlPath, PreviewSize size) {
+    public String getPreviewUrl(AssetReference assetReference, PreviewSize size) {
         if (localEndpoint) {
             String baseUrl = getBaseUrl();
             if (baseUrl == null) {
@@ -28,9 +29,9 @@ public abstract class AbstractAssetPreviewService implements AssetPreviewService
             if (baseUrl.endsWith("/")) {
                 baseUrl = baseUrl.substring(0, baseUrl.length() - 1);
             }
-            return baseUrl + apiProperties.getPath() + "/" + id + "/" + size.name().toLowerCase();
+            return baseUrl + apiProperties.getPath() + "/" + assetReference.getId() + "/" + size.name().toLowerCase();
         } else {
-            return getThumbor().buildImage(urlPath)
+            return getThumbor().buildImage(assetReference.getUrlPath())
                     .resize(size.getMaxWidth(), size.getMaxHeight())
                     .fitIn()
                     .toUrl();

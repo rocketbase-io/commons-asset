@@ -36,7 +36,7 @@ public class AssetBatchService {
         for (AssetBatchWriteEntry entry : assetBatch.getEntries()) {
             try {
                 DownloadService.TempDownload download = downloadService.downloadUrl(entry.getUrl());
-                AssetEntity asset = assetService.storeAndDeleteFile(download.getFile(), download.getFilename(), download.getFile().length(), entry.getSystemRefId(), entry.getUrl());
+                AssetEntity asset = assetService.storeAndDeleteFile(download.getFile(), download.getFilename(), download.getFile().length(), entry.getSystemRefId(), entry.getContext(), entry.getUrl());
                 builder.success(entry.getUrl(), assetConverter.fromEntity(asset, previewSizes));
             } catch (DownloadService.DownloadError e) {
                 builder.failure(entry.getUrl(), e.getErrorCode());
@@ -60,7 +60,7 @@ public class AssetBatchService {
         for (AssetBatchWriteEntry entry : assetBatch.getEntries()) {
             try {
                 DownloadService.TempDownload download = downloadService.downloadUrl(entry.getUrl());
-                AssetEntity asset = assetService.storeAndDeleteFile(download.getFile(), download.getFilename(), download.getFile().length(), entry.getSystemRefId(), entry.getUrl());
+                AssetEntity asset = assetService.storeAndDeleteFile(download.getFile(), download.getFilename(), download.getFile().length(), entry.getSystemRefId(), entry.getContext(), entry.getUrl());
                 builder.success(entry.getUrl(), assetConverter.fromEntityWithoutPreviews(asset));
             } catch (DownloadService.DownloadError e) {
                 builder.failure(entry.getUrl(), e.getErrorCode());

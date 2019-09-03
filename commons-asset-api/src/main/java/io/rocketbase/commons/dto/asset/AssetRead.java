@@ -24,16 +24,18 @@ public class AssetRead extends AssetReference {
     }
 
     @JsonCreator
-    @ConstructorProperties({"id", "systemRefId", "urlPath", "type", "meta", "previews"})
+    @ConstructorProperties({"id", "systemRefId", "urlPath", "type", "context", "meta", "previews", "download"})
     @Builder(builderMethodName = "builderRead")
-    public AssetRead(@NotNull String id, String systemRefId, String urlPath, AssetType type, AssetMeta meta, AssetPreviews previews) {
-        super(id, systemRefId, urlPath, type, meta);
+    public AssetRead(@NotNull String id, String systemRefId, String urlPath, AssetType type, String context, AssetMeta meta, AssetPreviews previews, String download) {
+        super(id, systemRefId, urlPath, type, context, meta);
         setPreviews(previews);
+        setDownload(download);
     }
 
     public String toString() {
-        return "AssetRead(id=" + this.getId() + ", systemRefId=" + this.getSystemRefId() + ", urlPath=" + this.getUrlPath() + ", type=" + this.getType() + ", meta=" + this.getMeta() + ", previews=" + this.getPreviews() + ")";
+        return "AssetRead(id=" + this.getId() + ", systemRefId=" + this.getSystemRefId() + ", urlPath=" + this.getUrlPath() + ", type=" + this.getType() + ", context=" + this.getContext() + ", meta=" + this.getMeta() + ", previews=" + this.getPreviews() + ", download=" + this.getDownload() + ")";
     }
+
 
     @JsonIgnore
     public AssetReference toReference() {

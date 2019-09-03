@@ -25,6 +25,7 @@ public interface AssetTypeFilterService {
         private String originalFilename;
         private long size;
         private String systemRefId;
+        private String context;
         private String referenceUrl;
     }
 }

@@ -32,6 +32,7 @@ public class AssetConverter {
         AssetRead result = AssetRead.builderRead()
                 .id(entity.getId())
                 .systemRefId(entity.getSystemRefId())
+                .context(entity.getContext())
                 .urlPath(entity.getUrlPath())
                 .type(entity.getType())
                 .meta(AssetMeta.builder()
@@ -44,20 +45,26 @@ public class AssetConverter {
                         .build())
                 .build();
 
-        result.setPreviews(AssetPreviews.builder()
-                .previewMap(new HashMap<>())
-                .build());
-
-        if (entity.getType() != null && entity.getType().isImage()) {
-            ((sizes == null || sizes.isEmpty()) ? defaultSizes : sizes)
-                    .forEach(s -> result.getPreviews().getPreviewMap()
-                            .put(s, assetPreviewService.getPreviewUrl(entity.getId(), entity.getUrlPath(), s)));
-        }
-        if (apiProperties.isDownload()) {
-            result.setDownload(apiProperties.getPath() + "/" + entity.getId() + "/b");
-        }
+        injectPreviewsAndDownload(result, sizes);
 
         return result;
+    }
+
+    private void injectPreviewsAndDownload(AssetRead result, List<PreviewSize> sizes) {
+        if (result != null) {
+            if (result.getType() != null && result.getType().isImage()) {
+                result.setPreviews(AssetPreviews.builder()
+                        .previewMap(new HashMap<>())
+                        .build());
+
+                ((sizes == null || sizes.isEmpty()) ? defaultSizes : sizes)
+                        .forEach(s -> result.getPreviews().getPreviewMap()
+                                .put(s, assetPreviewService.getPreviewUrl(result, s)));
+            }
+            if (apiProperties.isDownload()) {
+                result.setDownload(apiProperties.getPath() + "/" + result.getId() + "/b");
+            }
+        }
     }
 
     public AssetReference fromEntityWithoutPreviews(AssetEntity entity) {
@@ -68,6 +75,7 @@ public class AssetConverter {
         return AssetReference.builder()
                 .id(entity.getId())
                 .systemRefId(entity.getSystemRefId())
+                .context(entity.getContext())
                 .urlPath(entity.getUrlPath())
                 .type(entity.getType())
                 .meta(AssetMeta.builder()
@@ -96,22 +104,20 @@ public class AssetConverter {
         if (reference == null) {
             return null;
         }
-        AssetPreviews assetPreviews = AssetPreviews.builder()
-                .previewMap(new HashMap<>())
-                .build();
 
-        ((sizes == null || sizes.isEmpty()) ? defaultSizes : sizes)
-                .forEach(s -> assetPreviews.getPreviewMap()
-                        .put(s, assetPreviewService.getPreviewUrl(reference.getId(), reference.getUrlPath(), s)));
-
-        return AssetRead.builderRead()
+        AssetRead result = AssetRead.builderRead()
                 .id(reference.getId())
                 .systemRefId(reference.getSystemRefId())
+                .context(reference.getContext())
                 .urlPath(reference.getUrlPath())
                 .type(reference.getType())
                 .meta(reference.getMeta())
-                .previews(assetPreviews)
                 .build();
+
+        injectPreviewsAndDownload(result, sizes);
+
+
+        return result;
     }
 
 }

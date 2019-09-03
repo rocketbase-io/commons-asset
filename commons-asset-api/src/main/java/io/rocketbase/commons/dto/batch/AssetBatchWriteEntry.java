@@ -19,6 +19,8 @@ public class AssetBatchWriteEntry implements Serializable {
 
     private String systemRefId;
 
+    private String context;
+
     public AssetBatchWriteEntry() {
     }
 
