@@ -2,7 +2,7 @@
   "swagger": "2.0",
   "info": {
     "description": "Provides services + rest-controller to handle asset with different storage engines.",
-    "version": "1.7.0",
+    "version": "1.9.0",
     "title": "commons-asset api",
     "contact": {
       "name": "rocketbase.io",
@@ -30,6 +30,10 @@
     {
       "name": "preview",
       "description": "Simple preview service."
+    },
+    {
+      "name": "analyse",
+      "description": "Analyse files without storing it."
     }
   ],
   "paths": {
@@ -379,6 +383,100 @@
         },
         "deprecated": false
       }
+    },
+    "/api/asset/analyse": {
+      "post": {
+        "tags": [
+          "analyse"
+        ],
+        "summary": "analyse upload",
+        "description": "analyse given asset and read meta-information.",
+        "operationId": "analyseFilePOST",
+        "consumes": [
+          "multipart/form-data"
+        ],
+        "produces": [
+          "*/*"
+        ],
+        "parameters": [
+          {
+            "name": "file",
+            "in": "formData",
+            "description": "MultipartFile upload",
+            "required": true,
+            "type": "file"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/AssetAnalyse"
+            }
+          },
+          "201": {
+            "description": "Created"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        },
+        "deprecated": false
+      }
+    },
+    "/api/asset/analyse/batch": {
+      "post": {
+        "tags": [
+          "analyse"
+        ],
+        "summary": "batch analyse",
+        "description": "download given urls and analyse without storing",
+        "operationId": "processBatchAnalysePOST",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "*/*"
+        ],
+        "parameters": [
+          {
+            "in": "body",
+            "name": "uriList",
+            "description": "List of Urls",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/UriList"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/AssetBatchAnalyseResult"
+            }
+          },
+          "201": {
+            "description": "Created"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        },
+        "deprecated": false
+      }
     }
   },
   "definitions": {
@@ -388,13 +486,47 @@
         "failed": {
           "type": "object",
           "additionalProperties": {
-            "type": "string"
+            "type": "string",
+            "enum": [
+              "INVALID_CONTENT_TYPE",
+              "NOT_ALLOWED_CONTENT_TYPE",
+              "ASSET_FILE_IS_EMPTY",
+              "SYSTEM_REF_ID_ALREADY_USED",
+              "UNPROCESSABLE_ASSET",
+              "NOT_DOWNLOADABLE"
+            ]
           }
         },
         "succeeded": {
           "type": "object",
           "additionalProperties": {
             "$ref": "#/definitions/AssetRead"
+          }
+        }
+      },
+      "title": "AssetBatchResult"
+    },
+    "AssetBatchAnalyseResult": {
+      "type": "object",
+      "properties": {
+        "failed": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string",
+            "enum": [
+              "INVALID_CONTENT_TYPE",
+              "NOT_ALLOWED_CONTENT_TYPE",
+              "ASSET_FILE_IS_EMPTY",
+              "SYSTEM_REF_ID_ALREADY_USED",
+              "UNPROCESSABLE_ASSET",
+              "NOT_DOWNLOADABLE"
+            ]
+          }
+        },
+        "succeeded": {
+          "type": "object",
+          "additionalProperties": {
+            "$ref": "#/definitions/AssetAnalyse"
           }
         }
       },
@@ -435,6 +567,49 @@
       "properties": {
         "colorPalette": {
           "$ref": "#/definitions/ColorPalette"
+        },
+        "created": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "fileSize": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "originalFilename": {
+          "type": "string"
+        },
+        "referenceUrl": {
+          "type": "string"
+        },
+        "resolution": {
+          "$ref": "#/definitions/Resolution"
+        }
+      },
+      "title": "AssetMeta"
+    },
+    "AssetAnalyse": {
+      "type": "object",
+      "properties": {
+        "colorPalette": {
+          "$ref": "#/definitions/ColorPalette"
+        },
+        "type": {
+          "type": "string",
+          "enum": [
+            "JPEG",
+            "PNG",
+            "GIF",
+            "TIFF",
+            "PDF",
+            "ZIP",
+            "XLS",
+            "XLSX",
+            "DOC",
+            "DOCX",
+            "PPT",
+            "PPTX"
+          ]
         },
         "created": {
           "type": "string",
@@ -625,6 +800,13 @@
         }
       },
       "title": "Resolution"
+    },
+    "UriList": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "title": "UriList"
     }
   }
 }
