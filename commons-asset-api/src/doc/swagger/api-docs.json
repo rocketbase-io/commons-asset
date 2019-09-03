@@ -416,10 +416,16 @@
       "type": "object",
       "properties": {
         "systemRefId": {
-          "type": "string"
+          "type": "string",
+          "description": "optional foreign id of other system"
+        },
+        "context": {
+          "type": "string",
+          "description": "allows to store individual grouping for assets to find all picture of a flexible type. for example all avatar images or backgrounds..."
         },
         "url": {
-          "type": "string"
+          "type": "string",
+          "description": "address where to download asset"
         }
       },
       "title": "AssetBatchWriteEntry"
@@ -466,7 +472,8 @@
       "type": "object",
       "properties": {
         "download": {
-          "type": "string"
+          "type": "string",
+          "description": "download url to original file when enabled"
         },
         "id": {
           "type": "string"
@@ -478,7 +485,12 @@
           "$ref": "#/definitions/AssetPreviews"
         },
         "systemRefId": {
-          "type": "string"
+          "type": "string",
+          "description": "optional foreign id of other system"
+        },
+        "context": {
+          "type": "string",
+          "description": "allows to store individual grouping for assets to find all picture of a flexible type. for example all avatar images or backgrounds..."
         },
         "type": {
           "type": "string",
@@ -486,12 +498,15 @@
             "JPEG",
             "PNG",
             "GIF",
+            "TIFF",
             "PDF",
             "ZIP",
             "XLS",
             "XLSX",
             "DOC",
-            "DOCX"
+            "DOCX",
+            "PPT",
+            "PPTX"
           ]
         },
         "urlPath": {
