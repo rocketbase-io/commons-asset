@@ -30,7 +30,7 @@ public final class ColorDetection {
             List<String> colors = colorMap.vboxes.stream()
                     .map(v -> RGBUtil.createRGBHexString(v.avg(false)))
                     .collect(Collectors.toList());
-            return new ColorPalette(colors.get(0), colors.size() > 1 ? colors.subList(1, colors.size() - 1) : null);
+            return new ColorPalette(colors.get(0), colors.size() > 1 ? colors.subList(1, colors.size() - 1).stream().distinct().collect(Collectors.toList()) : null);
         }
         return null;
     }

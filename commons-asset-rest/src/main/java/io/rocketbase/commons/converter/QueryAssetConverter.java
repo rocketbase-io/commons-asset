@@ -15,6 +15,7 @@ public class QueryAssetConverter implements BaseController {
                 .before(parseLocalDateTime(params, "before", null))
                 .after(parseLocalDateTime(params, "after", null))
                 .originalFilename(params.containsKey("originalFilename") ? params.getFirst("originalFilename") : null)
+                .context(params.containsKey("context") ? params.getFirst("context") : null)
                 .referenceUrl(params.containsKey("referenceUrl") ? params.getFirst("referenceUrl") : null);
 
         if (params.containsKey("type")) {

@@ -1,7 +1,6 @@
 package io.rocketbase.commons.dto.batch;
 
-import io.rocketbase.commons.dto.asset.AssetMeta;
-import io.rocketbase.commons.dto.asset.AssetRead;
+import io.rocketbase.commons.dto.asset.AssetAnalyse;
 import io.rocketbase.commons.exception.AssetErrorCodes;
 import lombok.*;
 
@@ -18,7 +17,7 @@ public class AssetBatchAnalyseResult implements Serializable {
      * key holds the given url
      */
     @Singular("success")
-    private Map<String, AssetMeta> succeeded;
+    private Map<String, AssetAnalyse> succeeded;
 
     /**
      * key holds the given url

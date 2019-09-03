@@ -3,7 +3,6 @@ package io.rocketbase.commons.service;
 import com.google.common.io.BaseEncoding;
 import io.rocketbase.commons.dto.asset.AssetType;
 import okhttp3.*;
-import org.jetbrains.annotations.NotNull;
 import org.junit.Test;
 import org.springframework.http.HttpHeaders;
 
@@ -56,14 +55,13 @@ public class DefaultDownloadServiceTest {
         assertThat(result.getFile(), notNullValue());
     }
 
-    @NotNull
     private Response buildResponse(String filename) {
         Response.Builder builder = new Response.Builder()
                 .request(new Request.Builder().url("http://localhost").build())
                 .protocol(Protocol.HTTP_2)
                 .code(200)
                 .message("")
-                .body(ResponseBody.create(BaseEncoding.base64().decode("R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw=="), MediaType.get("image/gif")));
+                .body(ResponseBody.create(MediaType.get("image/gif"), BaseEncoding.base64().decode("R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==")));
         if (filename != null) {
             builder.header(HttpHeaders.CONTENT_DISPOSITION, "attachment;filename=" + filename);
         }

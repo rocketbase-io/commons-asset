@@ -2,8 +2,10 @@ package io.rocketbase.commons.resource;
 
 import com.google.common.io.ByteStreams;
 import io.rocketbase.commons.dto.PageableResult;
+import io.rocketbase.commons.dto.asset.AssetAnalyse;
 import io.rocketbase.commons.dto.asset.AssetRead;
 import io.rocketbase.commons.dto.asset.QueryAsset;
+import io.rocketbase.commons.dto.batch.AssetBatchAnalyseResult;
 import io.rocketbase.commons.dto.batch.AssetBatchResult;
 import io.rocketbase.commons.dto.batch.AssetBatchWrite;
 import io.rocketbase.commons.exception.NotFoundException;
@@ -16,14 +18,17 @@ import org.springframework.http.*;
 import org.springframework.util.Assert;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.StreamUtils;
+import org.springframework.util.StringUtils;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.time.format.DateTimeFormatter;
+import java.util.List;
 
 public class AssetResource implements BaseRestResource {
 
@@ -84,6 +89,9 @@ public class AssetResource implements BaseRestResource {
             }
             if (query.getReferenceUrl() != null) {
                 uriBuilder.queryParam("referenceUrl", query.getReferenceUrl());
+            }
+            if (query.getContext() != null) {
+                uriBuilder.queryParam("context", query.getContext());
             }
             if (query.getTypes() != null) {
                 uriBuilder.queryParam("type", query.getTypes());
@@ -163,12 +171,22 @@ public class AssetResource implements BaseRestResource {
      */
     @SneakyThrows
     public AssetRead uploadFile(InputStream assetResource, String filename, String systemRefId) {
+        HttpEntity<LinkedMultiValueMap<String, Object>> requestEntity = buildUploadMultipartForm(assetResource, filename, systemRefId);
+        ResponseEntity<AssetRead> response = getRestTemplate().exchange(getUriBuilder().toUriString(),
+                HttpMethod.POST,
+                requestEntity,
+                AssetRead.class);
+
+        return response.getBody();
+    }
+
+    private HttpEntity<LinkedMultiValueMap<String, Object>> buildUploadMultipartForm(InputStream assetResource, String filename, String systemRefId) throws IOException {
         byte[] bytes = ByteStreams.toByteArray(assetResource);
         LinkedMultiValueMap<String, Object> form = new LinkedMultiValueMap<>();
         form.add("file", new ByteArrayResource(bytes) {
             @Override
             public String getFilename() {
-                return filename != null && !filename.isEmpty() ? filename : super.getFilename();
+                return !StringUtils.isEmpty(filename) ? filename : super.getFilename();
             }
         });
         // optional parameters
@@ -179,20 +197,14 @@ public class AssetResource implements BaseRestResource {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.MULTIPART_FORM_DATA);
 
-        HttpEntity<LinkedMultiValueMap<String, Object>> requestEntity = new HttpEntity<>(form, headers);
-        ResponseEntity<AssetRead> response = getRestTemplate().exchange(getUriBuilder().toUriString(),
-                HttpMethod.POST,
-                requestEntity,
-                AssetRead.class);
-
-        return response.getBody();
+        return new HttpEntity<>(form, headers);
     }
 
     /**
      * download assets in batch and store them
      *
      * @param assetBatch list of url's to download and keep
-     * @return AssetBatchResultData
+     * @return AssetBatchResult
      */
     public AssetBatchResult processBatchFileUrls(AssetBatchWrite assetBatch) {
         ResponseEntity<AssetBatchResult> response = getRestTemplate().exchange(getUriBuilder().path("/batch")
@@ -212,6 +224,39 @@ public class AssetResource implements BaseRestResource {
             return ret;
         });
         return file;
+    }
+
+    /**
+     * download assets in batch and store them
+     *
+     * @param urls list of url's to download and analyse
+     * @return AssetBatchAnalyseResult
+     */
+    public AssetBatchAnalyseResult processBatchAnalyseUrls(List<String> urls) {
+        ResponseEntity<AssetBatchAnalyseResult> response = getRestTemplate().exchange(getUriBuilder().path("/analyse/batch")
+                        .toUriString(),
+                HttpMethod.POST,
+                new HttpEntity<>(urls),
+                AssetBatchAnalyseResult.class);
+
+        return response.getBody();
+    }
+
+    /**
+     * upload binary file to analyse content
+     *
+     * @param assetResource stream to resource
+     * @return stored asset references
+     */
+    @SneakyThrows
+    public AssetAnalyse analyseFile(InputStream assetResource, String filename) {
+        HttpEntity<LinkedMultiValueMap<String, Object>> requestEntity = buildUploadMultipartForm(assetResource, filename, null);
+        ResponseEntity<AssetAnalyse> response = getRestTemplate().exchange(getUriBuilder().path("/analyse").toUriString(),
+                HttpMethod.POST,
+                requestEntity,
+                AssetAnalyse.class);
+
+        return response.getBody();
     }
 
     protected UriComponentsBuilder getUriBuilder() {

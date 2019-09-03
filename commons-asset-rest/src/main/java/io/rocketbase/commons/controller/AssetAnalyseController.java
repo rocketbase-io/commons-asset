@@ -30,13 +30,13 @@ public class AssetAnalyseController implements BaseAssetController {
 
     @SneakyThrows
     @RequestMapping(value = "/analyse", method = RequestMethod.POST)
-    public AssetMeta processBatchFileUrls(@RequestParam("file") MultipartFile file) {
+    public AssetMeta analyseFile(@RequestParam("file") MultipartFile file) {
         File tempFile = null;
         try {
             tempFile = File.createTempFile("asset", "");
             IOUtils.copy(file.getInputStream(), new FileOutputStream(tempFile));
 
-            return assetService.analyse(tempFile);
+            return assetService.analyse(tempFile, file.getOriginalFilename());
         } finally {
             if (tempFile != null) {
                 tempFile.delete();
@@ -46,7 +46,7 @@ public class AssetAnalyseController implements BaseAssetController {
 
     @SneakyThrows
     @RequestMapping(value = "/analyse/batch", method = RequestMethod.POST)
-    public AssetBatchAnalyseResult processBatchFileUrls(@RequestBody List<String> urls) {
+    public AssetBatchAnalyseResult processBatchAnalyse(@RequestBody List<String> urls) {
         return assetBatchService.batchAnalyse(urls);
     }
 

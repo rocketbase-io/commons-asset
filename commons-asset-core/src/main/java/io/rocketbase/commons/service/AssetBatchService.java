@@ -1,7 +1,7 @@
 package io.rocketbase.commons.service;
 
 import io.rocketbase.commons.converter.AssetConverter;
-import io.rocketbase.commons.dto.asset.AssetMeta;
+import io.rocketbase.commons.dto.asset.AssetAnalyse;
 import io.rocketbase.commons.dto.asset.PreviewSize;
 import io.rocketbase.commons.dto.batch.*;
 import io.rocketbase.commons.exception.AssetErrorCodes;
@@ -80,16 +80,22 @@ public class AssetBatchService {
     public AssetBatchAnalyseResult batchAnalyse(List<String> urls) {
         AssetBatchAnalyseResult.AssetBatchAnalyseResultBuilder builder = AssetBatchAnalyseResult.builder();
         for (String url : urls) {
+            DownloadService.TempDownload download = null;
             try {
-                DownloadService.TempDownload download = downloadService.downloadUrl(url);
-                AssetMeta meta = assetService.analyse(download.getFile());
-                builder.success(url, meta);
+                download = downloadService.downloadUrl(url);
+                AssetAnalyse analyse = assetService.analyse(download.getFile(), download.getFilename());
+                analyse.setReferenceUrl(url);
+                builder.success(url, analyse);
             } catch (DownloadService.DownloadError e) {
                 builder.failure(url, e.getErrorCode());
             } catch (InvalidContentTypeException e) {
                 builder.failure(url, AssetErrorCodes.INVALID_CONTENT_TYPE);
             } catch (Exception e) {
                 builder.failure(url, AssetErrorCodes.UNPROCESSABLE_ASSET);
+            } finally {
+                if (download != null && download.getFile() != null) {
+                    download.getFile().delete();
+                }
             }
         }
         return builder.build();

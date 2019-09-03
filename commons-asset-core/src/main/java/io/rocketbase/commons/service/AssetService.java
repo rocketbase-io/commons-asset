@@ -2,7 +2,7 @@ package io.rocketbase.commons.service;
 
 import com.google.common.base.Stopwatch;
 import io.rocketbase.commons.config.ApiProperties;
-import io.rocketbase.commons.dto.asset.AssetMeta;
+import io.rocketbase.commons.dto.asset.AssetAnalyse;
 import io.rocketbase.commons.dto.asset.AssetType;
 import io.rocketbase.commons.dto.asset.ColorPalette;
 import io.rocketbase.commons.dto.asset.Resolution;
@@ -126,7 +126,7 @@ public class AssetService {
             }
         }
 
-        AssetAnalyse analyse = analyse(type, file);
+        AnalyseResult analyse = analyse(type, file);
 
         AssetEntity entity = AssetEntity.builder()
                 .id(ObjectId.get().toHexString())
@@ -152,27 +152,25 @@ public class AssetService {
         return entity;
     }
 
-    public AssetMeta analyse(File file) {
-        AssetMeta result = null;
-        try {
-            long fileSize = file.length();
-            AssetType assetType = detectAssetTypeWithChecks(file, null, fileSize, null, null, null);
-            AssetAnalyse analyse = analyse(assetType, file);
+    public AssetAnalyse analyse(File file, String originalFilename) throws IOException {
+        AssetAnalyse result = null;
+        long fileSize = file.length();
+        AssetType assetType = detectAssetTypeWithChecks(file, originalFilename, fileSize, null, null, null);
+        AnalyseResult analyse = analyse(assetType, file);
 
-            result = AssetMeta.builder()
-                    .fileSize(fileSize)
-                    .resolution(analyse.getResolution())
-                    .colorPalette(analyse.getColorPalette())
-                    .created(LocalDateTime.now())
-                    .build();
-        } catch (Exception e) {
-            log.error("couldn't analyse inputStream");
-        }
+        result = AssetAnalyse.builderAnalyse()
+                .type(assetType)
+                .fileSize(fileSize)
+                .resolution(analyse.getResolution())
+                .colorPalette(analyse.getColorPalette())
+                .created(LocalDateTime.now())
+                .originalFilename(originalFilename)
+                .build();
         return result;
     }
 
-    private AssetAnalyse analyse(AssetType type, File file) {
-        AssetAnalyse.AssetAnalyseBuilder builder = AssetAnalyse.builder();
+    private AnalyseResult analyse(AssetType type, File file) {
+        AnalyseResult.AnalyseResultBuilder builder = AnalyseResult.builder();
         if (type.isImage() && (apiProperties.isDetectResolution() || apiProperties.isDetectColors())) {
             try {
                 BufferedImage bufferedImage = ImageIO.read(file);
@@ -195,7 +193,7 @@ public class AssetService {
 
     @Builder
     @Getter
-    public static class AssetAnalyse {
+    public static class AnalyseResult {
         private Resolution resolution;
         private ColorPalette colorPalette;
     }
