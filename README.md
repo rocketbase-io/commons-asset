@@ -10,7 +10,7 @@
 
 Add a simple asset service with basic features to your spring-boot applications. 
 
-I've added a swagger api-documentation. You can find it within [src](./commons-asset-api/src/doc/swagger) of [swaggerHub](https://app.swaggerhub.com/apis/melistik/commons-asset)
+I've added a swagger api-documentation. You can find it within [src](./commons-asset-api/src/doc/swagger) of [swaggerHub](https://app.swaggerhub.com/apis-docs/melistik/commons-asset)
 
 
 **Features:**
