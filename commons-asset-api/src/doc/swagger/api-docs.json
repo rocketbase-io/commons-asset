@@ -629,7 +629,7 @@
           "$ref": "#/definitions/Resolution"
         }
       },
-      "title": "AssetMeta"
+      "title": "AssetAnalyse"
     },
     "AssetPreviews": {
       "type": "object",
