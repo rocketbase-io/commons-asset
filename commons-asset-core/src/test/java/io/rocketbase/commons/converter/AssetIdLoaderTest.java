@@ -3,7 +3,6 @@ package io.rocketbase.commons.converter;
 import io.rocketbase.commons.BaseIntegrationTest;
 import io.rocketbase.commons.dto.asset.AssetId;
 import io.rocketbase.commons.dto.asset.AssetRead;
-import io.rocketbase.commons.dto.asset.AssetReference;
 import io.rocketbase.commons.dto.asset.AssetType;
 import io.rocketbase.commons.model.AssetEntity;
 import io.rocketbase.commons.service.AssetService;

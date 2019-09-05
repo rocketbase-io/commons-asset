@@ -1,22 +1,20 @@
 package io.rocketbase.commons.converter;
 
 import io.rocketbase.commons.config.ApiProperties;
-import io.rocketbase.commons.dto.asset.*;
+import io.rocketbase.commons.dto.asset.AssetMeta;
+import io.rocketbase.commons.dto.asset.AssetRead;
+import io.rocketbase.commons.dto.asset.AssetReference;
+import io.rocketbase.commons.dto.asset.PreviewSize;
 import io.rocketbase.commons.model.AssetEntity;
-import lombok.RequiredArgsConstructor;
 
-import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
 import java.util.stream.Collectors;
 
-@RequiredArgsConstructor
-public class AssetConverter {
+public class AssetConverter extends AssetEssentialConverter {
 
-    private final ApiProperties apiProperties;
-    private final AssetPreviewService assetPreviewService;
-
-    private List<PreviewSize> defaultSizes = Arrays.asList(PreviewSize.S, PreviewSize.M, PreviewSize.L);
+    public AssetConverter(ApiProperties apiProperties, AssetPreviewService assetPreviewService) {
+        super(apiProperties, assetPreviewService);
+    }
 
     /**
      * extract baseUrl from RequestContextHolder - so in case there is no RequestContext you get errors!
@@ -50,23 +48,6 @@ public class AssetConverter {
         return result;
     }
 
-    private void injectPreviewsAndDownload(AssetRead result, List<PreviewSize> sizes) {
-        if (result != null) {
-            if (result.getType() != null && result.getType().isImage()) {
-                result.setPreviews(AssetPreviews.builder()
-                        .previewMap(new HashMap<>())
-                        .build());
-
-                ((sizes == null || sizes.isEmpty()) ? defaultSizes : sizes)
-                        .forEach(s -> result.getPreviews().getPreviewMap()
-                                .put(s, assetPreviewService.getPreviewUrl(result, s)));
-            }
-            if (apiProperties.isDownload()) {
-                result.setDownload(apiProperties.getPath() + "/" + result.getId() + "/b");
-            }
-        }
-    }
-
     public AssetReference fromEntityWithoutPreviews(AssetEntity entity) {
         if (entity == null) {
             return null;
@@ -94,30 +75,6 @@ public class AssetConverter {
             return null;
         }
         return entities.stream().map(v -> fromEntity(v, sizes)).collect(Collectors.toList());
-    }
-
-    public AssetRead toRead(AssetReference reference) {
-        return toRead(reference, null);
-    }
-
-    public AssetRead toRead(AssetReference reference, List<PreviewSize> sizes) {
-        if (reference == null) {
-            return null;
-        }
-
-        AssetRead result = AssetRead.builderRead()
-                .id(reference.getId())
-                .systemRefId(reference.getSystemRefId())
-                .context(reference.getContext())
-                .urlPath(reference.getUrlPath())
-                .type(reference.getType())
-                .meta(reference.getMeta())
-                .build();
-
-        injectPreviewsAndDownload(result, sizes);
-
-
-        return result;
     }
 
 }

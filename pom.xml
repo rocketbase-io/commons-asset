@@ -44,6 +44,7 @@ SOFTWARE.
         <module>commons-asset-tooling</module>
         <module>commons-asset-s3</module>
         <module>commons-asset-rest</module>
+        <module>commons-asset-essential</module>
     </modules>
 
     <licenses>

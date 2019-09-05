@@ -1,0 +1,63 @@
+package io.rocketbase.commons.converter;
+
+import io.rocketbase.commons.config.ApiProperties;
+import io.rocketbase.commons.dto.asset.AssetPreviews;
+import io.rocketbase.commons.dto.asset.AssetRead;
+import io.rocketbase.commons.dto.asset.AssetReference;
+import io.rocketbase.commons.dto.asset.PreviewSize;
+import lombok.RequiredArgsConstructor;
+
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+
+@RequiredArgsConstructor
+public class AssetEssentialConverter {
+
+    private final ApiProperties apiProperties;
+    private final AssetPreviewService assetPreviewService;
+
+    private List<PreviewSize> defaultSizes = Arrays.asList(PreviewSize.S, PreviewSize.M, PreviewSize.L);
+
+    protected void injectPreviewsAndDownload(AssetRead result, List<PreviewSize> sizes) {
+        if (result != null) {
+            if (result.getType() != null && result.getType().isImage()) {
+                result.setPreviews(AssetPreviews.builder()
+                        .previewMap(new HashMap<>())
+                        .build());
+
+                ((sizes == null || sizes.isEmpty()) ? defaultSizes : sizes)
+                        .forEach(s -> result.getPreviews().getPreviewMap()
+                                .put(s, assetPreviewService.getPreviewUrl(result, s)));
+            }
+            if (apiProperties.isDownload()) {
+                result.setDownload(apiProperties.getPath() + "/" + result.getId() + "/b");
+            }
+        }
+    }
+
+    public AssetRead toRead(AssetReference reference) {
+        return toRead(reference, null);
+    }
+
+    public AssetRead toRead(AssetReference reference, List<PreviewSize> sizes) {
+        if (reference == null) {
+            return null;
+        }
+
+        AssetRead result = AssetRead.builderRead()
+                .id(reference.getId())
+                .systemRefId(reference.getSystemRefId())
+                .context(reference.getContext())
+                .urlPath(reference.getUrlPath())
+                .type(reference.getType())
+                .meta(reference.getMeta())
+                .build();
+
+        injectPreviewsAndDownload(result, sizes);
+
+
+        return result;
+    }
+
+}
