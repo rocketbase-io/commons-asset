@@ -30,6 +30,8 @@ public class ApiProperties implements Serializable {
 
     private boolean detectColors = true;
 
+    private boolean analyse = true;
+
     private Map<String, String> downloadHeaders = new HashMap<>();
 
 }
