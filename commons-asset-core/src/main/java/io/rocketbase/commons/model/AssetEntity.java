@@ -1,71 +1,57 @@
 package io.rocketbase.commons.model;
 
-import io.rocketbase.commons.dto.asset.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-import org.springframework.data.annotation.Id;
+import io.rocketbase.commons.dto.asset.AssetMeta;
+import io.rocketbase.commons.dto.asset.AssetReference;
 import org.springframework.data.annotation.Transient;
-import org.springframework.data.mongodb.core.index.Indexed;
-import org.springframework.data.mongodb.core.mapping.Document;
 
-import java.time.LocalDateTime;
+public interface AssetEntity {
 
-@Data
-@Document(collection = "assets")
-@Builder
-@AllArgsConstructor
-@NoArgsConstructor
-public class AssetEntity {
+    String getId();
 
-    @Id
-    private String id;
+    void setId(String id);
 
-    /**
-     * optional foreign id of other system
-     */
-    @Indexed
-    private String systemRefId;
+    String getSystemRefId();
 
-    /**
-     * relative path of storage
-     */
-    private String urlPath;
+    void setSystemRefId(String systemRefId);
 
-    private AssetType type;
+    String getUrlPath();
 
-    /**
-     * allows to store individual grouping for assets to find all picture of a flexible type<br>
-     * for example all avatar images or backgrounds...
-     */
-    @Indexed
-    private String context;
+    void setUrlPath(String urlPath);
 
-    private LocalDateTime created;
+    io.rocketbase.commons.dto.asset.AssetType getType();
 
-    private String originalFilename;
+    void setType(io.rocketbase.commons.dto.asset.AssetType type);
 
-    private long fileSize;
+    String getContext();
 
-    /**
-     * only filled in case of image asset
-     */
-    private Resolution resolution;
+    void setContext(String context);
 
-    /**
-     * only filled in case of image asset
-     */
-    private ColorPalette colorPalette;
+    java.time.LocalDateTime getCreated();
 
-    /**
-     * only filled in case of batch downloaded image
-     */
-    @Indexed
-    private String referenceUrl;
+    void setCreated(java.time.LocalDateTime created);
+
+    String getOriginalFilename();
+
+    void setOriginalFilename(String originalFilename);
+
+    long getFileSize();
+
+    void setFileSize(long fileSize);
+
+    io.rocketbase.commons.dto.asset.Resolution getResolution();
+
+    void setResolution(io.rocketbase.commons.dto.asset.Resolution resolution);
+
+    io.rocketbase.commons.dto.asset.ColorPalette getColorPalette();
+
+    void setColorPalette(io.rocketbase.commons.dto.asset.ColorPalette colorPalette);
+
+    String getReferenceUrl();
+
+    void setReferenceUrl(String referenceUrl);
 
     @Transient
-    public AssetReference toReference() {
+    default AssetReference toReference() {
         return AssetReference.builder()
                 .id(getId())
                 .systemRefId(getSystemRefId())

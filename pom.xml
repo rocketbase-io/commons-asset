@@ -40,11 +40,12 @@ SOFTWARE.
 
     <modules>
         <module>commons-asset-api</module>
-        <module>commons-asset-essential</module>
         <module>commons-asset-tooling</module>
         <module>commons-asset-core</module>
         <module>commons-asset-s3</module>
         <module>commons-asset-rest</module>
+        <module>commons-asset-mongo</module>
+        <module>commons-asset-jpa</module>
     </modules>
 
     <licenses>

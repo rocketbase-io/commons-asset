@@ -39,7 +39,7 @@ SOFTWARE.
     <dependencies>
         <dependency>
             <groupId>io.rocketbase.commons</groupId>
-            <artifactId>commons-asset-essential</artifactId>
+            <artifactId>commons-asset-api</artifactId>
             <version>${project.version}</version>
         </dependency>
 
@@ -51,13 +51,12 @@ SOFTWARE.
 
         <dependency>
             <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-data-mongodb</artifactId>
+            <artifactId>spring-boot-autoconfigure</artifactId>
         </dependency>
 
         <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-configuration-processor</artifactId>
-            <optional>true</optional>
+            <groupId>javax.annotation</groupId>
+            <artifactId>javax.annotation-api</artifactId>
         </dependency>
 
         <dependency>
@@ -77,6 +76,12 @@ SOFTWARE.
                     <artifactId>commons-io</artifactId>
                 </exclusion>
             </exclusions>
+        </dependency>
+
+        <dependency>
+            <groupId>com.squareup</groupId>
+            <artifactId>pollexor</artifactId>
+            <version>${pollexor.version}</version>
         </dependency>
 
         <!-- tests -->

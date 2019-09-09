@@ -7,6 +7,7 @@ import io.rocketbase.commons.service.S3FileStoreService;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import org.springframework.boot.autoconfigure.AutoConfigureBefore;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
@@ -53,6 +54,7 @@ public class AssetS3AutoConfiguration {
     }
 
     @Bean
+    @ConditionalOnBean
     public FileStorageService fileStorageService() {
         return new S3FileStoreService(s3Properties.getBucket(), getS3Client());
     }

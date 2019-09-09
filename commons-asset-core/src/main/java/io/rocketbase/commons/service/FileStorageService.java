@@ -30,4 +30,8 @@ public interface FileStorageService {
      */
     void delete(AssetEntity entity);
 
+    default boolean localEndpoint() {
+        return true;
+    }
+
 }

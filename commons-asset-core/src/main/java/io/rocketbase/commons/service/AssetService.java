@@ -16,7 +16,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.IOUtils;
 import org.apache.tika.Tika;
-import org.bson.types.ObjectId;
 
 import javax.annotation.Resource;
 import javax.imageio.ImageIO;
@@ -111,11 +110,14 @@ public class AssetService {
     }
 
     public void deleteByIdOrSystemRefId(String sid) {
-        AssetEntity asset = assetRepository.findByIdOrSystemRefId(sid)
-                .orElseThrow(() -> new NotFoundException());
+        Optional<AssetEntity> asset = assetRepository.findByIdOrSystemRefId(sid);
 
-        fileStorageService.delete(asset);
-        assetRepository.delete(asset.getId());
+        if (!asset.isPresent()) {
+            throw new NotFoundException();
+        }
+
+        fileStorageService.delete(asset.get());
+        assetRepository.delete(asset.get().getId());
     }
 
     private AssetEntity saveAndUploadAsset(AssetType type, File file, String originalFilename, long size, String systemRefId, String context, String referenceUrl) {
@@ -128,18 +130,15 @@ public class AssetService {
 
         AnalyseResult analyse = analyse(type, file);
 
-        AssetEntity entity = AssetEntity.builder()
-                .id(ObjectId.get().toHexString())
-                .type(type)
-                .originalFilename(originalFilename)
-                .referenceUrl(referenceUrl)
-                .systemRefId(systemRefId)
-                .context(context)
-                .fileSize(size)
-                .created(LocalDateTime.now())
-                .resolution(analyse.getResolution())
-                .colorPalette(analyse.getColorPalette())
-                .build();
+        AssetEntity entity = assetRepository.initNewInstance();
+        entity.setType(type);
+        entity.setOriginalFilename(originalFilename);
+        entity.setReferenceUrl(referenceUrl);
+        entity.setSystemRefId(systemRefId);
+        entity.setContext(context);
+        entity.setFileSize(size);
+        entity.setResolution(analyse.getResolution());
+        entity.setColorPalette(analyse.getColorPalette());
 
         try {
             fileStorageService.upload(entity, file);
