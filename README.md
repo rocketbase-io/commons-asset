@@ -15,12 +15,12 @@ I've added a swagger api-documentation. You can find it within [src](./commons-a
 
 **Features:**
 * api and controller to handle asset-uploads
-* works with jpeg, gif, png and files like pdf, excel, word and zip
+* works with images: jpeg, gif, png, tiff and documents like: pdf, excel, word, powerpoint and zip
 * you can configure the allowed contentTypes via property *("asset.api.types")*
-* 2 different storage implementations (mongo-grif-fs / aws-s3)
-* embedded thumb service (for mongo-grif-fs) or thumbor via s3 connector
+* 3 different storage implementations (mongo-grid-fs / aws-s3 / jpa-blob)
+* embedded thumb service (for mongo-grid-fs/jpa-blob) or thumbor via s3 connector
 * java resource to communicate with api
-* batch downloading urls and storing them
+* batch downloading urls and storing them / analyzing
 * intergrated [color-thief](https://github.com/SvenWoltmann/color-thief-java) in order to get primary and other colors from photo
 
 ## commons-asset-api
@@ -35,6 +35,7 @@ The main Objects are: **AssetReference** that is used to store in MongoDb in cas
     "id": "5b0f6bf23c5ded0ee5dcab57",
     "urlPath": "a/b/5/7/5b0f6bf23c5ded0ee5dcab57.jpg",
     "type": "JPEG",
+    "context": "people-shoot",
     "meta": {
         "created": "2018-05-31T07:28:50.239",
         "originalFilename": "photo-1478472190689-fa020c20809a.jpeg",
@@ -55,6 +56,10 @@ With urlPath you can calculate your preview url. The logic is been implemented i
 
 During upload process the file is getting read so that some meta information get stored. In case of image also the resolution is getting stored...
 
+## commons-asset-tooling
+
+Containing Thumbnail-Service, ColorThief, Download-Service, ImageHandler (for download images and on the fly thumbnailing + base64 converting)...
+
 ## commons-asset-core
 
 Containing an implementation for storing asset references...
@@ -72,6 +77,14 @@ Containing an implementation for storing asset references...
 | asset.api.baseUrl  | ""                | used for previewUrls in case of mongo-storage, will get used as fallback |
 | asset.thumbor.host | *required for s3* | base url of your thumbor service                             |
 | asset.thumbor.key  | *optional*        | secure your thumbor urls                                     |
+
+## commons-asset-mongo
+
+Implementation for MongoRepository + Mongo-FileStorageService...
+
+## commons-asset-jpa
+
+Implementation for JpaRepository + Jpa-FileStorageService...
 
 ## commons-asset-rest
 
