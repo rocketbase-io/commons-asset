@@ -98,10 +98,10 @@ SOFTWARE.
         <maven.compiler.target>1.8</maven.compiler.target>
         <maven.javadoc.failOnError>false</maven.javadoc.failOnError>
 
-        <spring-boot.version>2.1.7.RELEASE</spring-boot.version>
+        <spring-boot.version>2.1.8.RELEASE</spring-boot.version>
         <spring-cloud-dependencies.version>Greenwich.SR2</spring-cloud-dependencies.version>
 
-        <commons-rest.version>1.7.0</commons-rest.version>
+        <commons-rest.version>1.8.0</commons-rest.version>
         <guava.version>28.1-jre</guava.version>
         <pollexor.version>2.0.4</pollexor.version>
         <commons-fileupload.version>1.4</commons-fileupload.version>
