@@ -90,6 +90,8 @@ Implementation for JpaRepository + Jpa-FileStorageService...
 
 Containing an all controllers for the rest implementation...
 
+**Hint:** The maximum fileupload size within a spring-boot application is by default just 1Mb you can change this via a property: **spring.servlet.multipart.max-file-size=5MB**
+
 ## commons-asset-s3
 
 Containing a communication layer with s3 in order to use it as file storage.
