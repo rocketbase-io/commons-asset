@@ -3,7 +3,7 @@ package io.rocketbase.commons.dto.asset;
 import lombok.*;
 
 import java.io.Serializable;
-import java.time.LocalDateTime;
+import java.time.Instant;
 import java.util.List;
 
 @Data
@@ -12,8 +12,8 @@ import java.util.List;
 @Builder
 public class QueryAsset implements Serializable {
 
-    private LocalDateTime before;
-    private LocalDateTime after;
+    private Instant before;
+    private Instant after;
     private String originalFilename;
     private String referenceUrl;
     private String context;

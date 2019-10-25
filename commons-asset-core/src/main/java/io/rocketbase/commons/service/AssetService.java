@@ -24,6 +24,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
@@ -162,7 +163,7 @@ public class AssetService {
                 .fileSize(fileSize)
                 .resolution(analyse.getResolution())
                 .colorPalette(analyse.getColorPalette())
-                .created(LocalDateTime.now())
+                .created(Instant.now())
                 .originalFilename(originalFilename)
                 .build();
         return result;

@@ -3,8 +3,8 @@ package io.rocketbase.commons.service;
 import io.rocketbase.commons.BaseIntegrationTest;
 import io.rocketbase.commons.dto.asset.AssetType;
 import io.rocketbase.commons.dto.asset.QueryAsset;
-import io.rocketbase.commons.model.AssetMongoEntity;
 import io.rocketbase.commons.model.AssetEntity;
+import io.rocketbase.commons.model.AssetMongoEntity;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.data.domain.Page;
@@ -14,6 +14,7 @@ import org.springframework.data.mongodb.core.MongoTemplate;
 
 import javax.annotation.Resource;
 import java.time.LocalDateTime;
+import java.time.ZoneOffset;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -34,27 +35,27 @@ public class AssetRepositoryTest extends BaseIntegrationTest {
         mongoTemplate.save(AssetMongoEntity.builder()
                 .type(AssetType.JPEG)
                 .originalFilename("oRiginalF.jpg")
-                .created(LocalDateTime.of(2018, 3, 1, 10, 22))
+                .created(LocalDateTime.of(2018, 3, 1, 10, 22).toInstant(ZoneOffset.UTC))
                 .fileSize(1234L)
                 .build());
         mongoTemplate.save(AssetMongoEntity.builder()
                 .type(AssetType.JPEG)
                 .originalFilename("second.jpg")
-                .created(LocalDateTime.of(2018, 2, 20, 10, 30))
+                .created(LocalDateTime.of(2018, 2, 20, 10, 30).toInstant(ZoneOffset.UTC))
                 .fileSize(1234L)
                 .build());
         mongoTemplate.save(AssetMongoEntity.builder()
                 .type(AssetType.PDF)
                 .originalFilename("second-doc.pdf")
                 .referenceUrl("http://www.other.com/second-doc.pdf")
-                .created(LocalDateTime.of(2018, 3, 3, 11, 0))
+                .created(LocalDateTime.of(2018, 3, 3, 11, 0).toInstant(ZoneOffset.UTC))
                 .fileSize(2345L)
                 .build());
         mongoTemplate.save(AssetMongoEntity.builder()
                 .type(AssetType.PDF)
                 .originalFilename("sample.pdf")
                 .referenceUrl("http://www.rocketbase.io/sample.pdf")
-                .created(LocalDateTime.of(2018, 4, 11, 2, 0))
+                .created(LocalDateTime.of(2018, 4, 11, 2, 0).toInstant(ZoneOffset.UTC))
                 .fileSize(2345L)
                 .build());
     }
@@ -81,7 +82,7 @@ public class AssetRepositoryTest extends BaseIntegrationTest {
     public void findAllByCreatedBefore() {
         // given
         QueryAsset query = QueryAsset.builder()
-                .before(LocalDateTime.of(2018, 3, 1, 9, 0))
+                .before(LocalDateTime.of(2018, 3, 1, 9, 0).toInstant(ZoneOffset.UTC))
                 .build();
         // when
         Page<AssetEntity> page = assetRepository.findAll(query, pageable);
@@ -95,7 +96,7 @@ public class AssetRepositoryTest extends BaseIntegrationTest {
     public void findAllByCreatedAfter() {
         // given
         QueryAsset query = QueryAsset.builder()
-                .after(LocalDateTime.of(2018, 3, 1, 9, 0))
+                .after(LocalDateTime.of(2018, 3, 1, 9, 0).toInstant(ZoneOffset.UTC))
                 .build();
         // when
         Page<AssetEntity> page = assetRepository.findAll(query, pageable);
@@ -109,8 +110,8 @@ public class AssetRepositoryTest extends BaseIntegrationTest {
     public void findAllByCreatedBeforeAndAfter() {
         // given
         QueryAsset query = QueryAsset.builder()
-                .before(LocalDateTime.of(2018, 3, 20, 23, 59))
-                .after(LocalDateTime.of(2018, 3, 1, 0, 0))
+                .before(LocalDateTime.of(2018, 3, 20, 23, 59).toInstant(ZoneOffset.UTC))
+                .after(LocalDateTime.of(2018, 3, 1, 0, 0).toInstant(ZoneOffset.UTC))
                 .build();
         // when
         Page<AssetEntity> page = assetRepository.findAll(query, pageable);
@@ -152,8 +153,8 @@ public class AssetRepositoryTest extends BaseIntegrationTest {
     public void findAllCombined() {
         // given
         QueryAsset query = QueryAsset.builder()
-                .before(LocalDateTime.of(2018, 3, 20, 23, 59))
-                .after(LocalDateTime.of(2018, 3, 1, 0, 0))
+                .before(LocalDateTime.of(2018, 3, 20, 23, 59).toInstant(ZoneOffset.UTC))
+                .after(LocalDateTime.of(2018, 3, 1, 0, 0).toInstant(ZoneOffset.UTC))
                 .type(AssetType.JPEG)
                 .type(AssetType.PNG)
                 .originalFilename("ORIGINAL")

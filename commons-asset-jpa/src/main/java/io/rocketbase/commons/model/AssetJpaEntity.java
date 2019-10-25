@@ -12,7 +12,7 @@ import lombok.NoArgsConstructor;
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
-import java.time.LocalDateTime;
+import java.time.Instant;
 
 
 @Entity
@@ -61,7 +61,7 @@ public class AssetJpaEntity implements AssetEntity {
 
     @NotNull
     @Column(nullable = false)
-    private LocalDateTime created;
+    private Instant created;
 
     private String originalFilename;
 

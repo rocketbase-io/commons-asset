@@ -8,6 +8,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.PagingAndSortingRepository;
 import org.springframework.data.repository.query.Param;
 
+import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -20,7 +21,7 @@ public interface AssetEntityRepository extends PagingAndSortingRepository<AssetJ
             + "(:referenceUrl is null or lower(a.referenceUrl) like %:referenceUrl%) and "
             + "(:context is null or lower(a.context) like %:context%) and "
             + "a.type in (:types)")
-    Page<AssetJpaEntity> findAllWithDates(@Param("before") LocalDateTime before, @Param("after") LocalDateTime after,
+    Page<AssetJpaEntity> findAllWithDates(@Param("before") Instant before, @Param("after") Instant after,
                                           @Param("originalFilename") String originalFilename, @Param("referenceUrl") String referenceUrl,
                                           @Param("context") String context, @Param("types") List<AssetType> types, Pageable pageable);
 

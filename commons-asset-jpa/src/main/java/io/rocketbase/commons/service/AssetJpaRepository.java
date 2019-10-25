@@ -10,6 +10,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.util.StringUtils;
 
 import javax.transaction.Transactional;
+import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
@@ -91,7 +92,7 @@ public class AssetJpaRepository implements AssetRepository<AssetJpaEntity> {
     public AssetJpaEntity initNewInstance() {
         return AssetJpaEntity.builder()
                 .id(UUID.randomUUID().toString())
-                .created(LocalDateTime.now())
+                .created(Instant.now())
                 .build();
     }
 

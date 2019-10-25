@@ -7,7 +7,7 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 
 import java.beans.ConstructorProperties;
-import java.time.LocalDateTime;
+import java.time.Instant;
 
 @Data
 @EqualsAndHashCode(callSuper = true)
@@ -18,7 +18,7 @@ public class AssetAnalyse extends AssetMeta {
     @JsonCreator
     @ConstructorProperties({"created", "originalFilename", "fileSize", "resolution", "colorPalette", "referenceUrl", "type"})
     @Builder(builderMethodName = "builderAnalyse")
-    public AssetAnalyse(LocalDateTime created, String originalFilename, long fileSize, Resolution resolution, ColorPalette colorPalette, String referenceUrl, AssetType type) {
+    public AssetAnalyse(Instant created, String originalFilename, long fileSize, Resolution resolution, ColorPalette colorPalette, String referenceUrl, AssetType type) {
         super(created, originalFilename, fileSize, resolution, colorPalette, referenceUrl);
         this.type = type;
     }

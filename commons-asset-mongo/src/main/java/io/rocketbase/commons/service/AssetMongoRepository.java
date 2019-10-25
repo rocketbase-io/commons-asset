@@ -5,14 +5,21 @@ import io.rocketbase.commons.dto.asset.QueryAsset;
 import io.rocketbase.commons.model.AssetMongoEntity;
 import lombok.RequiredArgsConstructor;
 import org.bson.types.ObjectId;
+import org.springframework.boot.context.event.ApplicationReadyEvent;
+import org.springframework.context.event.EventListener;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.data.mongodb.core.index.IndexOperations;
+import org.springframework.data.mongodb.core.index.IndexResolver;
+import org.springframework.data.mongodb.core.index.MongoPersistentEntityIndexResolver;
+import org.springframework.data.mongodb.core.mapping.MongoMappingContext;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.util.StringUtils;
 
+import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -21,6 +28,8 @@ import java.util.Optional;
 public class AssetMongoRepository implements AssetRepository<AssetMongoEntity> {
 
     private final MongoTemplate mongoTemplate;
+
+    private final MongoMappingContext mongoMappingContext;
 
     /**
      * search first by id, when not found by systemRefId
@@ -72,7 +81,7 @@ public class AssetMongoRepository implements AssetRepository<AssetMongoEntity> {
     public AssetMongoEntity initNewInstance() {
         return AssetMongoEntity.builder()
                 .id(ObjectId.get().toHexString())
-                .created(LocalDateTime.now())
+                .created(Instant.now())
                 .build();
     }
 
@@ -108,4 +117,13 @@ public class AssetMongoRepository implements AssetRepository<AssetMongoEntity> {
         }
         return result;
     }
+
+    @EventListener(ApplicationReadyEvent.class)
+    public void initIndicesAfterStartup() {
+        IndexOperations indexOps = mongoTemplate.indexOps(AssetMongoEntity.class);
+
+        IndexResolver resolver = new MongoPersistentEntityIndexResolver(mongoMappingContext);
+        resolver.resolveIndexFor(AssetMongoEntity.class).forEach(indexOps::ensureIndex);
+    }
+
 }

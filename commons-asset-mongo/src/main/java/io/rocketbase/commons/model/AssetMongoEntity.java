@@ -11,6 +11,7 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import java.time.Instant;
 import java.time.LocalDateTime;
 
 @Data
@@ -43,7 +44,7 @@ public class AssetMongoEntity implements AssetEntity {
     @Indexed
     private String context;
 
-    private LocalDateTime created;
+    private Instant created;
 
     private String originalFilename;
 

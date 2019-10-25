@@ -51,7 +51,7 @@ public class MongoFileStorageService implements FileStorageService {
         Document meta = new Document()
                 .append("type", entity.getType().name())
                 .append("originalFilename", entity.getOriginalFilename())
-                .append("created", entity.getCreated().toLocalDate().toString());
+                .append("created", entity.getCreated().toString());
         if (entity.getSystemRefId() != null) {
             meta.append("systemRefId", entity.getSystemRefId());
         }

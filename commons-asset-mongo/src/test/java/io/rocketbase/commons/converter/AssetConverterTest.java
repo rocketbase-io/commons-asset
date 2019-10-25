@@ -9,6 +9,7 @@ import io.rocketbase.commons.dto.asset.Resolution;
 import io.rocketbase.commons.model.AssetMongoEntity;
 import org.junit.Test;
 
+import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.Arrays;
 
@@ -30,7 +31,7 @@ public class AssetConverterTest {
                 .id("1235678")
                 .urlPath("12345678")
                 .fileSize(1234L)
-                .created(LocalDateTime.now())
+                .created(Instant.now())
                 .originalFilename("original.png")
                 .type(AssetType.PNG)
                 .systemRefId("123")

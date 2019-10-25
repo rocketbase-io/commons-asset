@@ -5,12 +5,12 @@ import io.rocketbase.commons.service.AssetRepository;
 import io.rocketbase.commons.service.FileStorageService;
 import io.rocketbase.commons.service.MongoFileStorageService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.AutoConfigureBefore;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.data.mongodb.core.mapping.MongoMappingContext;
 import org.springframework.data.mongodb.gridfs.GridFsTemplate;
 
 import javax.annotation.Resource;
@@ -32,8 +32,8 @@ public class AssetMongoAutoConfiguration implements Serializable {
 
     @Bean
     @ConditionalOnMissingBean
-    public AssetRepository assetRepository(@Autowired MongoTemplate mongoTemplate) {
-        return new AssetMongoRepository(mongoTemplate);
+    public AssetRepository assetRepository(MongoTemplate mongoTemplate, MongoMappingContext mongoMappingContext) {
+        return new AssetMongoRepository(mongoTemplate, mongoMappingContext);
     }
 
 }

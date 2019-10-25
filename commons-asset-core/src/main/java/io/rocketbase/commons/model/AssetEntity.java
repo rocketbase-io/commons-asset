@@ -1,8 +1,9 @@
 package io.rocketbase.commons.model;
 
-import io.rocketbase.commons.dto.asset.AssetMeta;
-import io.rocketbase.commons.dto.asset.AssetReference;
+import io.rocketbase.commons.dto.asset.*;
 import org.springframework.data.annotation.Transient;
+
+import java.time.Instant;
 
 public interface AssetEntity {
 
@@ -18,17 +19,17 @@ public interface AssetEntity {
 
     void setUrlPath(String urlPath);
 
-    io.rocketbase.commons.dto.asset.AssetType getType();
+    AssetType getType();
 
-    void setType(io.rocketbase.commons.dto.asset.AssetType type);
+    void setType(AssetType type);
 
     String getContext();
 
     void setContext(String context);
 
-    java.time.LocalDateTime getCreated();
+    Instant getCreated();
 
-    void setCreated(java.time.LocalDateTime created);
+    void setCreated(Instant created);
 
     String getOriginalFilename();
 
@@ -38,13 +39,13 @@ public interface AssetEntity {
 
     void setFileSize(long fileSize);
 
-    io.rocketbase.commons.dto.asset.Resolution getResolution();
+    Resolution getResolution();
 
-    void setResolution(io.rocketbase.commons.dto.asset.Resolution resolution);
+    void setResolution(Resolution resolution);
 
-    io.rocketbase.commons.dto.asset.ColorPalette getColorPalette();
+    ColorPalette getColorPalette();
 
-    void setColorPalette(io.rocketbase.commons.dto.asset.ColorPalette colorPalette);
+    void setColorPalette(ColorPalette colorPalette);
 
     String getReferenceUrl();
 

@@ -69,7 +69,7 @@ public class S3FileStoreService implements FileStorageService {
         objectMetadata.setHeader("type", entity.getType().name());
         objectMetadata.setHeader("context", entity.getContext());
         objectMetadata.setHeader("originalFilename", entity.getOriginalFilename());
-        objectMetadata.setHeader("created", entity.getCreated().toLocalDate().toString());
+        objectMetadata.setHeader("created", entity.getCreated().toString());
         if (entity.getSystemRefId() != null) {
             objectMetadata.setHeader("systemRefId", entity.getSystemRefId());
         }
