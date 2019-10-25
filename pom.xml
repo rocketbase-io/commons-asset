@@ -98,18 +98,18 @@ SOFTWARE.
         <maven.compiler.target>1.8</maven.compiler.target>
         <maven.javadoc.failOnError>false</maven.javadoc.failOnError>
 
-        <spring-boot.version>2.1.8.RELEASE</spring-boot.version>
-        <spring-cloud-dependencies.version>Greenwich.SR2</spring-cloud-dependencies.version>
+        <spring-boot.version>2.2.0.RELEASE</spring-boot.version>
+        <spring-cloud-dependencies.version>Greenwich.SR3</spring-cloud-dependencies.version>
 
-        <commons-rest.version>1.8.0</commons-rest.version>
+        <commons-rest.version>1.8.1</commons-rest.version>
         <guava.version>28.1-jre</guava.version>
         <pollexor.version>2.0.4</pollexor.version>
         <commons-fileupload.version>1.4</commons-fileupload.version>
         <commons-io.version>2.6</commons-io.version>
         <tika-core.version>1.22</tika-core.version>
         <thumbnailator.version>0.4.8</thumbnailator.version>
-        <okhttp.version>4.1.0</okhttp.version>
-        <jacoco.version>0.8.4</jacoco.version>
+        <okhttp.version>4.2.2</okhttp.version>
+        <jacoco.version>0.8.5</jacoco.version>
     </properties>
 
     <dependencyManagement>
