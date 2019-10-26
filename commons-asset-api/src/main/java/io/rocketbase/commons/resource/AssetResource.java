@@ -9,6 +9,7 @@ import io.rocketbase.commons.dto.batch.AssetBatchAnalyseResult;
 import io.rocketbase.commons.dto.batch.AssetBatchResult;
 import io.rocketbase.commons.dto.batch.AssetBatchWrite;
 import io.rocketbase.commons.exception.NotFoundException;
+import io.rocketbase.commons.util.QueryParamBuilder;
 import lombok.SneakyThrows;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.core.io.ByteArrayResource;
@@ -27,7 +28,6 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 public class AssetResource implements BaseRestResource {
@@ -78,12 +78,8 @@ public class AssetResource implements BaseRestResource {
     public PageableResult<AssetRead> findAll(Pageable pageable, QueryAsset query) {
         UriComponentsBuilder uriBuilder = appendParams(getUriBuilder(), pageable);
         if (query != null) {
-            if (query.getBefore() != null) {
-                uriBuilder.queryParam("before", DateTimeFormatter.ISO_LOCAL_DATE_TIME.format(query.getBefore()));
-            }
-            if (query.getAfter() != null) {
-                uriBuilder.queryParam("after", DateTimeFormatter.ISO_LOCAL_DATE_TIME.format(query.getAfter()));
-            }
+            QueryParamBuilder.appendParams(uriBuilder, "before", query.getBefore());
+            QueryParamBuilder.appendParams(uriBuilder, "after", query.getAfter());
             if (query.getOriginalFilename() != null) {
                 uriBuilder.queryParam("originalFilename", query.getOriginalFilename());
             }
