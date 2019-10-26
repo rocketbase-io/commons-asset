@@ -4,6 +4,7 @@ import com.mongodb.client.result.DeleteResult;
 import io.rocketbase.commons.dto.asset.QueryAsset;
 import io.rocketbase.commons.model.AssetMongoEntity;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.bson.types.ObjectId;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.event.EventListener;
@@ -20,16 +21,18 @@ import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.util.StringUtils;
 
 import java.time.Instant;
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
+@Slf4j
 @RequiredArgsConstructor
 public class AssetMongoRepository implements AssetRepository<AssetMongoEntity> {
 
     private final MongoTemplate mongoTemplate;
 
     private final MongoMappingContext mongoMappingContext;
+
+    private final boolean mongoEnsureInde;
 
     /**
      * search first by id, when not found by systemRefId
@@ -120,10 +123,15 @@ public class AssetMongoRepository implements AssetRepository<AssetMongoEntity> {
 
     @EventListener(ApplicationReadyEvent.class)
     public void initIndicesAfterStartup() {
-        IndexOperations indexOps = mongoTemplate.indexOps(AssetMongoEntity.class);
+        if (mongoEnsureInde) {
+            IndexOperations indexOps = mongoTemplate.indexOps(AssetMongoEntity.class);
 
-        IndexResolver resolver = new MongoPersistentEntityIndexResolver(mongoMappingContext);
-        resolver.resolveIndexFor(AssetMongoEntity.class).forEach(indexOps::ensureIndex);
+            IndexResolver resolver = new MongoPersistentEntityIndexResolver(mongoMappingContext);
+            resolver.resolveIndexFor(AssetMongoEntity.class).forEach(indexOps::ensureIndex);
+            log.info("created index for AssetMongoEntity");
+        } else {
+            log.debug("disabled creating of index for AssetMongoEntity");
+        }
     }
 
 }

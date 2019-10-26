@@ -5,6 +5,7 @@ import io.rocketbase.commons.service.AssetRepository;
 import io.rocketbase.commons.service.FileStorageService;
 import io.rocketbase.commons.service.MongoFileStorageService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.AutoConfigureBefore;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.annotation.Bean;
@@ -24,6 +25,9 @@ public class AssetMongoAutoConfiguration implements Serializable {
     @Resource
     private GridFsTemplate gridFsTemplate;
 
+    @Value("${asset.api.mongo.index:true}")
+    private boolean mongoEnsureIndex;
+
     @Bean
     @ConditionalOnMissingBean
     public FileStorageService fileStorageService() {
@@ -33,7 +37,7 @@ public class AssetMongoAutoConfiguration implements Serializable {
     @Bean
     @ConditionalOnMissingBean
     public AssetRepository assetRepository(MongoTemplate mongoTemplate, MongoMappingContext mongoMappingContext) {
-        return new AssetMongoRepository(mongoTemplate, mongoMappingContext);
+        return new AssetMongoRepository(mongoTemplate, mongoMappingContext, mongoEnsureIndex);
     }
 
 }
