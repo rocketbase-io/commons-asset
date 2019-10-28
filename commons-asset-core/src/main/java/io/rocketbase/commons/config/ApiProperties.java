@@ -32,6 +32,11 @@ public class ApiProperties implements Serializable {
 
     private boolean analyse = true;
 
+    /**
+     * in case filestorage is not present - what option should be used for preview generation
+     */
+    private boolean localEndpointFallback = true;
+
     private Map<String, String> downloadHeaders = new HashMap<>();
 
 }
