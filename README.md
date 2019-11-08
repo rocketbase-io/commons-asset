@@ -78,7 +78,7 @@ Containing an implementation for storing asset references...
 
 ### custom preview service
 
-From version 3.x on we've removed our thumbor integration to open our project to multiple thumb providers. In case you would like to use your own you need to provide a custom bean within you application.
+From version 2.2.x on we've removed our thumbor integration to open our project to multiple thumb providers. In case you would like to use your own you need to provide a custom bean within you application.
 
 ````java
 /*
