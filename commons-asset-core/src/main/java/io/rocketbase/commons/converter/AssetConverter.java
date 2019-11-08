@@ -76,14 +76,7 @@ public class AssetConverter {
                 .context(entity.getContext())
                 .urlPath(entity.getUrlPath())
                 .type(entity.getType())
-                .meta(AssetMeta.builder()
-                        .created(entity.getCreated())
-                        .fileSize(entity.getFileSize())
-                        .originalFilename(entity.getOriginalFilename())
-                        .resolution(entity.getResolution())
-                        .colorPalette(entity.getColorPalette())
-                        .referenceUrl(entity.getReferenceUrl())
-                        .build())
+                .meta(entity.getMeta())
                 .build();
 
         injectPreviewsAndDownload(result, sizes);
@@ -102,14 +95,7 @@ public class AssetConverter {
                 .context(entity.getContext())
                 .urlPath(entity.getUrlPath())
                 .type(entity.getType())
-                .meta(AssetMeta.builder()
-                        .created(entity.getCreated())
-                        .fileSize(entity.getFileSize())
-                        .originalFilename(entity.getOriginalFilename())
-                        .resolution(entity.getResolution())
-                        .colorPalette(entity.getColorPalette())
-                        .referenceUrl(entity.getReferenceUrl())
-                        .build())
+                .meta(entity.getMeta())
                 .build();
     }
 

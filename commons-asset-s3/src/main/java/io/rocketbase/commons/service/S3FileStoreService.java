@@ -19,7 +19,7 @@ import java.io.FileInputStream;
 @RequiredArgsConstructor
 public class S3FileStoreService implements FileStorageService {
 
-    private final String bucket;
+    private final BucketResolver bucketResolver;
     private final AmazonS3 amazonS3;
 
     @SneakyThrows
@@ -34,7 +34,7 @@ public class S3FileStoreService implements FileStorageService {
                 .withS3Client(amazonS3)
                 .build();
         ObjectMetadata objectMetadata = generateObjectMeta(entity);
-        Upload upload = transferManager.upload(new PutObjectRequest(bucket,
+        Upload upload = transferManager.upload(new PutObjectRequest(bucketResolver.resolveBucketName(entity),
                 entity.getUrlPath(), new FileInputStream(file), objectMetadata)
                 .withCannedAcl(CannedAccessControlList.BucketOwnerRead));
 
@@ -52,7 +52,7 @@ public class S3FileStoreService implements FileStorageService {
         TransferManager transferManager = TransferManagerBuilder.standard()
                 .withS3Client(amazonS3)
                 .build();
-        Download download = transferManager.download(bucket, entity.getUrlPath(), tempFile);
+        Download download = transferManager.download(bucketResolver.resolveBucketName(entity), entity.getUrlPath(), tempFile);
         download.waitForCompletion();
 
         return new InputStreamResource(new FileInputStream(tempFile));
@@ -60,7 +60,7 @@ public class S3FileStoreService implements FileStorageService {
 
     @Override
     public void delete(AssetEntity entity) {
-        amazonS3.deleteObject(bucket, entity.getUrlPath());
+        amazonS3.deleteObject(bucketResolver.resolveBucketName(entity), entity.getUrlPath());
     }
 
     private ObjectMetadata generateObjectMeta(AssetEntity entity) {

@@ -3,41 +3,20 @@ package io.rocketbase.commons.config;
 import io.rocketbase.commons.converter.*;
 import io.rocketbase.commons.service.*;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.*;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
-import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-import javax.annotation.Resource;
 import java.io.Serializable;
 
 @Configuration
-@EnableConfigurationProperties({ApiProperties.class, ThumborProperties.class})
+@EnableConfigurationProperties({ApiProperties.class})
 @RequiredArgsConstructor
 public class AssetCoreAutoConfiguration implements Serializable {
 
     private final ApiProperties apiProperties;
-    private final ThumborProperties thumborProperties;
-
-    @Resource
-    private ApplicationContext applicationContext;
-
-    private Boolean cacheUsesLocalEndpoint;
-
-    private boolean usesLocalEndpoints() {
-        if (cacheUsesLocalEndpoint == null) {
-            try {
-                FileStorageService bean = applicationContext.getBean(FileStorageService.class);
-                cacheUsesLocalEndpoint = bean.localEndpoint();
-            } catch (BeansException e) {
-                cacheUsesLocalEndpoint = apiProperties.isLocalEndpointFallback();
-            }
-        }
-        return cacheUsesLocalEndpoint;
-    }
 
     @Bean
     @ConditionalOnMissingBean
@@ -49,14 +28,14 @@ public class AssetCoreAutoConfiguration implements Serializable {
     @ConditionalOnMissingBean(value = AssetPreviewService.class)
     @ConditionalOnNotWebApplication
     public AssetPreviewService assetPreviewService() {
-        return new DefaultAssetPreviewService(thumborProperties, apiProperties, usesLocalEndpoints());
+        return new DefaultAssetPreviewService(apiProperties);
     }
 
     @Bean
     @ConditionalOnMissingBean(value = AssetPreviewService.class)
     @ConditionalOnWebApplication
     public AssetPreviewService webAssetPreviewService() {
-        return new ServletAssetPreviewService(thumborProperties, apiProperties, usesLocalEndpoints());
+        return new ServletAssetPreviewService(apiProperties);
     }
 
     @Bean

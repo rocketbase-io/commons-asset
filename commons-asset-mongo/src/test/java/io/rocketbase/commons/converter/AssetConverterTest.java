@@ -1,7 +1,6 @@
 package io.rocketbase.commons.converter;
 
 import io.rocketbase.commons.config.ApiProperties;
-import io.rocketbase.commons.config.ThumborProperties;
 import io.rocketbase.commons.dto.asset.AssetRead;
 import io.rocketbase.commons.dto.asset.AssetType;
 import io.rocketbase.commons.dto.asset.PreviewSize;
@@ -10,7 +9,6 @@ import io.rocketbase.commons.model.AssetMongoEntity;
 import org.junit.Test;
 
 import java.time.Instant;
-import java.time.LocalDateTime;
 import java.util.Arrays;
 
 import static org.hamcrest.CoreMatchers.equalTo;
@@ -25,7 +23,7 @@ public class AssetConverterTest {
         ApiProperties apiProperties = new ApiProperties();
         apiProperties.setBaseUrl("http://localhost:8080");
 
-        AssetConverter converter = new AssetConverter(apiProperties, new DefaultAssetPreviewService(new ThumborProperties(), apiProperties, true));
+        AssetConverter converter = new AssetConverter(apiProperties, new DefaultAssetPreviewService(apiProperties));
         // when
         AssetRead assetRead = converter.fromEntity(AssetMongoEntity.builder()
                 .id("1235678")

@@ -18,7 +18,7 @@ I've added a swagger api-documentation. You can find it within [src](./commons-a
 * works with images: jpeg, gif, png, tiff and documents like: pdf, excel, word, powerpoint and zip
 * you can configure the allowed contentTypes via property *("asset.api.types")*
 * 3 different storage implementations (mongo-grid-fs / aws-s3 / jpa-blob)
-* embedded thumb service (for mongo-grid-fs/jpa-blob) or thumbor via s3 connector
+* embedded thumb service for mongo-grid-fs/jpa-blob - for s3 use custom AssetPreviewService (example below)
 * java resource to communicate with api
 * batch downloading urls and storing them / analyzing
 * intergrated [color-thief](https://github.com/SvenWoltmann/color-thief-java) in order to get primary and other colors from photo
@@ -75,8 +75,84 @@ Containing an implementation for storing asset references...
 | asset.api.detectResolution    | true              | you can disable image resolution detection                              |
 | asset.api.detectColor    | true              | you can disable image colorThief                              |
 | asset.api.baseUrl  | ""                | used for previewUrls in case of mongo-storage, will get used as fallback |
-| asset.thumbor.host | *required for s3* | base url of your thumbor service                             |
-| asset.thumbor.key  | *optional*        | secure your thumbor urls                                     |
+
+### custom preview service
+
+From version 3.x on we've removed our thumbor integration to open our project to multiple thumb providers. In case you would like to use your own you need to provide a custom bean within you application.
+
+````java
+/*
+ * <dependency>
+ *     <groupId>com.squareup</groupId>
+ *     <artifactId>pollexor</artifactId>
+ *     <version>2.0.4</version>
+ * </dependency>
+ */
+@Service
+@RequiredArgsConstructor
+public abstract class ThumborPreviewService implements AssetPreviewService {
+
+    protected final ThumborProperties thumborProperties;
+
+    public String getPreviewUrl(AssetReferenceType assetReference, PreviewSize size) {
+        return getThumbor().buildImage(assetReference.getUrlPath())
+                .resize(size.getMaxWidth(), size.getMaxHeight())
+                .fitIn()
+                .toUrl();
+    }
+
+    protected Thumbor getThumbor() {
+        if (thumbor == null) {
+            String thumborKey = thumborProperties.getKey();
+            if (thumborKey.isEmpty()) {
+                thumbor = Thumbor.create(thumborProperties.getHost());
+            } else {
+                thumbor = Thumbor.create(thumborProperties.getHost(), thumborKey);
+            }
+        }
+        return thumbor;
+    }
+
+}
+````
+
+````java
+/*
+ * <dependency>
+ *     <groupId>io.rocketbase.asset</groupId>
+ *     <artifactId>imgproxy</artifactId>
+ *     <version>0.1.0</version>
+ * </dependency>
+ */
+@Service
+@RequiredArgsConstructor
+public abstract class ImgproxyPreviewService implements AssetPreviewService {
+    
+    private final ImgproxyProperties imgproxyProperties;
+
+    private final BucketResolver bucketResolver;
+
+    private SignatureConfiguration signatureConfiguration;
+
+    public String getPreviewUrl(AssetReferenceType assetReference, PreviewSize size) { 
+        return Signature.of(getConfig())
+                .resize(ResizeType.fit, 300, 300, true)
+                .url("s3://"+ bucketResolver.resolveBucketName(assetReference) +"/" + assetReference.getUrlPath());
+    }
+    
+    private SignatureConfiguration getConfig() {
+        if (signatureConfiguration == null) {
+            signatureConfiguration = new SignatureConfiguration(imgproxyProperties.getBaseurl(),
+                                                             imgproxyProperties.getKey(),
+                                                             imgproxyProperties.getSalt());
+        }
+        return signatureConfiguration;
+    }
+
+
+}
+````
+
 
 ## commons-asset-mongo
 
@@ -113,6 +189,24 @@ cloud:
 | ----------------- | ------------ | ------------------------------------------------------------ |
 | asset.s3.bucket   | **required** | bucket name where files should get stored                    |
 | asset.s3.endpoint | *optional*   | allow to connect to replacements of aws s3<br />by for example  [minio](https://www.minio.io/) you can specify the endpoint |
+
+### multiple buckets
+
+You can provide your custom BucketResolver bean to allow support for multiple buckets. An sample implementation could be.
+
+````java
+@Service
+public class CustomBucketResolver implements BucketResolver {
+    
+    @Override
+    public String resolveBucketName(AssetReferenceType assetReference) {
+        if ("profile".equalsIgnoreCase(assetReference.getContext())) {
+            return "profile_bucket";
+        }
+        return "default_bucket";
+    }
+}
+````
 
 ### The MIT License (MIT)
 Copyright (c) 2018 rocketbase.io

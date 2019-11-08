@@ -16,12 +16,11 @@ import java.io.Serializable;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class AssetReference implements Serializable {
+public class AssetReference implements Serializable, AssetReferenceType {
 
     /**
      * reference to asset in asset collection
      */
-    @NotNull
     private String id;
 
     /**

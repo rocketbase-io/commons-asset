@@ -5,25 +5,15 @@ import org.springframework.data.annotation.Transient;
 
 import java.time.Instant;
 
-public interface AssetEntity {
-
-    String getId();
+public interface AssetEntity extends AssetReferenceType {
 
     void setId(String id);
 
-    String getSystemRefId();
-
     void setSystemRefId(String systemRefId);
-
-    String getUrlPath();
 
     void setUrlPath(String urlPath);
 
-    AssetType getType();
-
     void setType(AssetType type);
-
-    String getContext();
 
     void setContext(String context);
 
@@ -58,14 +48,19 @@ public interface AssetEntity {
                 .systemRefId(getSystemRefId())
                 .urlPath(getUrlPath())
                 .type(getType())
-                .meta(AssetMeta.builder()
-                        .created(getCreated())
-                        .fileSize(getFileSize())
-                        .originalFilename(getOriginalFilename())
-                        .resolution(getResolution())
-                        .colorPalette(getColorPalette())
-                        .referenceUrl(getReferenceUrl())
-                        .build())
+                .meta(getMeta())
+                .build();
+    }
+
+    @Transient
+    default AssetMeta getMeta() {
+        return AssetMeta.builder()
+                .created(getCreated())
+                .originalFilename(getOriginalFilename())
+                .fileSize(getFileSize())
+                .resolution(getResolution())
+                .colorPalette(getColorPalette())
+                .referenceUrl(getReferenceUrl())
                 .build();
     }
 
