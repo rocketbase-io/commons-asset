@@ -10,7 +10,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.AutoConfigureBefore;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
@@ -57,14 +57,14 @@ public class AssetS3AutoConfiguration {
     }
 
     @Bean
-    @ConditionalOnBean
+    @ConditionalOnMissingBean
     public BucketResolver bucketResolver() {
         return new DefaultBucketResolver(s3Properties.getBucket());
     }
 
 
     @Bean
-    @ConditionalOnBean
+    @ConditionalOnMissingBean
     public FileStorageService fileStorageService(@Autowired BucketResolver bucketResolver) {
         return new S3FileStoreService(bucketResolver, getS3Client());
     }

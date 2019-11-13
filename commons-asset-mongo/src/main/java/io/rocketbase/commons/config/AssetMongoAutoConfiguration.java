@@ -8,6 +8,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.AutoConfigureBefore;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingClass;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.mongodb.core.MongoTemplate;
@@ -29,6 +30,7 @@ public class AssetMongoAutoConfiguration implements Serializable {
     private boolean mongoEnsureIndex;
 
     @Bean
+    @ConditionalOnMissingClass(value = {"io.rocketbase.commons.config.S3Properties"})
     @ConditionalOnMissingBean
     public FileStorageService fileStorageService() {
         return new MongoFileStorageService(gridFsTemplate);
