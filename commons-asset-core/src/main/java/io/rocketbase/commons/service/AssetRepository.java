@@ -17,7 +17,7 @@ public interface AssetRepository<T extends AssetEntity> {
 
     boolean delete(String id);
 
-    void save(T entity);
+    T save(T entity);
 
     Page<T> findAll(QueryAsset query, Pageable pageable);
 

@@ -56,8 +56,8 @@ public class AssetJpaRepository implements AssetRepository<AssetJpaEntity> {
 
     @Override
     @Transactional
-    public void save(AssetJpaEntity entity) {
-        assetEntityRepository.save(entity);
+    public AssetJpaEntity save(AssetJpaEntity entity) {
+        return assetEntityRepository.save(entity);
     }
 
     @Override

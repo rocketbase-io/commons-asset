@@ -68,8 +68,8 @@ public class AssetMongoRepository implements AssetRepository<AssetMongoEntity> {
     }
 
     @Override
-    public void save(AssetMongoEntity entity) {
-        mongoTemplate.save(entity);
+    public AssetMongoEntity save(AssetMongoEntity entity) {
+        return mongoTemplate.save(entity);
     }
 
     @Override
