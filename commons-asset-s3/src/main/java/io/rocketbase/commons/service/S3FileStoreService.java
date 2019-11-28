@@ -9,6 +9,8 @@ import com.amazonaws.services.s3.transfer.TransferManager;
 import com.amazonaws.services.s3.transfer.TransferManagerBuilder;
 import com.amazonaws.services.s3.transfer.Upload;
 import io.rocketbase.commons.model.AssetEntity;
+import io.rocketbase.commons.util.Nulls;
+import io.rocketbase.commons.util.UrlParts;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import org.springframework.core.io.InputStreamResource;
@@ -20,14 +22,13 @@ import java.io.FileInputStream;
 public class S3FileStoreService implements FileStorageService {
 
     private final BucketResolver bucketResolver;
+    private final PathResolver pathResolver;
     private final AmazonS3 amazonS3;
 
     @SneakyThrows
     @Override
     public void upload(AssetEntity entity, File file) {
-
-        String pathId = entity.getId().substring(entity.getId().length() - 3, entity.getId().length());
-        entity.setUrlPath(String.format("%s/%s/%s/%s.%s", pathId.charAt(0), pathId.charAt(1), pathId.charAt(2), entity.getId(), entity.getType().getFileExtension())
+        entity.setUrlPath(String.format("%s%s.%s", UrlParts.ensureEndsWithSlash(pathResolver.resolvePath(entity)), entity.getId(), entity.getType().getFileExtension())
                 .toLowerCase());
 
         TransferManager transferManager = TransferManagerBuilder.standard()
@@ -67,8 +68,8 @@ public class S3FileStoreService implements FileStorageService {
         ObjectMetadata objectMetadata = new ObjectMetadata();
         objectMetadata.setContentType(entity.getType().getContentType());
         objectMetadata.setHeader("type", entity.getType().name());
-        objectMetadata.setHeader("context", entity.getContext());
-        objectMetadata.setHeader("originalFilename", entity.getOriginalFilename());
+        objectMetadata.setHeader("context", Nulls.notNull(entity.getContext()));
+        objectMetadata.setHeader("originalFilename", Nulls.notNull(entity.getOriginalFilename()));
         objectMetadata.setHeader("created", entity.getCreated().toString());
         if (entity.getSystemRefId() != null) {
             objectMetadata.setHeader("systemRefId", entity.getSystemRefId());

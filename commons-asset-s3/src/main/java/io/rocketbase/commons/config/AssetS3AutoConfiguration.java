@@ -2,10 +2,7 @@ package io.rocketbase.commons.config;
 
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.S3ClientOptions;
-import io.rocketbase.commons.service.BucketResolver;
-import io.rocketbase.commons.service.DefaultBucketResolver;
-import io.rocketbase.commons.service.FileStorageService;
-import io.rocketbase.commons.service.S3FileStoreService;
+import io.rocketbase.commons.service.*;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -62,11 +59,16 @@ public class AssetS3AutoConfiguration {
         return new DefaultBucketResolver(s3Properties.getBucket());
     }
 
+    @Bean
+    @ConditionalOnMissingBean
+    public PathResolver pathResolver() {
+        return new DefaultPathResolver();
+    }
 
     @Bean
     @ConditionalOnMissingBean
-    public FileStorageService fileStorageService(@Autowired BucketResolver bucketResolver) {
-        return new S3FileStoreService(bucketResolver, getS3Client());
+    public FileStorageService fileStorageService(@Autowired BucketResolver bucketResolver, @Autowired PathResolver pathResolver) {
+        return new S3FileStoreService(bucketResolver, pathResolver, getS3Client());
     }
 
 }
