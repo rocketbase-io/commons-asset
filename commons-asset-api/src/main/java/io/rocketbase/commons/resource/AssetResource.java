@@ -154,7 +154,7 @@ public class AssetResource implements BaseRestResource {
      * @return stored asset references
      */
     public AssetRead uploadFile(InputStream assetResource, String filename) {
-        return uploadFile(assetResource, filename, null);
+        return uploadFile(assetResource, filename, null, null);
     }
 
     /**
@@ -163,11 +163,12 @@ public class AssetResource implements BaseRestResource {
      * @param assetResource stream to resource
      * @param filename      optional originalFileName
      * @param systemRefId   optional reference id
+     * @param context       optional name of context (could be used to differ buckets for example)
      * @return stored asset references
      */
     @SneakyThrows
-    public AssetRead uploadFile(InputStream assetResource, String filename, String systemRefId) {
-        HttpEntity<LinkedMultiValueMap<String, Object>> requestEntity = buildUploadMultipartForm(assetResource, filename, systemRefId);
+    public AssetRead uploadFile(InputStream assetResource, String filename, String systemRefId, String context) {
+        HttpEntity<LinkedMultiValueMap<String, Object>> requestEntity = buildUploadMultipartForm(assetResource, filename, systemRefId, context);
         ResponseEntity<AssetRead> response = getRestTemplate().exchange(getUriBuilder().toUriString(),
                 HttpMethod.POST,
                 requestEntity,
@@ -176,7 +177,7 @@ public class AssetResource implements BaseRestResource {
         return response.getBody();
     }
 
-    private HttpEntity<LinkedMultiValueMap<String, Object>> buildUploadMultipartForm(InputStream assetResource, String filename, String systemRefId) throws IOException {
+    private HttpEntity<LinkedMultiValueMap<String, Object>> buildUploadMultipartForm(InputStream assetResource, String filename, String systemRefId, String context) throws IOException {
         byte[] bytes = ByteStreams.toByteArray(assetResource);
         LinkedMultiValueMap<String, Object> form = new LinkedMultiValueMap<>();
         form.add("file", new ByteArrayResource(bytes) {
@@ -188,6 +189,9 @@ public class AssetResource implements BaseRestResource {
         // optional parameters
         if (systemRefId != null) {
             form.add("systemRefId", systemRefId);
+        }
+        if (systemRefId != null) {
+            form.add("context", context);
         }
 
         HttpHeaders headers = new HttpHeaders();
@@ -246,7 +250,7 @@ public class AssetResource implements BaseRestResource {
      */
     @SneakyThrows
     public AssetAnalyse analyseFile(InputStream assetResource, String filename) {
-        HttpEntity<LinkedMultiValueMap<String, Object>> requestEntity = buildUploadMultipartForm(assetResource, filename, null);
+        HttpEntity<LinkedMultiValueMap<String, Object>> requestEntity = buildUploadMultipartForm(assetResource, filename, null, null);
         ResponseEntity<AssetAnalyse> response = getRestTemplate().exchange(getUriBuilder().path("/analyse").toUriString(),
                 HttpMethod.POST,
                 requestEntity,
