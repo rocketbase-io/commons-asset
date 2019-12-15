@@ -101,7 +101,7 @@ SOFTWARE.
         <spring-boot.version>2.2.2.RELEASE</spring-boot.version>
         <spring-cloud-dependencies.version>Hoxton.RELEASE</spring-cloud-dependencies.version>
 
-        <commons-rest.version>1.10.2</commons-rest.version>
+        <commons-rest.version>1.11.2</commons-rest.version>
         <guava.version>28.1-jre</guava.version>
         <commons-fileupload.version>1.4</commons-fileupload.version>
         <commons-io.version>2.6</commons-io.version>
