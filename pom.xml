@@ -99,7 +99,7 @@ SOFTWARE.
         <maven.javadoc.failOnError>false</maven.javadoc.failOnError>
 
         <spring-boot.version>2.2.2.RELEASE</spring-boot.version>
-        <spring-cloud-dependencies.version>Hoxton</spring-cloud-dependencies.version>
+        <spring-cloud-dependencies.version>Hoxton.RELEASE</spring-cloud-dependencies.version>
 
         <commons-rest.version>1.10.2</commons-rest.version>
         <guava.version>28.1-jre</guava.version>
