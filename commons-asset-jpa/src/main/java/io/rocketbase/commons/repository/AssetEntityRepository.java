@@ -9,7 +9,6 @@ import org.springframework.data.repository.PagingAndSortingRepository;
 import org.springframework.data.repository.query.Param;
 
 import java.time.Instant;
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -18,19 +17,22 @@ public interface AssetEntityRepository extends PagingAndSortingRepository<AssetJ
 
     @Query("select a from AssetJpaEntity a where a.created between :before and :after and "
             + "(:originalFilename is null or lower(a.originalFilename) like %:originalFilename%) and "
-            + "(:referenceUrl is null or lower(a.referenceUrl) like %:referenceUrl%) and "
+            + "(:referenceHash is null or a.referenceHash = :referenceHash) and "
             + "(:context is null or lower(a.context) like %:context%) and "
             + "a.type in (:types)")
     Page<AssetJpaEntity> findAllWithDates(@Param("before") Instant before, @Param("after") Instant after,
-                                          @Param("originalFilename") String originalFilename, @Param("referenceUrl") String referenceUrl,
+                                          @Param("originalFilename") String originalFilename, @Param("referenceHash") String referenceHash,
                                           @Param("context") String context, @Param("types") List<AssetType> types, Pageable pageable);
 
     @Query("select a from AssetJpaEntity a where "
             + "(:originalFilename is null or lower(a.originalFilename) like %:originalFilename%) and "
-            + "(:referenceUrl is null or lower(a.referenceUrl) like %:referenceUrl%) and "
+            + "(:referenceHash is null or a.referenceHash = :referenceHash) and "
             + "(:context is null or lower(a.context) like %:context%) and "
             + "a.type in (:types)")
-    Page<AssetJpaEntity> findAllBy(@Param("originalFilename") String originalFilename, @Param("referenceUrl") String referenceUrl,
+    Page<AssetJpaEntity> findAllBy(@Param("originalFilename") String originalFilename, @Param("referenceHash") String referenceHash,
                                    @Param("context") String context, @Param("types") List<AssetType> types, Pageable pageable);
+
+    @Query("select a from AssetJpaEntity a where a.referenceHash is null and a.referenceUrl is not null")
+    Page<AssetJpaEntity> findAssetsWithMissingReferenceHash(Pageable pageable);
 
 }

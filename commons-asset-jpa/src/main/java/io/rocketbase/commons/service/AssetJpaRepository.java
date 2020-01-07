@@ -1,5 +1,8 @@
 package io.rocketbase.commons.service;
 
+import com.google.common.base.Strings;
+import com.google.common.hash.HashCode;
+import com.google.common.hash.Hashing;
 import io.rocketbase.commons.dto.asset.AssetType;
 import io.rocketbase.commons.dto.asset.QueryAsset;
 import io.rocketbase.commons.model.AssetJpaEntity;
@@ -10,8 +13,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.util.StringUtils;
 
 import javax.transaction.Transactional;
+import java.nio.charset.Charset;
 import java.time.Instant;
-import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
@@ -62,12 +65,15 @@ public class AssetJpaRepository implements AssetRepository<AssetJpaEntity> {
 
     @Override
     public Page<AssetJpaEntity> findAll(QueryAsset query, Pageable pageable) {
+        String referenceHash = query != null && !StringUtils.isEmpty(query.getReferenceUrl()) ?
+
+                Hashing.sha256().hashString(query.getReferenceUrl(), Charset.forName("UTF8")).toString() : null;
         if (query != null && (query.getBefore() != null || query.getAfter() != null)) {
             return assetEntityRepository.findAllWithDates(query.getBefore(), query.getAfter(),
-                    notEmptyToLowercase(query.getOriginalFilename()), notEmptyToLowercase(query.getReferenceUrl()),
+                    notEmptyToLowercase(query.getOriginalFilename()), referenceHash,
                     notEmptyToLowercase(query.getContext()), typesFilter(query), pageable);
         } else if (query != null) {
-            return assetEntityRepository.findAllBy(notEmptyToLowercase(query.getOriginalFilename()), notEmptyToLowercase(query.getReferenceUrl()),
+            return assetEntityRepository.findAllBy(notEmptyToLowercase(query.getOriginalFilename()), referenceHash,
                     notEmptyToLowercase(query.getContext()), typesFilter(query), pageable);
         } else {
             return assetEntityRepository.findAll(pageable);

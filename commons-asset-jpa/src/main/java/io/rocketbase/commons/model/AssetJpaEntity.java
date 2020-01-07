@@ -21,7 +21,7 @@ import java.time.Instant;
                 @UniqueConstraint(name = "uk_asset_system_ref_if", columnNames = {"systemRefId"})
         },
         indexes = {
-                @Index(name = "idx_asset_reference_url", columnList = "referenceUrl"),
+                @Index(name = "idx_asset_reference_hash", columnList = "referenceHash"),
                 @Index(name = "idx_asset_context", columnList = "context"),
         }
 )
@@ -78,6 +78,13 @@ public class AssetJpaEntity implements AssetEntity {
      */
     @Embedded
     private ColorPaletteEntity colorPaletteEntity;
+
+    /**
+     * only filled in case of batch downloaded image
+     */
+    @Size(max = 64)
+    @Column(length = 64)
+    private String referenceHash;
 
     /**
      * only filled in case of batch downloaded image
