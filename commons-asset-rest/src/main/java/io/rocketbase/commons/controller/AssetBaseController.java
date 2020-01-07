@@ -4,6 +4,7 @@ import io.rocketbase.commons.converter.AssetConverter;
 import io.rocketbase.commons.converter.QueryAssetConverter;
 import io.rocketbase.commons.dto.PageableResult;
 import io.rocketbase.commons.dto.asset.AssetRead;
+import io.rocketbase.commons.dto.asset.AssetUpdate;
 import io.rocketbase.commons.exception.EmptyFileException;
 import io.rocketbase.commons.exception.NotFoundException;
 import io.rocketbase.commons.model.AssetEntity;
@@ -13,10 +14,14 @@ import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.util.MultiValueMap;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.Resource;
+import javax.validation.constraints.NotNull;
+import java.util.HashMap;
+import java.util.Map;
 
 @RestController
 @RequestMapping("${asset.api:/api/asset}")
@@ -38,13 +43,19 @@ public class AssetBaseController implements BaseAssetController {
     @RequestMapping(method = RequestMethod.POST)
     public AssetRead handleFileUpload(@RequestParam("file") MultipartFile file,
                                       @RequestParam(value = "systemRefId", required = false) String systemRefId,
-                                      @RequestParam(value = "context", required = false) String context) {
+                                      @RequestParam(value = "context", required = false) String context,
+                                      @RequestParam(required = false) MultiValueMap<String, String> params) {
         if (file.isEmpty()) {
             throw new EmptyFileException();
         }
+        Map<String, String> keyValues = new HashMap<>();
+        for (String p : params.keySet()) {
+            if (p.startsWith("k_") && p.length() > 2) {
+                keyValues.put(p.substring(2), params.getFirst(p));
+            }
+        }
 
-        AssetEntity asset = assetService.store(file.getInputStream(), file.getOriginalFilename(), file.getSize(), context, systemRefId);
-
+        AssetEntity asset = assetService.store(file.getInputStream(), file.getOriginalFilename(), file.getSize(), systemRefId, context, null, keyValues);
 
         return assetConverter.fromEntityByRequestContext(asset, getPreviewSizes(null));
     }
@@ -62,6 +73,14 @@ public class AssetBaseController implements BaseAssetController {
         AssetEntity entity = assetService.findByIdOrSystemRefId(sid)
                 .orElseThrow(() -> new NotFoundException());
         return assetConverter.fromEntityByRequestContext(entity, getPreviewSizes(params));
+    }
+
+    @RequestMapping(value = "/{sid}", method = RequestMethod.PUT)
+    public AssetRead updateAsset(@PathVariable("sid") String sid, @RequestBody @NotNull @Validated AssetUpdate update,
+                                 @RequestParam(required = false) MultiValueMap<String, String> params) {
+        AssetEntity entity = assetService.findByIdOrSystemRefId(sid)
+                .orElseThrow(() -> new NotFoundException());
+        return assetConverter.fromEntityByRequestContext(assetService.updateKeyValues(entity, update.getKeyValues()), getPreviewSizes(params));
     }
 
 

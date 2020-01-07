@@ -19,9 +19,9 @@ public class DefaultAssetIdLoader implements AssetIdLoader {
 
     @Override
     public AssetRead toRead(AssetId assetId) {
-        AssetReference reference = toReference(assetId);
-        if (reference != null) {
-            return assetConverter.toRead(reference);
+        AssetEntity entity = assetService.findById(assetId.getValue()).orElse(null);
+        if (entity != null) {
+            return assetConverter.fromEntity(entity, null);
         }
         return null;
     }

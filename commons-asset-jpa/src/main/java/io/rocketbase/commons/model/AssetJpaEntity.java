@@ -13,6 +13,8 @@ import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.time.Instant;
+import java.util.HashMap;
+import java.util.Map;
 
 
 @Entity
@@ -93,6 +95,18 @@ public class AssetJpaEntity implements AssetEntity {
     @Column(length = 2000)
     private String referenceUrl;
 
+    @ElementCollection(fetch = FetchType.EAGER)
+    @CollectionTable(
+            name = "asset_keyvalue_pairs",
+            joinColumns = @JoinColumn(name = "asset_id"),
+            uniqueConstraints = @UniqueConstraint(name = "uk_asset_keyvalue_pairs", columnNames = {"asset_id", "field_key"}),
+            indexes = @Index(name = "idx_asset_keyvalue_pairs", columnList = "asset_id")
+    )
+    @MapKeyColumn(name = "field_key", length = 50)
+    @Column(name = "field_value", length = 4000, nullable = false)
+    @Builder.Default
+    private Map<String, String> keyValueMap = new HashMap<>();
+
     @Override
     public Resolution getResolution() {
         return Nulls.notNull(resolutionEntity, ResolutionEntity::toApi, null);
@@ -121,4 +135,10 @@ public class AssetJpaEntity implements AssetEntity {
             this.colorPaletteEntity = new ColorPaletteEntity(colorPalette.getPrimary(), colorPalette.getColors());
         }
     }
+
+    @Override
+    public Map<String, String> getKeyValues() {
+        return keyValueMap;
+    }
+
 }

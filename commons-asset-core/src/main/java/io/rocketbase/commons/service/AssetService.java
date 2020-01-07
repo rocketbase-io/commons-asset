@@ -25,7 +25,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.time.Instant;
-import java.time.LocalDateTime;
+import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
@@ -40,7 +40,7 @@ public class AssetService {
     private FileStorageService fileStorageService;
 
     @Resource
-    private AssetRepository assetRepository;
+    private AssetRepository<AssetEntity> assetRepository;
 
     @Resource
     private AssetTypeFilterService assetTypeFilterService;
@@ -50,6 +50,10 @@ public class AssetService {
     }
 
     public AssetEntity store(InputStream inputStream, String originalFilename, long size, String systemRefId, String context, String referenceUrl) {
+        return store(inputStream, originalFilename, size, systemRefId, context, referenceUrl, null);
+    }
+
+    public AssetEntity store(InputStream inputStream, String originalFilename, long size, String systemRefId, String context, String referenceUrl, Map<String, String> keyValues) {
         try {
             Stopwatch stopwatch = null;
             if (log.isDebugEnabled()) {
@@ -66,7 +70,7 @@ public class AssetService {
             File tempFile = File.createTempFile("asset", suffix);
             IOUtils.copy(inputStream, new FileOutputStream(tempFile));
 
-            AssetEntity asset = storeAndDeleteFile(tempFile, originalFilename, size, systemRefId, context, referenceUrl);
+            AssetEntity asset = storeAndDeleteFile(tempFile, originalFilename, size, systemRefId, context, referenceUrl, keyValues);
 
             if (log.isDebugEnabled()) {
                 log.debug("store file {} with id: {}, took: {} ms", originalFilename, asset.getId(), stopwatch.elapsed(TimeUnit.MILLISECONDS));
@@ -79,10 +83,33 @@ public class AssetService {
         }
     }
 
-    public AssetEntity storeAndDeleteFile(File file, String originalFilename, long size, String systemRefId, String context, String referenceUrl) throws IOException {
+    /**
+     * will add/update key values and removes those with value = null<br>
+     * is only an update so that not mentioned keys will still be saved within entity
+     */
+    public AssetEntity updateKeyValues(AssetEntity asset, Map<String, String> keyValues) {
+        AssetEntity entity = assetRepository.findById(asset.getId())
+                .orElseThrow(NotFoundException::new);
+        handleKeyValues(entity, keyValues);
+        return assetRepository.save(entity);
+    }
+
+    protected void handleKeyValues(AssetEntity entity, Map<String, String> keyValues) {
+        if (keyValues != null) {
+            keyValues.forEach((key, value) -> {
+                if (value != null) {
+                    entity.addKeyValue(key, value);
+                } else {
+                    entity.removeKeyValue(key);
+                }
+            });
+        }
+    }
+
+    public AssetEntity storeAndDeleteFile(File file, String originalFilename, long size, String systemRefId, String context, String referenceUrl, Map<String, String> keyValues) throws IOException {
         try {
             AssetType assetType = detectAssetTypeWithChecks(file, originalFilename, size, systemRefId, context, referenceUrl);
-            AssetEntity asset = saveAndUploadAsset(assetType, file, originalFilename, size, systemRefId, context, referenceUrl);
+            AssetEntity asset = saveAndUploadAsset(assetType, file, originalFilename, size, systemRefId, context, referenceUrl, keyValues);
             return asset;
         } finally {
             file.delete();
@@ -111,17 +138,14 @@ public class AssetService {
     }
 
     public void deleteByIdOrSystemRefId(String sid) {
-        Optional<AssetEntity> asset = assetRepository.findByIdOrSystemRefId(sid);
+        AssetEntity asset = assetRepository.findByIdOrSystemRefId(sid)
+                .orElseThrow(NotFoundException::new);
 
-        if (!asset.isPresent()) {
-            throw new NotFoundException();
-        }
-
-        fileStorageService.delete(asset.get());
-        assetRepository.delete(asset.get().getId());
+        fileStorageService.delete(asset);
+        assetRepository.delete(asset.getId());
     }
 
-    private AssetEntity saveAndUploadAsset(AssetType type, File file, String originalFilename, long size, String systemRefId, String context, String referenceUrl) {
+    private AssetEntity saveAndUploadAsset(AssetType type, File file, String originalFilename, long size, String systemRefId, String context, String referenceUrl, Map<String, String> keyValues) {
 
         if (systemRefId != null) {
             if (assetRepository.findBySystemRefId(systemRefId).isPresent()) {
@@ -140,6 +164,8 @@ public class AssetService {
         entity.setFileSize(size);
         entity.setResolution(analyse.getResolution());
         entity.setColorPalette(analyse.getColorPalette());
+
+        handleKeyValues(entity, keyValues);
 
         try {
             fileStorageService.upload(entity, file);

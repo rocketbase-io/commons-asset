@@ -2,7 +2,7 @@
   "swagger": "2.0",
   "info": {
     "description": "Provides services + rest-controller to handle asset with different storage engines.",
-    "version": "1.9.0",
+    "version": "2.5.0",
     "title": "commons-asset api",
     "contact": {
       "name": "rocketbase.io",
@@ -143,6 +143,63 @@
             "description": "allows to store reference id from different system",
             "required": false,
             "type": "string"
+          },
+          {
+            "name": "context",
+            "in": "query",
+            "description": "optional name of context (could be used to differ buckets for example)",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "k_",
+            "in": "query",
+            "description": "key values need to start with k_ (will get cut/off after parsing) - value could be max 4000 chars",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/AssetRead"
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        },
+        "deprecated": false
+      },
+      "put": {
+        "tags": [
+          "base"
+        ],
+        "summary": "update asset",
+        "description": "update key values",
+        "operationId": "updateAssetPUT",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "*/*"
+        ],
+        "parameters": [
+          {
+            "in": "body",
+            "name": "updateAsset",
+            "description": "mainly contains keyValues property",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/UpdateAsset"
+            }
           }
         ],
         "responses": {
@@ -555,6 +612,13 @@
           "type": "string",
           "description": "allows to store individual grouping for assets to find all picture of a flexible type. for example all avatar images or backgrounds..."
         },
+        "keyValues": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          },
+          "description": "will get stored with lowercase, max length of 50 characters, key with _ as prefix will not get displayed in REST_API"
+        },
         "url": {
           "type": "string",
           "description": "address where to download asset"
@@ -667,6 +731,12 @@
           "type": "string",
           "description": "allows to store individual grouping for assets to find all picture of a flexible type. for example all avatar images or backgrounds..."
         },
+        "keyValues": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          }
+        },
         "type": {
           "type": "string",
           "enum": [
@@ -689,6 +759,19 @@
         }
       },
       "title": "AssetRead"
+    },
+    "UpdateAsset": {
+      "type": "object",
+      "properties": {
+        "keyValues": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          },
+          "description": "will removed key that have value of null, will only add/replace new/existing key values, not mentioned key will still stay the same"
+        }
+      },
+      "title": "UpdateAsset"
     },
     "ColorPalette": {
       "type": "object",

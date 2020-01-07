@@ -2,8 +2,10 @@ package io.rocketbase.commons.model;
 
 import io.rocketbase.commons.dto.asset.*;
 import org.springframework.data.annotation.Transient;
+import org.springframework.util.Assert;
 
 import java.time.Instant;
+import java.util.Map;
 
 public interface AssetEntity extends AssetReferenceType {
 
@@ -40,6 +42,40 @@ public interface AssetEntity extends AssetReferenceType {
     String getReferenceUrl();
 
     void setReferenceUrl(String referenceUrl);
+
+    Map<String, String> getKeyValues();
+
+    default boolean hasKeyValue(String key) {
+        return getKeyValues() != null && key != null && getKeyValues().containsKey(key.toLowerCase());
+    }
+
+    default String getKeyValue(String key) {
+        return getKeyValues() != null && key != null ? getKeyValues().getOrDefault(key.toLowerCase(), null) : null;
+    }
+
+    /**
+     * @param key   will get stored with lowercase<br>
+     *              max length of 50 characters<br>
+     *              key with _ as prefix will not get displayed in REST_API
+     * @param value max length of 4000 characters
+     * @return itself for fluent api
+     */
+    default AssetEntity addKeyValue(String key, String value) {
+        checkKeyValue(key, value);
+        getKeyValues().put(key.toLowerCase(), value);
+        return this;
+    }
+
+    default void removeKeyValue(String key) {
+        getKeyValues().remove(key.toLowerCase());
+    }
+
+    default void checkKeyValue(String key, String value) {
+        Assert.hasLength(key, "Key must not be empty");
+        Assert.state(key.length() <= 50, "Key is too long - at least 50 chars");
+        Assert.hasLength(value, "Value must not be empty");
+        Assert.state(value.length() <= 4000, "Value is too long - at least 4000 chars");
+    }
 
     @Transient
     default AssetReference toReference() {

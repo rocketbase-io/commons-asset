@@ -1,13 +1,17 @@
 package io.rocketbase.commons.converter;
 
 import io.rocketbase.commons.config.ApiProperties;
-import io.rocketbase.commons.dto.asset.*;
+import io.rocketbase.commons.dto.asset.AssetPreviews;
+import io.rocketbase.commons.dto.asset.AssetRead;
+import io.rocketbase.commons.dto.asset.AssetReference;
+import io.rocketbase.commons.dto.asset.PreviewSize;
 import io.rocketbase.commons.model.AssetEntity;
 import lombok.RequiredArgsConstructor;
 
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
@@ -17,6 +21,17 @@ public class AssetConverter {
     private final AssetPreviewService assetPreviewService;
 
     private List<PreviewSize> defaultSizes = Arrays.asList(PreviewSize.S, PreviewSize.M, PreviewSize.L);
+
+    public static Map<String, String> filterInvisibleKeys(Map<String, String> keyValues) {
+        if (keyValues == null) {
+            return null;
+        }
+        Map<String, String> map = new HashMap<>();
+        keyValues.entrySet().stream()
+                .filter(e -> !e.getKey().startsWith("_"))
+                .forEach(e -> map.put(e.getKey(), e.getValue()));
+        return map;
+    }
 
     protected void injectPreviewsAndDownload(AssetRead result, List<PreviewSize> sizes) {
         if (result != null) {
@@ -40,6 +55,10 @@ public class AssetConverter {
     }
 
     public AssetRead toRead(AssetReference reference, List<PreviewSize> sizes) {
+        return toRead(reference, sizes, null);
+    }
+
+    public AssetRead toRead(AssetReference reference, List<PreviewSize> sizes, Map<String, String> keyValues) {
         if (reference == null) {
             return null;
         }
@@ -51,10 +70,10 @@ public class AssetConverter {
                 .urlPath(reference.getUrlPath())
                 .type(reference.getType())
                 .meta(reference.getMeta())
+                .keyValues(filterInvisibleKeys(keyValues))
                 .build();
 
         injectPreviewsAndDownload(result, sizes);
-
 
         return result;
     }
@@ -67,21 +86,24 @@ public class AssetConverter {
     }
 
     public AssetRead fromEntity(AssetEntity entity, List<PreviewSize> sizes) {
+        AssetRead result = fromEntity(entity);
+        injectPreviewsAndDownload(result, sizes);
+        return result;
+    }
+
+    public AssetRead fromEntity(AssetEntity entity) {
         if (entity == null) {
             return null;
         }
-        AssetRead result = AssetRead.builderRead()
+        return AssetRead.builderRead()
                 .id(entity.getId())
                 .systemRefId(entity.getSystemRefId())
                 .context(entity.getContext())
                 .urlPath(entity.getUrlPath())
                 .type(entity.getType())
                 .meta(entity.getMeta())
+                .keyValues(filterInvisibleKeys(entity.getKeyValues()))
                 .build();
-
-        injectPreviewsAndDownload(result, sizes);
-
-        return result;
     }
 
     public AssetReference fromEntityWithoutPreviews(AssetEntity entity) {

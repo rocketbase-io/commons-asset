@@ -13,6 +13,8 @@ import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.time.Instant;
 import java.time.LocalDateTime;
+import java.util.HashMap;
+import java.util.Map;
 
 @Data
 @Document(collection = "assets")
@@ -66,4 +68,11 @@ public class AssetMongoEntity implements AssetEntity {
     @Indexed
     private String referenceUrl;
 
+    @Builder.Default
+    private Map<String, String> keyValueMap = new HashMap<>();
+
+    @Override
+    public Map<String, String> getKeyValues() {
+        return keyValueMap;
+    }
 }

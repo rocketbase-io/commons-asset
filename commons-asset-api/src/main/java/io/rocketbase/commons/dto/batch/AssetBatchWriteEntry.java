@@ -6,6 +6,7 @@ import lombok.Data;
 
 import javax.validation.constraints.NotNull;
 import java.io.Serializable;
+import java.util.Map;
 
 
 @Data
@@ -18,6 +19,8 @@ public class AssetBatchWriteEntry implements Serializable {
     private String systemRefId;
 
     private String context;
+
+    private Map<String, String> keyValues;
 
     public AssetBatchWriteEntry() {
     }

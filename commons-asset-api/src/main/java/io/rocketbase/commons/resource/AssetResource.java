@@ -4,6 +4,7 @@ import com.google.common.io.ByteStreams;
 import io.rocketbase.commons.dto.PageableResult;
 import io.rocketbase.commons.dto.asset.AssetAnalyse;
 import io.rocketbase.commons.dto.asset.AssetRead;
+import io.rocketbase.commons.dto.asset.AssetUpdate;
 import io.rocketbase.commons.dto.asset.QueryAsset;
 import io.rocketbase.commons.dto.batch.AssetBatchAnalyseResult;
 import io.rocketbase.commons.dto.batch.AssetBatchResult;
@@ -29,6 +30,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
+import java.util.Map;
 
 public class AssetResource implements BaseRestResource {
 
@@ -168,7 +170,24 @@ public class AssetResource implements BaseRestResource {
      */
     @SneakyThrows
     public AssetRead uploadFile(InputStream assetResource, String filename, String systemRefId, String context) {
-        HttpEntity<LinkedMultiValueMap<String, Object>> requestEntity = buildUploadMultipartForm(assetResource, filename, systemRefId, context);
+        return uploadFile(assetResource, filename, systemRefId, context, null);
+    }
+
+    /**
+     * upload binary file to asset endpoint
+     *
+     * @param assetResource stream to resource
+     * @param filename      optional originalFileName
+     * @param systemRefId   optional reference id
+     * @param context       optional name of context (could be used to differ buckets for example)
+     * @param keyValues     optional will get stored with lowercase<br>
+     *                      max length of 50 characters<br>
+     *                      key with _ as prefix will not get displayed in REST_API
+     * @return stored asset references
+     */
+    @SneakyThrows
+    public AssetRead uploadFile(InputStream assetResource, String filename, String systemRefId, String context, Map<String, String> keyValues) {
+        HttpEntity<LinkedMultiValueMap<String, Object>> requestEntity = buildUploadMultipartForm(assetResource, filename, systemRefId, context, keyValues);
         ResponseEntity<AssetRead> response = getRestTemplate().exchange(getUriBuilder().toUriString(),
                 HttpMethod.POST,
                 requestEntity,
@@ -177,7 +196,17 @@ public class AssetResource implements BaseRestResource {
         return response.getBody();
     }
 
-    private HttpEntity<LinkedMultiValueMap<String, Object>> buildUploadMultipartForm(InputStream assetResource, String filename, String systemRefId, String context) throws IOException {
+    @SneakyThrows
+    public AssetRead updateKeyValues(String id, AssetUpdate assetUpdate) {
+        ResponseEntity<AssetRead> response = getRestTemplate().exchange(getUriBuilder().path("/" + id).toUriString(),
+                HttpMethod.PUT,
+                new HttpEntity<>(assetUpdate),
+                AssetRead.class);
+
+        return response.getBody();
+    }
+
+    private HttpEntity<LinkedMultiValueMap<String, Object>> buildUploadMultipartForm(InputStream assetResource, String filename, String systemRefId, String context, Map<String, String> keyValues) throws IOException {
         byte[] bytes = ByteStreams.toByteArray(assetResource);
         LinkedMultiValueMap<String, Object> form = new LinkedMultiValueMap<>();
         form.add("file", new ByteArrayResource(bytes) {
@@ -190,8 +219,13 @@ public class AssetResource implements BaseRestResource {
         if (systemRefId != null) {
             form.add("systemRefId", systemRefId);
         }
-        if (systemRefId != null) {
+        if (context != null) {
             form.add("context", context);
+        }
+        if (keyValues != null) {
+            for (String k : keyValues.keySet()) {
+                form.add(String.format("k_%s", k), keyValues.get(k));
+            }
         }
 
         HttpHeaders headers = new HttpHeaders();
@@ -250,7 +284,7 @@ public class AssetResource implements BaseRestResource {
      */
     @SneakyThrows
     public AssetAnalyse analyseFile(InputStream assetResource, String filename) {
-        HttpEntity<LinkedMultiValueMap<String, Object>> requestEntity = buildUploadMultipartForm(assetResource, filename, null, null);
+        HttpEntity<LinkedMultiValueMap<String, Object>> requestEntity = buildUploadMultipartForm(assetResource, filename, null, null, null);
         ResponseEntity<AssetAnalyse> response = getRestTemplate().exchange(getUriBuilder().path("/analyse").toUriString(),
                 HttpMethod.POST,
                 requestEntity,
