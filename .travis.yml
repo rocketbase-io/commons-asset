@@ -19,8 +19,9 @@ script: mvn --settings .travis/settings.xml -U clean install
 after_script:
   - JACOCO_SOURCE_PATH=commons-asset-api/src/main/java ./cc-test-reporter format-coverage -t jacoco -o coverage/codeclimate.api.json commons-asset-api/target/site/jacoco/jacoco.xml
   - JACOCO_SOURCE_PATH=commons-asset-core/src/main/java ./cc-test-reporter format-coverage -t jacoco -o coverage/codeclimate.core.json commons-asset-core/target/site/jacoco/jacoco.xml
+  - JACOCO_SOURCE_PATH=commons-asset-jpa/src/main/java ./cc-test-reporter format-coverage -t jacoco -o coverage/codeclimate.jpa.json commons-asset-jpa/target/site/jacoco/jacoco.xml
   - JACOCO_SOURCE_PATH=commons-asset-rest/src/main/java ./cc-test-reporter format-coverage -t jacoco -o coverage/codeclimate.rest.json commons-asset-rest/target/site/jacoco/jacoco.xml
-  - ./cc-test-reporter sum-coverage coverage/codeclimate.*.json -p 3
+  - ./cc-test-reporter sum-coverage coverage/codeclimate.*.json -p 4
   - if [[ "$TRAVIS_TEST_RESULT" == 0 ]]; then ./cc-test-reporter upload-coverage; fi  # Upload coverage/codeclimate.json
 
 ## release on tag
