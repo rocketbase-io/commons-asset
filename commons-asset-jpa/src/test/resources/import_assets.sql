@@ -20,3 +20,6 @@ INSERT INTO asset (id, color_others, color_primary, context, created, file_size,
 INSERT INTO asset (id, color_others, color_primary, context, created, file_size, original_filename, reference_url, resolution_height, resolution_width, system_ref_id, type, url_path) VALUES ('5a1d8c54f19aec0001815d55', NULL, NULL, NULL,'2019-12-03 14:46:14.496000', 0, NULL, NULL, 667, 1000, NULL,'JPEG','d/5/5/5 a1d8c54f19aec0001815d55.jpg');
 INSERT INTO asset (id, color_others, color_primary, context, created, file_size, original_filename, reference_url, resolution_height, resolution_width, system_ref_id, type, url_path) VALUES ('5a1d8ef4f19aec0001815d56', NULL, NULL, NULL,'2019-12-03 14:46:14.524000', 0, NULL, NULL, 60, 120, NULL,'JPEG','d/5/6/5 a1d8ef4f19aec0001815d56.jpg');
 INSERT INTO asset (id, color_others, color_primary, context, created, file_size, original_filename, reference_url, resolution_height, resolution_width, system_ref_id, type, url_path) VALUES ('5a1d8f10f19aec0001815d57', NULL, NULL, NULL,'2019-12-03 14:46:14.515000', 0, NULL, NULL, 630, 1000, NULL,'JPEG','d/5/7/5 a1d8f10f19aec0001815d57.jpg');
+
+INSERT INTO asset_keyvalue_pairs (asset_id, field_key, field_value) VALUES ('5a1d5e9df19aec0001815d3b', 'client', '1');
+INSERT INTO asset_keyvalue_pairs (asset_id, field_key, field_value) VALUES ('5a1d5e9df19aec0001815d3b', '_hidden', 'secret');

@@ -123,4 +123,21 @@ public class AssetJpaRepositoryTest {
         assertThat(optional, notNullValue());
         assertThat(optional.isPresent(), equalTo(false));
     }
+
+    @Test
+    public void testKeyValues() {
+        // given
+        String id = "5a1d5e9df19aec0001815d3b";
+
+        // when
+        AssetJpaEntity asset = service.findById(id).orElseThrow(NoClassDefFoundError::new);
+
+        // then
+        assertThat(asset.getKeyValueMap(), notNullValue());
+        assertThat(asset.getKeyValueMap().containsKey("client"), equalTo(true));
+        assertThat(asset.getKeyValueMap().get("client"), equalTo("1"));
+        assertThat(asset.getKeyValueMap().containsKey("_hidden"), equalTo(true));
+        assertThat(asset.getKeyValueMap().get("_hidden"), equalTo("secret"));
+    }
+
 }
