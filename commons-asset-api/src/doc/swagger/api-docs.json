@@ -90,6 +90,12 @@
             "type": "string"
           },
           {
+            "name": "context",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
             "name": "type",
             "in": "query",
             "description": "possible types JPEG, PNG, GIF, PDF, ZIP, XLS, XLSX, DOC, DOCX. allows to use multiple types for a list...",
