@@ -21,11 +21,9 @@ public class InvalidContentTypeExceptionHandler extends BaseExceptionHandler {
     @ResponseStatus(BAD_REQUEST)
     @ResponseBody
     public ErrorResponse handleRegistrationException(HttpServletRequest request, InvalidContentTypeException e) {
-        return ErrorResponse.builder()
-                .status(AssetErrorCodes.INVALID_CONTENT_TYPE.getStatus())
-                .message(translate(request, "error.invalidContentType", "invalid content type"))
-                .field("contentType", e.getContentType())
-                .field("supportedTypes", Joiner.on(", ").join(AssetType.values()))
-                .build();
+        return new ErrorResponse(AssetErrorCodes.INVALID_CONTENT_TYPE.getStatus(),
+                translate(request, "error.invalidContentType", "invalid content type"))
+                .addField("contentType", e.getContentType())
+                .addField("supportedTypes", Joiner.on(", ").join(AssetType.values()));
     }
 }

@@ -19,10 +19,8 @@ public class EmptyFileExceptionHandler extends BaseExceptionHandler {
     @ResponseStatus(BAD_REQUEST)
     @ResponseBody
     public ErrorResponse handleRegistrationException(HttpServletRequest request, EmptyFileException e) {
-        return ErrorResponse.builder()
-                .status(AssetErrorCodes.ASSET_FILE_IS_EMPTY.getStatus())
-                .message(translate(request, "error.emptyAsset", "asset is empty"))
-                .field("file", "is empty")
-                .build();
+        return new ErrorResponse(AssetErrorCodes.ASSET_FILE_IS_EMPTY.getStatus(),
+                translate(request, "error.emptyAsset", "asset is empty"))
+                .addField("file", "is empty");
     }
 }

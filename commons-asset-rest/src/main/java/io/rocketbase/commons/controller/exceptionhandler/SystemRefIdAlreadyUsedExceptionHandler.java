@@ -19,10 +19,8 @@ public class SystemRefIdAlreadyUsedExceptionHandler extends BaseExceptionHandler
     @ResponseStatus(BAD_REQUEST)
     @ResponseBody
     public ErrorResponse handleRegistrationException(HttpServletRequest request, SystemRefIdAlreadyUsedException e) {
-        return ErrorResponse.builder()
-                .status(AssetErrorCodes.SYSTEM_REF_ID_ALREADY_USED.getStatus())
-                .message(translate(request, "error.systemRefIdUsed", "given systemRefId is already used"))
-                .field("systemRefId", "is already used - take other")
-                .build();
+        return new ErrorResponse(AssetErrorCodes.SYSTEM_REF_ID_ALREADY_USED.getStatus(),
+                translate(request, "error.systemRefIdUsed", "given systemRefId is already used"))
+                .addField("systemRefId", "is already used - take other");
     }
 }

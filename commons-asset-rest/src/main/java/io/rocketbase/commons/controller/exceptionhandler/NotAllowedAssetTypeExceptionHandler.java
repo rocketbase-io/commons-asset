@@ -25,11 +25,9 @@ public class NotAllowedAssetTypeExceptionHandler extends BaseExceptionHandler {
     @ResponseStatus(BAD_REQUEST)
     @ResponseBody
     public ErrorResponse handleRegistrationException(HttpServletRequest request, NotAllowedAssetTypeException e) {
-        return ErrorResponse.builder()
-                .status(AssetErrorCodes.NOT_ALLOWED_CONTENT_TYPE.getStatus())
-                .message(translate(request, "error.notAllowedContentType", "not allowed content type"))
-                .field("assetType", e.getAssetType().name())
-                .field("allowedTypes", Joiner.on(", ").join(assetTypeFilterService.getAllowedAssetTypes()))
-                .build();
+        return new ErrorResponse(AssetErrorCodes.NOT_ALLOWED_CONTENT_TYPE.getStatus(),
+                translate(request, "error.notAllowedContentType", "not allowed content type"))
+                .addField("assetType", e.getAssetType().name())
+                .addField("allowedTypes", Joiner.on(", ").join(assetTypeFilterService.getAllowedAssetTypes()));
     }
 }
