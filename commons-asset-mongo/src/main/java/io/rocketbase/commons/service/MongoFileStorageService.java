@@ -1,6 +1,7 @@
 package io.rocketbase.commons.service;
 
 import com.mongodb.client.gridfs.model.GridFSFile;
+import io.rocketbase.commons.exception.NotFoundException;
 import io.rocketbase.commons.model.AssetEntity;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
@@ -25,7 +26,8 @@ public class MongoFileStorageService implements FileStorageService {
     @Override
     public void upload(AssetEntity entity, File file) {
         ObjectId objectId = gridFsTemplate.store(new FileInputStream(file), entity.getOriginalFilename(),
-                entity.getType().getContentType(), generateObjectMeta(entity));
+                entity.getType()
+                        .getContentType(), generateObjectMeta(entity));
         entity.setId(objectId.toHexString());
         entity.setUrlPath(objectId.toHexString());
     }
@@ -33,7 +35,10 @@ public class MongoFileStorageService implements FileStorageService {
     @Override
     public InputStreamResource download(AssetEntity entity) {
         GridFSFile gridFsFile = gridFsTemplate.findOne(getIdQuery(entity.getId()));
-        return gridFsTemplate.getResource(gridFsFile.getFilename());
+        if (gridFsFile == null) {
+            throw new NotFoundException("asset with id " + entity.getId() + " was not found in system");
+        }
+        return gridFsTemplate.getResource(gridFsFile);
     }
 
     @Override
@@ -49,9 +54,13 @@ public class MongoFileStorageService implements FileStorageService {
 
     private Document generateObjectMeta(AssetEntity entity) {
         Document meta = new Document()
-                .append("type", entity.getType().name())
+                .append("type",
+                        entity.getType()
+                                .name())
                 .append("originalFilename", entity.getOriginalFilename())
-                .append("created", entity.getCreated().toString());
+                .append("created",
+                        entity.getCreated()
+                                .toString());
         if (entity.getSystemRefId() != null) {
             meta.append("systemRefId", entity.getSystemRefId());
         }
