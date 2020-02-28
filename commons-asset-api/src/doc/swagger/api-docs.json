@@ -737,6 +737,10 @@
           "type": "string",
           "description": "allows to store individual grouping for assets to find all picture of a flexible type. for example all avatar images or backgrounds..."
         },
+        "lqip": {
+          "type": "string",
+          "description": "base64 preview in ultra low-res + quality - LQIP = Low Quality Image Placeholder. Depending on config is available or null"
+        },
         "keyValues": {
           "type": "object",
           "additionalProperties": {
