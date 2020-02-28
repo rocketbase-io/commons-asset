@@ -13,3 +13,13 @@ spring:
 logging:
   level:
     io.rocketbase: TRACE
+
+
+asset:
+  api:
+    previewQuality:
+      S: 0.5
+      M: 0.4
+      L: 0.3
+  lqip:
+    enabled: true

@@ -1,6 +1,6 @@
 package io.rocketbase.commons.converter;
 
-import io.rocketbase.commons.config.ApiProperties;
+import io.rocketbase.commons.config.AssetApiProperties;
 import io.rocketbase.commons.dto.asset.AssetPreviews;
 import io.rocketbase.commons.dto.asset.AssetRead;
 import io.rocketbase.commons.dto.asset.AssetReference;
@@ -17,7 +17,7 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class AssetConverter {
 
-    private final ApiProperties apiProperties;
+    private final AssetApiProperties assetApiProperties;
     private final AssetPreviewService assetPreviewService;
 
     private List<PreviewSize> defaultSizes = Arrays.asList(PreviewSize.S, PreviewSize.M, PreviewSize.L);
@@ -44,8 +44,8 @@ public class AssetConverter {
                         .forEach(s -> result.getPreviews().getPreviewMap()
                                 .put(s, assetPreviewService.getPreviewUrl(result, s)));
             }
-            if (apiProperties.isDownload()) {
-                result.setDownload(apiProperties.getPath() + "/" + result.getId() + "/b");
+            if (assetApiProperties.isDownload()) {
+                result.setDownload(assetApiProperties.getPath() + "/" + result.getId() + "/b");
             }
         }
     }

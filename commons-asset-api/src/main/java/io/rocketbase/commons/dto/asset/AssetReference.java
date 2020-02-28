@@ -1,11 +1,7 @@
 package io.rocketbase.commons.dto.asset;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
-import javax.validation.constraints.NotNull;
 import java.io.Serializable;
 
 
@@ -16,6 +12,7 @@ import java.io.Serializable;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
+@ToString(exclude = "lqip")
 public class AssetReference implements Serializable, AssetReferenceType {
 
     /**
@@ -42,5 +39,10 @@ public class AssetReference implements Serializable, AssetReferenceType {
     private String context;
 
     private AssetMeta meta;
+
+    /**
+     * Low Quality Image Placeholder (LQIP) that is a base64 preview in ultra low-res + quality
+     */
+    private String lqip;
 
 }

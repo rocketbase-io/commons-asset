@@ -1,16 +1,16 @@
 package io.rocketbase.commons.converter;
 
-import io.rocketbase.commons.config.ApiProperties;
+import io.rocketbase.commons.config.AssetApiProperties;
 
 public class DefaultAssetPreviewService extends AbstractAssetPreviewService {
 
-    public DefaultAssetPreviewService(ApiProperties apiProperties) {
-        super(apiProperties);
+    public DefaultAssetPreviewService(AssetApiProperties assetApiProperties) {
+        super(assetApiProperties);
     }
 
     @Override
     protected String getBaseUrl() {
-        return apiProperties.getBaseUrl();
+        return assetApiProperties.getBaseUrl();
     }
 
 }

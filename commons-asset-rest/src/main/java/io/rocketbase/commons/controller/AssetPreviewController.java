@@ -5,9 +5,9 @@ import io.rocketbase.commons.exception.NotFoundException;
 import io.rocketbase.commons.model.AssetEntity;
 import io.rocketbase.commons.service.AssetService;
 import io.rocketbase.commons.service.FileStorageService;
+import io.rocketbase.commons.service.ImagePreviewRendering;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
-import net.coobird.thumbnailator.Thumbnails;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.CacheControl;
@@ -32,6 +32,9 @@ public class AssetPreviewController implements BaseAssetController {
     @Resource
     private AssetService assetService;
 
+    @Resource
+    private ImagePreviewRendering imagePreviewRendering;
+
     @SneakyThrows
     @RequestMapping(value = "/{sid}/{size}", method = RequestMethod.GET)
     @ResponseBody
@@ -46,10 +49,7 @@ public class AssetPreviewController implements BaseAssetController {
 
         InputStreamResource streamResource = fileStorageService.download(entity);
 
-        ByteArrayOutputStream thumbOs = new ByteArrayOutputStream();
-        Thumbnails.of(streamResource.getInputStream())
-                .size(previewSize.getMaxWidth(), previewSize.getMaxHeight())
-                .toOutputStream(thumbOs);
+        ByteArrayOutputStream thumbOs = imagePreviewRendering.getPreview(entity.getType(), streamResource.getInputStream(), previewSize);
 
         return ResponseEntity.ok()
                 .contentLength(thumbOs.toByteArray().length)

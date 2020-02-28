@@ -1,6 +1,6 @@
 package io.rocketbase.commons.converter;
 
-import io.rocketbase.commons.config.ApiProperties;
+import io.rocketbase.commons.config.AssetApiProperties;
 import io.rocketbase.commons.dto.asset.AssetRead;
 import io.rocketbase.commons.dto.asset.AssetType;
 import io.rocketbase.commons.dto.asset.PreviewSize;
@@ -20,10 +20,10 @@ public class AssetConverterTest {
     @Test
     public void testFromEntityWithLocalRender() {
         // given
-        ApiProperties apiProperties = new ApiProperties();
-        apiProperties.setBaseUrl("http://localhost:8080");
+        AssetApiProperties assetApiProperties = new AssetApiProperties();
+        assetApiProperties.setBaseUrl("http://localhost:8080");
 
-        AssetConverter converter = new AssetConverter(apiProperties, new DefaultAssetPreviewService(apiProperties));
+        AssetConverter converter = new AssetConverter(assetApiProperties, new DefaultAssetPreviewService(assetApiProperties));
         // when
         AssetRead assetRead = converter.fromEntity(AssetMongoEntity.builder()
                 .id("1235678")
@@ -40,7 +40,7 @@ public class AssetConverterTest {
         assertThat(assetRead, notNullValue());
         assertThat(assetRead.getPreviews(), notNullValue());
         assertThat(assetRead.getPreviews().getPreviewMap().size(), equalTo(3));
-        String baseWithApi = apiProperties.getBaseUrl() + apiProperties.getPath() + "/";
+        String baseWithApi = assetApiProperties.getBaseUrl() + assetApiProperties.getPath() + "/";
         assertThat(assetRead.getPreviews().getPreviewMap().get(PreviewSize.S), equalTo(baseWithApi + assetRead.getId() + "/s"));
         assertThat(assetRead.getPreviews().getPreviewMap().get(PreviewSize.M), equalTo(baseWithApi + assetRead.getId() + "/m"));
         assertThat(assetRead.getPreviews().getPreviewMap().get(PreviewSize.L), equalTo(baseWithApi + assetRead.getId() + "/l"));

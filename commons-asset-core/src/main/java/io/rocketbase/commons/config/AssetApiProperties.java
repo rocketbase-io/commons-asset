@@ -10,7 +10,7 @@ import java.util.*;
 
 @Data
 @ConfigurationProperties(prefix = "asset.api")
-public class ApiProperties implements Serializable {
+public class AssetApiProperties implements Serializable {
 
     private String baseUrl = "";
 
@@ -38,5 +38,7 @@ public class ApiProperties implements Serializable {
     private boolean localEndpointFallback = true;
 
     private Map<String, String> downloadHeaders = new HashMap<>();
+
+    private Map<String, Float> previewQuality = new HashMap<>();
 
 }

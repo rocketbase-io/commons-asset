@@ -1,6 +1,6 @@
 package io.rocketbase.commons.converter;
 
-import io.rocketbase.commons.config.ApiProperties;
+import io.rocketbase.commons.config.AssetApiProperties;
 import io.rocketbase.commons.util.Nulls;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
@@ -10,8 +10,8 @@ import javax.servlet.http.HttpServletRequest;
 
 public class ServletAssetPreviewService extends AbstractAssetPreviewService {
 
-    public ServletAssetPreviewService(ApiProperties apiProperties) {
-        super(apiProperties);
+    public ServletAssetPreviewService(AssetApiProperties assetApiProperties) {
+        super(assetApiProperties);
     }
 
     @Override
@@ -29,7 +29,7 @@ public class ServletAssetPreviewService extends AbstractAssetPreviewService {
             }
             return uriComponentsBuilder.toUriString();
         } catch (Exception e) {
-            return apiProperties.getBaseUrl();
+            return assetApiProperties.getBaseUrl();
         }
     }
 }

@@ -27,10 +27,10 @@ public class AssetRead extends AssetReference {
     }
 
     @JsonCreator
-    @ConstructorProperties({"id", "systemRefId", "urlPath", "type", "context", "meta", "previews", "download", "keyValues"})
+    @ConstructorProperties({"id", "systemRefId", "urlPath", "type", "context", "meta", "lqip", "previews", "download", "keyValues"})
     @Builder(builderMethodName = "builderRead")
-    public AssetRead(@NotNull String id, String systemRefId, String urlPath, AssetType type, String context, AssetMeta meta, AssetPreviews previews, String download, Map<String, String> keyValues) {
-        super(id, systemRefId, urlPath, type, context, meta);
+    public AssetRead(@NotNull String id, String systemRefId, String urlPath, AssetType type, String context, AssetMeta meta, String lqip, AssetPreviews previews, String download, Map<String, String> keyValues) {
+        super(id, systemRefId, urlPath, type, context, meta, lqip);
         setPreviews(previews);
         setDownload(download);
         setKeyValues(keyValues);

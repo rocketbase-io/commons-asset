@@ -1,7 +1,6 @@
 package io.rocketbase.commons.converter;
 
-import io.rocketbase.commons.config.ApiProperties;
-import io.rocketbase.commons.dto.asset.AssetReference;
+import io.rocketbase.commons.config.AssetApiProperties;
 import io.rocketbase.commons.dto.asset.AssetReferenceType;
 import io.rocketbase.commons.dto.asset.PreviewSize;
 import lombok.RequiredArgsConstructor;
@@ -9,7 +8,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public abstract class AbstractAssetPreviewService implements AssetPreviewService {
 
-    protected final ApiProperties apiProperties;
+    protected final AssetApiProperties assetApiProperties;
 
     protected abstract String getBaseUrl();
 
@@ -21,7 +20,7 @@ public abstract class AbstractAssetPreviewService implements AssetPreviewService
         if (baseUrl.endsWith("/")) {
             baseUrl = baseUrl.substring(0, baseUrl.length() - 1);
         }
-        return baseUrl + apiProperties.getPath() + "/" + assetReference.getId() + "/" + size.name().toLowerCase();
+        return baseUrl + assetApiProperties.getPath() + "/" + assetReference.getId() + "/" + size.name().toLowerCase();
     }
 
 }

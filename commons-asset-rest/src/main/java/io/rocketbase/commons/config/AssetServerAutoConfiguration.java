@@ -2,13 +2,17 @@ package io.rocketbase.commons.config;
 
 import io.rocketbase.commons.controller.*;
 import io.rocketbase.commons.controller.exceptionhandler.*;
+import lombok.RequiredArgsConstructor;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 import java.io.Serializable;
 
 @Configuration
+@EnableConfigurationProperties({AssetApiProperties.class, AssetLqipProperties.class})
+@RequiredArgsConstructor
 public class AssetServerAutoConfiguration implements Serializable {
 
     // -------------------------------------------------------

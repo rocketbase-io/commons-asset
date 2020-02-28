@@ -10,13 +10,23 @@ import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
 public enum PreviewSize {
-    XS(150, 150), S(300, 300), M(600, 600), L(1200, 1200), XL(1900, 1900);
+    XS(150, 150, 0.7f),
+    S(300, 300, 0.75f),
+    M(600, 600, 0.8f),
+    L(1200, 1200, 0.85f),
+    XL(1900, 1900, 0.85f);
 
+    /*
+
+     */
     @Getter
     private final int maxWidth;
 
     @Getter
     private final int maxHeight;
+
+    @Getter
+    private final float defaultQuality;
 
     public static final PreviewSize getDefault() {
         return S;
