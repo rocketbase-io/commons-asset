@@ -43,6 +43,10 @@ public interface AssetEntity extends AssetReferenceType {
 
     void setReferenceUrl(String referenceUrl);
 
+    String getLqip();
+
+    void setLqip(String lqip);
+
     Map<String, String> getKeyValues();
 
     default boolean hasKeyValue(String key) {

@@ -1,7 +1,8 @@
 package io.rocketbase.commons.service;
 
 import com.google.common.base.Stopwatch;
-import io.rocketbase.commons.config.ApiProperties;
+import io.rocketbase.commons.config.AssetApiProperties;
+import io.rocketbase.commons.config.AssetLqipProperties;
 import io.rocketbase.commons.dto.asset.AssetAnalyse;
 import io.rocketbase.commons.dto.asset.AssetType;
 import io.rocketbase.commons.dto.asset.ColorPalette;
@@ -20,10 +21,7 @@ import org.apache.tika.Tika;
 import javax.annotation.Resource;
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
 import java.time.Instant;
 import java.util.Map;
 import java.util.Optional;
@@ -34,7 +32,8 @@ import java.util.concurrent.TimeUnit;
 public class AssetService {
 
     private final Tika tika = new Tika();
-    private final ApiProperties apiProperties;
+    private final AssetApiProperties assetApiProperties;
+    private final AssetLqipProperties lqipProperties;
 
     @Resource
     private FileStorageService fileStorageService;
@@ -44,6 +43,9 @@ public class AssetService {
 
     @Resource
     private AssetTypeFilterService assetTypeFilterService;
+
+    @Resource
+    private ImagePreviewRendering imagePreviewRendering;
 
     public AssetEntity store(InputStream inputStream, String originalFilename, long size, String systemRefId, String context) {
         return store(inputStream, originalFilename, size, systemRefId, context, null);
@@ -169,6 +171,15 @@ public class AssetService {
 
         try {
             fileStorageService.upload(entity, file);
+
+            if (lqipProperties.isEnabled() && type.isImage()) {
+                try {
+                    entity.setLqip(imagePreviewRendering.getLqip(type, new FileInputStream(file)));
+                } catch (Exception e) {
+                    log.error("got problem with lqip generation. {}", e.getMessage());
+                }
+            }
+
             assetRepository.save(entity);
         } catch (Exception e) {
             log.error("couldn't upload entity. {}", e.getMessage());
@@ -197,17 +208,17 @@ public class AssetService {
 
     private AnalyseResult analyse(AssetType type, File file) {
         AnalyseResult.AnalyseResultBuilder builder = AnalyseResult.builder();
-        if (type.isImage() && (apiProperties.isDetectResolution() || apiProperties.isDetectColors())) {
+        if (type.isImage() && (assetApiProperties.isDetectResolution() || assetApiProperties.isDetectColors())) {
             try {
                 BufferedImage bufferedImage = ImageIO.read(file);
-                if (apiProperties.isDetectResolution()) {
+                if (assetApiProperties.isDetectResolution()) {
                     if (bufferedImage != null) {
                         builder.resolution(new Resolution(bufferedImage.getWidth(), bufferedImage.getHeight()));
                     } else {
                         log.trace("file not readable");
                     }
                 }
-                if (apiProperties.isDetectColors()) {
+                if (assetApiProperties.isDetectColors()) {
                     builder.colorPalette(ColorDetection.detect(bufferedImage));
                 }
             } catch (Exception e) {

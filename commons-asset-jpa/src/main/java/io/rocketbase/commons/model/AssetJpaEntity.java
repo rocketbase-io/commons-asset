@@ -95,6 +95,9 @@ public class AssetJpaEntity implements AssetEntity {
     @Column(length = 2000)
     private String referenceUrl;
 
+    @Lob
+    private String lqip;
+
     @ElementCollection(fetch = FetchType.EAGER)
     @CollectionTable(
             name = "asset_keyvalue_pairs",
