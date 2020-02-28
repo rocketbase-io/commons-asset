@@ -71,6 +71,7 @@ public class AssetConverter {
                 .type(reference.getType())
                 .meta(reference.getMeta())
                 .keyValues(filterInvisibleKeys(keyValues))
+                .lqip(reference.getLqip())
                 .build();
 
         injectPreviewsAndDownload(result, sizes);
@@ -103,6 +104,7 @@ public class AssetConverter {
                 .type(entity.getType())
                 .meta(entity.getMeta())
                 .keyValues(filterInvisibleKeys(entity.getKeyValues()))
+                .lqip(entity.getLqip())
                 .build();
     }
 
@@ -118,6 +120,7 @@ public class AssetConverter {
                 .urlPath(entity.getUrlPath())
                 .type(entity.getType())
                 .meta(entity.getMeta())
+                .lqip(entity.getLqip())
                 .build();
     }
 
