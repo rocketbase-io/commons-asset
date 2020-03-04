@@ -12,6 +12,11 @@ export interface AssetMeta {
 }
 
 export interface AssetPreviews {
+    XS?: string;
+    S?: string;
+    M?: string;
+    L?: string;
+    XL?: string;
 }
 
 export interface AssetRead extends AssetReference {
