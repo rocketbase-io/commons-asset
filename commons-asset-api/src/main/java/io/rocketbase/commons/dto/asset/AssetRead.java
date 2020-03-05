@@ -6,6 +6,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
+import javax.annotation.Nullable;
 import javax.validation.constraints.NotNull;
 import java.beans.ConstructorProperties;
 import java.util.Map;
@@ -19,8 +20,10 @@ public class AssetRead extends AssetReference {
     /**
      * optional property to receive the downloadUrl
      */
+    @Nullable
     private String download;
 
+    @Nullable
     private Map<String, String> keyValues;
 
     public AssetRead() {

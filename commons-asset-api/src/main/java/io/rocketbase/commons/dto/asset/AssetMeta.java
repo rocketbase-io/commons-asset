@@ -6,6 +6,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import javax.annotation.Nullable;
 import java.io.Serializable;
 import java.time.Instant;
 
@@ -24,15 +25,18 @@ public class AssetMeta implements Serializable {
     /**
      * only filled in case of image asset
      */
+    @Nullable
     private Resolution resolution;
 
     /**
      * only filled in case of image asset
      */
+    @Nullable
     private ColorPalette colorPalette;
 
     /**
      * only filled in case of batch downloaded image
      */
+    @Nullable
     private String referenceUrl;
 }

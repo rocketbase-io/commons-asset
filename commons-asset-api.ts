@@ -6,9 +6,9 @@ export interface AssetMeta {
     created: string;
     originalFilename: string;
     fileSize: number;
-    resolution: Resolution;
-    colorPalette: ColorPalette;
-    referenceUrl: string;
+    resolution?: Resolution;
+    colorPalette?: ColorPalette;
+    referenceUrl?: string;
 }
 
 export interface AssetPreviews {
@@ -21,23 +21,29 @@ export interface AssetPreviews {
 
 export interface AssetRead extends AssetReference {
     previews: AssetPreviews;
-    download: string;
-    keyValues: Record<string, string>;
+    download?: string;
+    keyValues?: Record<string, string>;
 }
 
+/**
+ * used to store reference in db
+ */
 export interface AssetReference extends AssetReferenceType {
-    lqip: string;
+    lqip?: string;
 }
 
 export interface AssetReferenceType {
     context: string;
     id: string;
     type: AssetType;
-    meta: AssetMeta;
-    systemRefId: string;
+    systemRefId?: string;
     urlPath: string;
+    meta: AssetMeta;
 }
 
+/**
+ * null properties mean let value as it is
+ */
 export interface AssetUpdate {
     keyValues: Record<string, string>;
 }
@@ -48,12 +54,12 @@ export interface ColorPalette {
 }
 
 export interface QueryAsset {
-    before: string;
-    after: string;
-    originalFilename: string;
-    referenceUrl: string;
-    context: string;
-    types: AssetType[];
+    before?: string;
+    after?: string;
+    originalFilename?: string;
+    referenceUrl?: string;
+    context?: string;
+    types?: AssetType[];
 }
 
 export interface Resolution {
@@ -62,18 +68,18 @@ export interface Resolution {
 }
 
 export interface AssetBatchAnalyseResult {
-    succeeded: Record<string, AssetAnalyse>;
-    failed: Record<string, AssetErrorCodes>;
+    succeeded: Record<string, string>;
+    failed: Record<string, string>;
 }
 
 export interface AssetBatchResult {
-    succeeded: Record<string, AssetRead>;
-    failed: Record<string, AssetErrorCodes>;
+    succeeded: Record<string, string>;
+    failed: Record<string, string>;
 }
 
 export interface AssetBatchResultWithoutPreviews {
-    succeeded: Record<string, AssetReference>;
-    failed: Record<string, AssetErrorCodes>;
+    succeeded: Record<string, string>;
+    failed: Record<string, string>;
 }
 
 export interface AssetBatchWrite {
@@ -82,9 +88,9 @@ export interface AssetBatchWrite {
 
 export interface AssetBatchWriteEntry {
     url: string;
-    systemRefId: string;
+    systemRefId?: string;
     context: string;
-    keyValues: Record<string, string>;
+    keyValues?: Record<string, string>;
 }
 
 export type AssetType =
@@ -102,11 +108,3 @@ export type AssetType =
     | "PPTX";
 
 export type PreviewSize = "XS" | "S" | "M" | "L" | "XL";
-
-export type AssetErrorCodes =
-    "INVALID_CONTENT_TYPE"
-    | "NOT_ALLOWED_CONTENT_TYPE"
-    | "ASSET_FILE_IS_EMPTY"
-    | "SYSTEM_REF_ID_ALREADY_USED"
-    | "UNPROCESSABLE_ASSET"
-    | "NOT_DOWNLOADABLE";

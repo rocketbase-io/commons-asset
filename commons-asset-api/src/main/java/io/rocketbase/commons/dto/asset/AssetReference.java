@@ -2,6 +2,7 @@ package io.rocketbase.commons.dto.asset;
 
 import lombok.*;
 
+import javax.annotation.Nullable;
 import java.io.Serializable;
 
 
@@ -23,6 +24,7 @@ public class AssetReference implements Serializable, AssetReferenceType {
     /**
      * optional foreign id of other system
      */
+    @Nullable
     private String systemRefId;
 
     /**
@@ -43,6 +45,7 @@ public class AssetReference implements Serializable, AssetReferenceType {
     /**
      * Low Quality Image Placeholder (LQIP) that is a base64 preview in ultra low-res + quality
      */
+    @Nullable
     private String lqip;
 
 }
