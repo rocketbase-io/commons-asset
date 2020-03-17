@@ -53,6 +53,7 @@ public class AssetBaseControllerIntegrationTest extends BaseIntegrationTest {
         assertThat(result.getMeta().getFileSize(), equalTo(3572L));
         assertThat(result.getMeta().getResolution(), equalTo(new Resolution(200, 40)));
         assertThat(result.getMeta().getOriginalFilename(), equalTo(uploadFile.getName()));
+        assertThat(result.getDownload(), startsWith(getBaseUrl()));
     }
 
     @SneakyThrows

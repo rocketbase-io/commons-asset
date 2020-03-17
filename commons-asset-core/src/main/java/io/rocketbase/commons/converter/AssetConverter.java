@@ -45,7 +45,7 @@ public class AssetConverter {
                                 .put(s, assetPreviewService.getPreviewUrl(result, s)));
             }
             if (assetApiProperties.isDownload()) {
-                result.setDownload(assetApiProperties.getPath() + "/" + result.getId() + "/b");
+                result.setDownload(assetPreviewService.getDownloadUrl(result));
             }
         }
     }
