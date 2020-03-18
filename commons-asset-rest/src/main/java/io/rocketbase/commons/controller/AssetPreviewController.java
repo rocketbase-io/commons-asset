@@ -5,7 +5,8 @@ import io.rocketbase.commons.exception.NotFoundException;
 import io.rocketbase.commons.model.AssetEntity;
 import io.rocketbase.commons.service.AssetService;
 import io.rocketbase.commons.service.FileStorageService;
-import io.rocketbase.commons.service.ImagePreviewRendering;
+import io.rocketbase.commons.service.preview.ImagePreviewRendering;
+import io.rocketbase.commons.service.preview.PreviewConfig;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
@@ -13,6 +14,7 @@ import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.CacheControl;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
@@ -38,7 +40,7 @@ public class AssetPreviewController implements BaseAssetController {
     @SneakyThrows
     @RequestMapping(value = "/{sid}/{size}", method = RequestMethod.GET)
     @ResponseBody
-    public ResponseEntity<InputStreamResource> getPreview(@PathVariable("sid") String sid, @PathVariable("size") String size) {
+    public ResponseEntity<InputStreamResource> getPreview(@PathVariable("sid") String sid, @PathVariable("size") String size, @RequestParam(required = false) MultiValueMap<String, String> params) {
         PreviewSize previewSize = PreviewSize.getByName(size, PreviewSize.S);
         AssetEntity entity = assetService.findByIdOrSystemRefId(sid)
                 .orElseThrow(() -> new NotFoundException());
@@ -49,7 +51,11 @@ public class AssetPreviewController implements BaseAssetController {
 
         InputStreamResource streamResource = fileStorageService.download(entity);
 
-        ByteArrayOutputStream thumbOs = imagePreviewRendering.getPreview(entity.getType(), streamResource.getInputStream(), previewSize);
+        ByteArrayOutputStream thumbOs = imagePreviewRendering.getPreview(entity.getType(), streamResource.getInputStream(), PreviewConfig.builder()
+                .previewSize(previewSize)
+                .rotation(parseInteger(params, "rotation", null))
+                .bg(params.getFirst("bg"))
+                .build());
 
         return ResponseEntity.ok()
                 .contentLength(thumbOs.toByteArray().length)

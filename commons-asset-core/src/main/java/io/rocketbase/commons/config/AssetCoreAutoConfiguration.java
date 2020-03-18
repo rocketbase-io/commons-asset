@@ -4,6 +4,8 @@ import io.rocketbase.commons.converter.*;
 import io.rocketbase.commons.dto.asset.PreviewSize;
 import io.rocketbase.commons.dto.asset.Resolution;
 import io.rocketbase.commons.service.*;
+import io.rocketbase.commons.service.preview.DefaultImagePreviewRendering;
+import io.rocketbase.commons.service.preview.ImagePreviewRendering;
 import io.rocketbase.commons.util.Nulls;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;

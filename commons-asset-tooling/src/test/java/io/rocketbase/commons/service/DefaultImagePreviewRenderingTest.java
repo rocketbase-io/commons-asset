@@ -3,6 +3,9 @@ package io.rocketbase.commons.service;
 import io.rocketbase.commons.dto.asset.AssetType;
 import io.rocketbase.commons.dto.asset.PreviewSize;
 import io.rocketbase.commons.dto.asset.Resolution;
+import io.rocketbase.commons.service.preview.DefaultImagePreviewRendering;
+import io.rocketbase.commons.service.preview.ImagePreviewRendering;
+import io.rocketbase.commons.service.preview.PreviewConfig;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.IOUtils;
@@ -30,7 +33,9 @@ public class DefaultImagePreviewRenderingTest {
         PreviewSize size = PreviewSize.S;
 
         // when
-        ByteArrayOutputStream preview = previewService.getPreview(AssetType.JPEG, asset, size);
+        ByteArrayOutputStream preview = previewService.getPreview(AssetType.JPEG, asset, PreviewConfig.builder()
+                .previewSize(size)
+                .build());
         File tempFile = outputToFile(preview);
 
         // then
@@ -40,6 +45,49 @@ public class DefaultImagePreviewRenderingTest {
         assertThat(bufferedImage.getHeight(), lessThanOrEqualTo(size.getMaxHeight()));
         log.info("see preview-s: {}", tempFile.getAbsolutePath());
     }
+
+    @Test
+    public void getPreviewOfPngWithoutBackground() throws Exception {
+        // given
+        ImagePreviewRendering previewService = new DefaultImagePreviewRendering(null, new Resolution(50, 50), 0.07f);
+        InputStream asset = ClassLoader.class.getResourceAsStream("/assets/icon-tomate.png");
+        PreviewSize size = PreviewSize.S;
+
+        // when
+        ByteArrayOutputStream preview = previewService.getPreview(AssetType.PNG, asset, PreviewConfig.builder().previewSize(size).build());
+
+        // then
+        File tempFile = outputToFile(preview);
+
+        // then
+        assertThat(preview, notNullValue());
+        BufferedImage bufferedImage = ImageIO.read(tempFile);
+        assertThat(bufferedImage.getWidth(), lessThanOrEqualTo(size.getMaxWidth()));
+        assertThat(bufferedImage.getHeight(), lessThanOrEqualTo(size.getMaxHeight()));
+        log.info("see preview-s: {}", tempFile.getAbsolutePath());
+    }
+
+    @Test
+    public void getPreviewOfPngWithBackground() throws Exception {
+        // given
+        ImagePreviewRendering previewService = new DefaultImagePreviewRendering(null, new Resolution(50, 50), 0.07f);
+        InputStream asset = ClassLoader.class.getResourceAsStream("/assets/icon-tomate.png");
+        PreviewSize size = PreviewSize.S;
+
+        // when
+        ByteArrayOutputStream preview = previewService.getPreview(AssetType.PNG, asset, PreviewConfig.builder().previewSize(size).bg("#000").rotation(90).build());
+
+        // then
+        File tempFile = outputToFile(preview);
+
+        // then
+        assertThat(preview, notNullValue());
+        BufferedImage bufferedImage = ImageIO.read(tempFile);
+        assertThat(bufferedImage.getWidth(), lessThanOrEqualTo(size.getMaxWidth()));
+        assertThat(bufferedImage.getHeight(), lessThanOrEqualTo(size.getMaxHeight()));
+        log.info("see preview-s: {}", tempFile.getAbsolutePath());
+    }
+
 
     @Test
     public void getLqipJpeg() {

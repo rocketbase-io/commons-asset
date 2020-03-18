@@ -10,6 +10,7 @@ import io.rocketbase.commons.dto.asset.Resolution;
 import io.rocketbase.commons.exception.*;
 import io.rocketbase.commons.model.AssetEntity;
 import io.rocketbase.commons.service.AssetTypeFilterService.AssetUploadDetail;
+import io.rocketbase.commons.service.preview.ImagePreviewRendering;
 import io.rocketbase.commons.tooling.ColorDetection;
 import lombok.Builder;
 import lombok.Getter;

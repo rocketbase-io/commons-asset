@@ -1,7 +1,9 @@
-package io.rocketbase.commons.service;
+package io.rocketbase.commons.service.preview;
 
 import io.rocketbase.commons.BaseIntegrationTest;
 import io.rocketbase.commons.dto.asset.PreviewSize;
+import io.rocketbase.commons.service.preview.DefaultImagePreviewRendering;
+import io.rocketbase.commons.service.preview.ImagePreviewRendering;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.Test;
 
