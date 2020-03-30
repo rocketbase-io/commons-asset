@@ -13,6 +13,7 @@ public enum AssetType {
     PNG("image/png"),
     GIF("image/gif"),
     TIFF("image/tiff"),
+    SVG("image/svg+xml"),
     PDF("application/pdf"),
     ZIP("application/zip"),
     XLS("application/msexcel"),
@@ -59,7 +60,7 @@ public enum AssetType {
                     return type;
                 } else if (type.equals(JPEG) && fileExtensions.equalsIgnoreCase("jpeg")) {
                     return type;
-                }else if (type.equals(TIFF) && fileExtensions.equalsIgnoreCase("tif")) {
+                } else if (type.equals(TIFF) && fileExtensions.equalsIgnoreCase("tif")) {
                     return type;
                 }
             }
@@ -67,8 +68,11 @@ public enum AssetType {
         return null;
     }
 
+    /**
+     * image in case of preview rendering possible
+     */
     public boolean isImage() {
-        return getContentType().contains("image");
+        return getContentType().contains("image") && !this.equals(SVG);
     }
 
     public String getFileExtension() {
