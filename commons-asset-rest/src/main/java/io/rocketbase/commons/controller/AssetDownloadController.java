@@ -10,6 +10,7 @@ import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
@@ -34,14 +35,19 @@ public class AssetDownloadController implements BaseAssetController {
      */
     @RequestMapping(value = "/{sid}/b", method = RequestMethod.GET)
     @ResponseBody
-    public ResponseEntity<InputStreamResource> downloadAsset(@PathVariable("sid") String sid) {
+    public ResponseEntity<InputStreamResource> downloadAsset(@PathVariable("sid") String sid, @RequestParam(required = false) MultiValueMap<String, String> params) {
         AssetEntity entity = assetService.findByIdOrSystemRefId(sid)
                 .orElseThrow(() -> new NotFoundException());
         InputStreamResource streamResource = fileStorageService.download(entity);
 
-        return ResponseEntity.ok()
-                .contentLength(entity.getFileSize())
-                .header(HttpHeaders.CONTENT_DISPOSITION, String.format("attachment;filename=%s", entity.getOriginalFilename()))
+        ResponseEntity.BodyBuilder builder = ResponseEntity.ok()
+                .contentLength(entity.getFileSize());
+        if (params.containsKey("inline")) {
+            builder.header(HttpHeaders.CONTENT_DISPOSITION, "inline");
+        } else {
+            builder.header(HttpHeaders.CONTENT_DISPOSITION, String.format("attachment;filename=%s", entity.getOriginalFilename()));
+        }
+        return builder
                 .contentType(MediaType.parseMediaType(entity.getType().getContentType()))
                 .body(streamResource);
     }
