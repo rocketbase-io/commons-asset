@@ -9,6 +9,7 @@ import lombok.EqualsAndHashCode;
 import javax.annotation.Nullable;
 import javax.validation.constraints.NotNull;
 import java.beans.ConstructorProperties;
+import java.time.Instant;
 import java.util.Map;
 
 @Data
@@ -26,17 +27,21 @@ public class AssetRead extends AssetReference {
     @Nullable
     private Map<String, String> keyValues;
 
+    @Nullable
+    private Instant eol;
+
     public AssetRead() {
     }
 
     @JsonCreator
-    @ConstructorProperties({"id", "systemRefId", "urlPath", "type", "context", "meta", "lqip", "previews", "download", "keyValues"})
+    @ConstructorProperties({"id", "systemRefId", "urlPath", "type", "context", "meta", "lqip", "previews", "download", "keyValues", "eol"})
     @Builder(builderMethodName = "builderRead")
-    public AssetRead(@NotNull String id, String systemRefId, String urlPath, AssetType type, String context, AssetMeta meta, String lqip, AssetPreviews previews, String download, Map<String, String> keyValues) {
+    public AssetRead(@NotNull String id, String systemRefId, String urlPath, AssetType type, String context, AssetMeta meta, String lqip, AssetPreviews previews, String download, Map<String, String> keyValues, Instant eol) {
         super(id, systemRefId, urlPath, type, context, meta, lqip);
         setPreviews(previews);
         setDownload(download);
         setKeyValues(keyValues);
+        setEol(eol);
     }
 
     public String toString() {

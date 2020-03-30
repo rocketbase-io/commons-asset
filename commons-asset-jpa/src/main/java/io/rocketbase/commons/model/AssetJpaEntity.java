@@ -9,6 +9,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import javax.annotation.Nullable;
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
@@ -109,6 +110,9 @@ public class AssetJpaEntity implements AssetEntity {
     @Column(name = "field_value", length = 4000, nullable = false)
     @Builder.Default
     private Map<String, String> keyValueMap = new HashMap<>();
+
+    @Nullable
+    private Instant eol;
 
     @Override
     public Resolution getResolution() {

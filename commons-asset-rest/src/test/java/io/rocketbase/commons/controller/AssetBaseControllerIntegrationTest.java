@@ -1,10 +1,7 @@
 package io.rocketbase.commons.controller;
 
 import io.rocketbase.commons.BaseIntegrationTest;
-import io.rocketbase.commons.dto.asset.AssetRead;
-import io.rocketbase.commons.dto.asset.AssetType;
-import io.rocketbase.commons.dto.asset.AssetUpdate;
-import io.rocketbase.commons.dto.asset.Resolution;
+import io.rocketbase.commons.dto.asset.*;
 import io.rocketbase.commons.dto.batch.AssetBatchResult;
 import io.rocketbase.commons.dto.batch.AssetBatchWrite;
 import io.rocketbase.commons.dto.batch.AssetBatchWriteEntry;
@@ -95,7 +92,10 @@ public class AssetBaseControllerIntegrationTest extends BaseIntegrationTest {
         String _hiddenValue = "secret";
         keyValues.put(_hidden, _hiddenValue);
         String context = "context";
-        AssetRead result = assetResource.uploadFile(new FileInputStream(uploadFile), uploadFile.getName(), null, context, keyValues);
+        AssetRead result = assetResource.uploadFile(new FileInputStream(uploadFile), uploadFile.getName(), DefaultAssetUploadMeta.builder()
+                .context(context)
+                .keyValues(keyValues)
+                .build());
 
         // then
         assertThat(result, notNullValue());

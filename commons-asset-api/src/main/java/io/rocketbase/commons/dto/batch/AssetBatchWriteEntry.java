@@ -1,18 +1,19 @@
 package io.rocketbase.commons.dto.batch;
 
 
+import io.rocketbase.commons.dto.asset.AssetUploadMeta;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
 import javax.annotation.Nullable;
 import javax.validation.constraints.NotNull;
-import java.io.Serializable;
+import java.time.Instant;
 import java.util.Map;
 
 
 @Data
 @AllArgsConstructor
-public class AssetBatchWriteEntry implements Serializable {
+public class AssetBatchWriteEntry implements AssetUploadMeta {
 
     @NotNull
     private String url;
@@ -20,10 +21,14 @@ public class AssetBatchWriteEntry implements Serializable {
     @Nullable
     private String systemRefId;
 
+    @Nullable
     private String context;
 
     @Nullable
     private Map<String, String> keyValues;
+
+    @Nullable
+    private Instant eol;
 
     public AssetBatchWriteEntry() {
     }

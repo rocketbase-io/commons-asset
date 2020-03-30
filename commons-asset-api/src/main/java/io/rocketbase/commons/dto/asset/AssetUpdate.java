@@ -5,7 +5,9 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import javax.annotation.Nullable;
 import java.io.Serializable;
+import java.time.Instant;
 import java.util.Map;
 
 /**
@@ -21,6 +23,20 @@ public class AssetUpdate implements Serializable {
      * will only add/replace new/existing key values<br>
      * not mentioned key will still stay the same
      */
+    @Nullable
     private Map<String, String> keyValues;
 
+    /**
+     * after this time the asset could get deleted within a cleanup job
+     */
+    @Nullable
+    private Instant eol;
+
+    public AssetUpdate(@Nullable Map<String, String> keyValues) {
+        this.keyValues = keyValues;
+    }
+
+    public AssetUpdate(@Nullable Instant eol) {
+        this.eol = eol;
+    }
 }

@@ -49,6 +49,10 @@ public interface AssetEntity extends AssetReferenceType {
 
     Map<String, String> getKeyValues();
 
+    void setEol(Instant eol);
+
+    Instant getEol();
+
     default boolean hasKeyValue(String key) {
         return getKeyValues() != null && key != null && getKeyValues().containsKey(key.toLowerCase());
     }
@@ -103,5 +107,11 @@ public interface AssetEntity extends AssetReferenceType {
                 .referenceUrl(getReferenceUrl())
                 .build();
     }
+
+    @Transient
+    default boolean isEol() {
+        return getEol() != null ? getEol().isBefore(Instant.now()) : false;
+    }
+
 
 }

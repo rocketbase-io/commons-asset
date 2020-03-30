@@ -5,6 +5,8 @@ import io.rocketbase.commons.converter.QueryAssetConverter;
 import io.rocketbase.commons.dto.PageableResult;
 import io.rocketbase.commons.dto.asset.AssetRead;
 import io.rocketbase.commons.dto.asset.AssetUpdate;
+import io.rocketbase.commons.dto.asset.AssetUploadMeta;
+import io.rocketbase.commons.dto.asset.DefaultAssetUploadMeta;
 import io.rocketbase.commons.exception.EmptyFileException;
 import io.rocketbase.commons.exception.NotFoundException;
 import io.rocketbase.commons.model.AssetEntity;
@@ -42,22 +44,27 @@ public class AssetBaseController implements BaseAssetController {
     @SneakyThrows
     @RequestMapping(method = RequestMethod.POST)
     public AssetRead handleFileUpload(@RequestParam("file") MultipartFile file,
-                                      @RequestParam(value = "systemRefId", required = false) String systemRefId,
-                                      @RequestParam(value = "context", required = false) String context,
                                       @RequestParam(required = false) MultiValueMap<String, String> params) {
         if (file.isEmpty()) {
             throw new EmptyFileException();
         }
+        AssetEntity asset = assetService.store(file.getInputStream(), file.getOriginalFilename(), file.getSize(), null, convert(params));
+        return assetConverter.fromEntityByRequestContext(asset, getPreviewSizes(null));
+    }
+
+    protected AssetUploadMeta convert(MultiValueMap<String, String> params) {
+        DefaultAssetUploadMeta result = new DefaultAssetUploadMeta();
         Map<String, String> keyValues = new HashMap<>();
         for (String p : params.keySet()) {
             if (p.startsWith("k_") && p.length() > 2) {
                 keyValues.put(p.substring(2), params.getFirst(p));
             }
         }
-
-        AssetEntity asset = assetService.store(file.getInputStream(), file.getOriginalFilename(), file.getSize(), systemRefId, context, null, keyValues);
-
-        return assetConverter.fromEntityByRequestContext(asset, getPreviewSizes(null));
+        result.setKeyValues(keyValues);
+        result.setSystemRefId(params.getFirst("systemRefId"));
+        result.setContext(params.getFirst("context"));
+        result.setEol(parseInstant(params, "eol", null));
+        return result;
     }
 
     @RequestMapping(method = RequestMethod.GET)

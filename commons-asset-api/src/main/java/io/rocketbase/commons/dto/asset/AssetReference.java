@@ -38,6 +38,7 @@ public class AssetReference implements Serializable, AssetReferenceType {
      * allows to store individual grouping for assets to find all picture of a flexible type<br>
      * for example all avatar images or backgrounds...
      */
+    @Nullable
     private String context;
 
     private AssetMeta meta;

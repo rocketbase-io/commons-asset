@@ -9,7 +9,6 @@ import io.rocketbase.commons.exception.InvalidContentTypeException;
 import io.rocketbase.commons.model.AssetEntity;
 
 import javax.annotation.Resource;
-import java.io.File;
 import java.util.List;
 
 public class AssetBatchService {
@@ -35,7 +34,7 @@ public class AssetBatchService {
         for (AssetBatchWriteEntry entry : assetBatch.getEntries()) {
             try {
                 DownloadService.TempDownload download = downloadService.downloadUrl(entry.getUrl());
-                AssetEntity asset = assetService.storeAndDeleteFile(download.getFile(), download.getFilename(), download.getFile().length(), entry.getSystemRefId(), entry.getContext(), entry.getUrl(), entry.getKeyValues());
+                AssetEntity asset = assetService.storeAndDeleteFile(download.getFile(), download.getFilename(), download.getFile().length(), entry.getUrl(), entry);
                 builder.success(entry.getUrl(), assetConverter.fromEntity(asset, previewSizes));
             } catch (DownloadService.DownloadError e) {
                 builder.failure(entry.getUrl(), e.getErrorCode());
@@ -59,7 +58,7 @@ public class AssetBatchService {
         for (AssetBatchWriteEntry entry : assetBatch.getEntries()) {
             try {
                 DownloadService.TempDownload download = downloadService.downloadUrl(entry.getUrl());
-                AssetEntity asset = assetService.storeAndDeleteFile(download.getFile(), download.getFilename(), download.getFile().length(), entry.getSystemRefId(), entry.getContext(), entry.getUrl(), entry.getKeyValues());
+                AssetEntity asset = assetService.storeAndDeleteFile(download.getFile(), download.getFilename(), download.getFile().length(), entry.getUrl(), entry);
                 builder.success(entry.getUrl(), assetConverter.fromEntityWithoutPreviews(asset));
             } catch (DownloadService.DownloadError e) {
                 builder.failure(entry.getUrl(), e.getErrorCode());

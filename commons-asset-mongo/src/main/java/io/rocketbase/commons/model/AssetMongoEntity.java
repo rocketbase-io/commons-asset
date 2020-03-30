@@ -11,6 +11,7 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import javax.annotation.Nullable;
 import java.time.Instant;
 import java.util.HashMap;
 import java.util.Map;
@@ -68,6 +69,9 @@ public class AssetMongoEntity implements AssetEntity {
     private String referenceUrl;
 
     private String lqip;
+
+    @Nullable
+    private Instant eol;
 
     @Builder.Default
     private Map<String, String> keyValueMap = new HashMap<>();

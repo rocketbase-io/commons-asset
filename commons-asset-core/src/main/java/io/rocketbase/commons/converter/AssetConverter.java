@@ -8,6 +8,7 @@ import io.rocketbase.commons.dto.asset.PreviewSize;
 import io.rocketbase.commons.model.AssetEntity;
 import lombok.RequiredArgsConstructor;
 
+import java.time.Instant;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -55,10 +56,10 @@ public class AssetConverter {
     }
 
     public AssetRead toRead(AssetReference reference, List<PreviewSize> sizes) {
-        return toRead(reference, sizes, null);
+        return toRead(reference, sizes, null, null);
     }
 
-    public AssetRead toRead(AssetReference reference, List<PreviewSize> sizes, Map<String, String> keyValues) {
+    public AssetRead toRead(AssetReference reference, List<PreviewSize> sizes, Map<String, String> keyValues, Instant eol) {
         if (reference == null) {
             return null;
         }
@@ -72,6 +73,7 @@ public class AssetConverter {
                 .meta(reference.getMeta())
                 .keyValues(filterInvisibleKeys(keyValues))
                 .lqip(reference.getLqip())
+                .eol(eol)
                 .build();
 
         injectPreviewsAndDownload(result, sizes);
@@ -105,6 +107,7 @@ public class AssetConverter {
                 .meta(entity.getMeta())
                 .keyValues(filterInvisibleKeys(entity.getKeyValues()))
                 .lqip(entity.getLqip())
+                .eol(entity.getEol())
                 .build();
     }
 

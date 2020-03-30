@@ -3,15 +3,13 @@ package io.rocketbase.commons.service;
 import com.google.common.base.Stopwatch;
 import io.rocketbase.commons.config.AssetApiProperties;
 import io.rocketbase.commons.config.AssetLqipProperties;
-import io.rocketbase.commons.dto.asset.AssetAnalyse;
-import io.rocketbase.commons.dto.asset.AssetType;
-import io.rocketbase.commons.dto.asset.ColorPalette;
-import io.rocketbase.commons.dto.asset.Resolution;
+import io.rocketbase.commons.dto.asset.*;
 import io.rocketbase.commons.exception.*;
 import io.rocketbase.commons.model.AssetEntity;
 import io.rocketbase.commons.service.AssetTypeFilterService.AssetUploadDetail;
 import io.rocketbase.commons.service.preview.ImagePreviewRendering;
 import io.rocketbase.commons.tooling.ColorDetection;
+import io.rocketbase.commons.util.Nulls;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -49,14 +47,14 @@ public class AssetService {
     private ImagePreviewRendering imagePreviewRendering;
 
     public AssetEntity store(InputStream inputStream, String originalFilename, long size, String systemRefId, String context) {
-        return store(inputStream, originalFilename, size, systemRefId, context, null);
+        return store(inputStream, originalFilename, size, null, DefaultAssetUploadMeta.builder()
+                .systemRefId(systemRefId)
+                .context(context)
+                .build()
+        );
     }
 
-    public AssetEntity store(InputStream inputStream, String originalFilename, long size, String systemRefId, String context, String referenceUrl) {
-        return store(inputStream, originalFilename, size, systemRefId, context, referenceUrl, null);
-    }
-
-    public AssetEntity store(InputStream inputStream, String originalFilename, long size, String systemRefId, String context, String referenceUrl, Map<String, String> keyValues) {
+    public AssetEntity store(InputStream inputStream, String originalFilename, long size, String referenceUrl, AssetUploadMeta uploadMeta) {
         try {
             Stopwatch stopwatch = null;
             if (log.isDebugEnabled()) {
@@ -73,7 +71,7 @@ public class AssetService {
             File tempFile = File.createTempFile("asset", suffix);
             IOUtils.copy(inputStream, new FileOutputStream(tempFile));
 
-            AssetEntity asset = storeAndDeleteFile(tempFile, originalFilename, size, systemRefId, context, referenceUrl, keyValues);
+            AssetEntity asset = storeAndDeleteFile(tempFile, originalFilename, size, referenceUrl, uploadMeta);
 
             if (log.isDebugEnabled()) {
                 log.debug("store file {} with id: {}, took: {} ms", originalFilename, asset.getId(), stopwatch.elapsed(TimeUnit.MILLISECONDS));
@@ -109,23 +107,23 @@ public class AssetService {
         }
     }
 
-    public AssetEntity storeAndDeleteFile(File file, String originalFilename, long size, String systemRefId, String context, String referenceUrl, Map<String, String> keyValues) throws IOException {
+    public AssetEntity storeAndDeleteFile(File file, String originalFilename, long size, String referenceUrl, AssetUploadMeta uploadMeta) throws IOException {
         try {
-            AssetType assetType = detectAssetTypeWithChecks(file, originalFilename, size, systemRefId, context, referenceUrl);
-            AssetEntity asset = saveAndUploadAsset(assetType, file, originalFilename, size, systemRefId, context, referenceUrl, keyValues);
+            AssetType assetType = detectAssetTypeWithChecks(file, originalFilename, size, referenceUrl, uploadMeta);
+            AssetEntity asset = saveAndUploadAsset(assetType, file, originalFilename, size, referenceUrl, uploadMeta);
             return asset;
         } finally {
             file.delete();
         }
     }
 
-    private AssetType detectAssetTypeWithChecks(File file, String originalFilename, long size, String systemRefId, String context, String referenceUrl) throws IOException {
+    private AssetType detectAssetTypeWithChecks(File file, String originalFilename, long size, String referenceUrl, AssetUploadMeta uploadMeta) throws IOException {
         String contentType = tika.detect(file);
         AssetType assetType = AssetType.findByContentType(contentType);
         if (assetType == null) {
             log.info("detected contentType: {}", contentType);
             throw new InvalidContentTypeException(contentType);
-        } else if (!assetTypeFilterService.isAllowed(assetType, new AssetUploadDetail(file, originalFilename, size, systemRefId, context, referenceUrl))) {
+        } else if (!assetTypeFilterService.isAllowed(assetType, new AssetUploadDetail(file, originalFilename, size, referenceUrl, uploadMeta))) {
             log.info("got assetType: {} that is not within allowed list: {}", assetType, assetTypeFilterService.getAllowedAssetTypes());
             throw new NotAllowedAssetTypeException(assetType);
         }
@@ -148,10 +146,10 @@ public class AssetService {
         assetRepository.delete(asset.getId());
     }
 
-    private AssetEntity saveAndUploadAsset(AssetType type, File file, String originalFilename, long size, String systemRefId, String context, String referenceUrl, Map<String, String> keyValues) {
+    private AssetEntity saveAndUploadAsset(AssetType type, File file, String originalFilename, long size, String referenceUrl, AssetUploadMeta uploadMeta) {
 
-        if (systemRefId != null) {
-            if (assetRepository.findBySystemRefId(systemRefId).isPresent()) {
+        if (Nulls.notNull(uploadMeta, AssetUploadMeta::getSystemRefId, null) != null) {
+            if (assetRepository.findBySystemRefId(uploadMeta.getSystemRefId()).isPresent()) {
                 throw new SystemRefIdAlreadyUsedException();
             }
         }
@@ -162,13 +160,14 @@ public class AssetService {
         entity.setType(type);
         entity.setOriginalFilename(originalFilename);
         entity.setReferenceUrl(referenceUrl);
-        entity.setSystemRefId(systemRefId);
-        entity.setContext(context);
+        entity.setSystemRefId(Nulls.notNull(uploadMeta, AssetUploadMeta::getSystemRefId, null));
+        entity.setContext(Nulls.notNull(uploadMeta, AssetUploadMeta::getContext, null));
         entity.setFileSize(size);
         entity.setResolution(analyse.getResolution());
         entity.setColorPalette(analyse.getColorPalette());
+        entity.setEol(Nulls.notNull(uploadMeta, AssetUploadMeta::getEol, null));
 
-        handleKeyValues(entity, keyValues);
+        handleKeyValues(entity, Nulls.notNull(uploadMeta, AssetUploadMeta::getKeyValues, null));
 
         try {
             fileStorageService.upload(entity, file);
@@ -193,7 +192,7 @@ public class AssetService {
     public AssetAnalyse analyse(File file, String originalFilename) throws IOException {
         AssetAnalyse result = null;
         long fileSize = file.length();
-        AssetType assetType = detectAssetTypeWithChecks(file, originalFilename, fileSize, null, null, null);
+        AssetType assetType = detectAssetTypeWithChecks(file, originalFilename, fileSize, null, null);
         AnalyseResult analyse = analyse(assetType, file);
 
         result = AssetAnalyse.builderAnalyse()

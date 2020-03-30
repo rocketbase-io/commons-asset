@@ -2,10 +2,7 @@ package io.rocketbase.commons.resource;
 
 import com.google.common.io.ByteStreams;
 import io.rocketbase.commons.dto.PageableResult;
-import io.rocketbase.commons.dto.asset.AssetAnalyse;
-import io.rocketbase.commons.dto.asset.AssetRead;
-import io.rocketbase.commons.dto.asset.AssetUpdate;
-import io.rocketbase.commons.dto.asset.QueryAsset;
+import io.rocketbase.commons.dto.asset.*;
 import io.rocketbase.commons.dto.batch.AssetBatchAnalyseResult;
 import io.rocketbase.commons.dto.batch.AssetBatchResult;
 import io.rocketbase.commons.dto.batch.AssetBatchWrite;
@@ -30,7 +27,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
-import java.util.Map;
 
 public class AssetResource implements BaseRestResource {
 
@@ -170,7 +166,10 @@ public class AssetResource implements BaseRestResource {
      */
     @SneakyThrows
     public AssetRead uploadFile(InputStream assetResource, String filename, String systemRefId, String context) {
-        return uploadFile(assetResource, filename, systemRefId, context, null);
+        return uploadFile(assetResource, filename, DefaultAssetUploadMeta.builder()
+                .systemRefId(systemRefId)
+                .context(context)
+                .build());
     }
 
     /**
@@ -178,16 +177,12 @@ public class AssetResource implements BaseRestResource {
      *
      * @param assetResource stream to resource
      * @param filename      optional originalFileName
-     * @param systemRefId   optional reference id
-     * @param context       optional name of context (could be used to differ buckets for example)
-     * @param keyValues     optional will get stored with lowercase<br>
-     *                      max length of 50 characters<br>
-     *                      key with _ as prefix will not get displayed in REST_API
+     * @param uploadMeta    contains optional meta parameter like keyValues, systemRefId...
      * @return stored asset references
      */
     @SneakyThrows
-    public AssetRead uploadFile(InputStream assetResource, String filename, String systemRefId, String context, Map<String, String> keyValues) {
-        HttpEntity<LinkedMultiValueMap<String, Object>> requestEntity = buildUploadMultipartForm(assetResource, filename, systemRefId, context, keyValues);
+    public AssetRead uploadFile(InputStream assetResource, String filename, AssetUploadMeta uploadMeta) {
+        HttpEntity<LinkedMultiValueMap<String, Object>> requestEntity = buildUploadMultipartForm(assetResource, filename, uploadMeta);
         ResponseEntity<AssetRead> response = getRestTemplate().exchange(getUriBuilder().toUriString(),
                 HttpMethod.POST,
                 requestEntity,
@@ -206,7 +201,7 @@ public class AssetResource implements BaseRestResource {
         return response.getBody();
     }
 
-    private HttpEntity<LinkedMultiValueMap<String, Object>> buildUploadMultipartForm(InputStream assetResource, String filename, String systemRefId, String context, Map<String, String> keyValues) throws IOException {
+    private HttpEntity<LinkedMultiValueMap<String, Object>> buildUploadMultipartForm(InputStream assetResource, String filename, AssetUploadMeta uploadMeta) throws IOException {
         byte[] bytes = ByteStreams.toByteArray(assetResource);
         LinkedMultiValueMap<String, Object> form = new LinkedMultiValueMap<>();
         form.add("file", new ByteArrayResource(bytes) {
@@ -216,15 +211,20 @@ public class AssetResource implements BaseRestResource {
             }
         });
         // optional parameters
-        if (systemRefId != null) {
-            form.add("systemRefId", systemRefId);
-        }
-        if (context != null) {
-            form.add("context", context);
-        }
-        if (keyValues != null) {
-            for (String k : keyValues.keySet()) {
-                form.add(String.format("k_%s", k), keyValues.get(k));
+        if (uploadMeta != null) {
+            if (uploadMeta.getSystemRefId() != null) {
+                form.add("systemRefId", uploadMeta.getSystemRefId());
+            }
+            if (uploadMeta.getContext() != null) {
+                form.add("context", uploadMeta.getContext());
+            }
+            if (uploadMeta.getKeyValues() != null) {
+                for (String k : uploadMeta.getKeyValues().keySet()) {
+                    form.add(String.format("k_%s", k), uploadMeta.getKeyValues().get(k));
+                }
+            }
+            if (uploadMeta.getEol() != null) {
+                form.add("eol", uploadMeta.getEol().toString());
             }
         }
 
@@ -284,7 +284,7 @@ public class AssetResource implements BaseRestResource {
      */
     @SneakyThrows
     public AssetAnalyse analyseFile(InputStream assetResource, String filename) {
-        HttpEntity<LinkedMultiValueMap<String, Object>> requestEntity = buildUploadMultipartForm(assetResource, filename, null, null, null);
+        HttpEntity<LinkedMultiValueMap<String, Object>> requestEntity = buildUploadMultipartForm(assetResource, filename, null);
         ResponseEntity<AssetAnalyse> response = getRestTemplate().exchange(getUriBuilder().path("/analyse").toUriString(),
                 HttpMethod.POST,
                 requestEntity,
