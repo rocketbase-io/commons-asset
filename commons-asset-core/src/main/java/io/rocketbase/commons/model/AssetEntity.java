@@ -90,9 +90,11 @@ public interface AssetEntity extends AssetReferenceType {
         return AssetReference.builder()
                 .id(getId())
                 .systemRefId(getSystemRefId())
+                .context(getContext())
                 .urlPath(getUrlPath())
                 .type(getType())
                 .meta(getMeta())
+                .lqip(getLqip())
                 .build();
     }
 
