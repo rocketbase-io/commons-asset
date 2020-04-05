@@ -98,16 +98,16 @@ SOFTWARE.
         <maven.compiler.target>1.8</maven.compiler.target>
         <maven.javadoc.failOnError>false</maven.javadoc.failOnError>
 
-        <spring-boot.version>2.2.5.RELEASE</spring-boot.version>
+        <spring-boot.version>2.2.6.RELEASE</spring-boot.version>
         <spring-cloud-dependencies.version>Hoxton.SR3</spring-cloud-dependencies.version>
 
         <commons-rest.version>2.0.2</commons-rest.version>
         <guava.version>28.2-jre</guava.version>
         <commons-fileupload.version>1.4</commons-fileupload.version>
         <commons-io.version>2.6</commons-io.version>
-        <tika-core.version>1.23</tika-core.version>
+        <tika-core.version>1.24</tika-core.version>
         <thumbnailator.version>0.4.11</thumbnailator.version>
-        <okhttp.version>4.4.0</okhttp.version>
+        <okhttp.version>4.4.1</okhttp.version>
         <jacoco.version>0.8.5</jacoco.version>
         <colors.version>0.5.0</colors.version>
     </properties>
