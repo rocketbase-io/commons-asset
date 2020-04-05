@@ -117,6 +117,18 @@ public class AssetMongoRepository implements AssetRepository<AssetMongoEntity> {
             if (query.getTypes() != null && !query.getTypes().isEmpty()) {
                 result.addCriteria(Criteria.where("type").in(query.getTypes()));
             }
+            if (query.getHasEolValue() != null) {
+                result.addCriteria(Criteria.where("eol").exists(query.getHasEolValue()));
+            }
+            if (query.getIsEol() != null) {
+                if (query.getIsEol()) {
+                    result.addCriteria(Criteria.where("eol").exists(true)
+                            .andOperator(Criteria.where("eol").lt(Instant.now())));
+                } else {
+                    result.addCriteria(Criteria.where("eol").exists(false)
+                            .orOperator(Criteria.where("eol").gte(Instant.now())));
+                }
+            }
         }
         return result;
     }

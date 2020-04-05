@@ -13,20 +13,23 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.mongodb.core.MongoTemplate;
 
 import javax.annotation.Resource;
+import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
+import java.time.temporal.ChronoUnit;
 import java.util.Set;
 import java.util.stream.Collectors;
 
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.Matchers.notNullValue;
+import static org.hamcrest.Matchers.*;
 
 public class AssetRepositoryTest extends BaseIntegrationTest {
 
     private final Pageable pageable = PageRequest.of(0, 10);
+
     @Resource
     private MongoTemplate mongoTemplate;
+
     @Resource
     private AssetRepository assetRepository;
 
@@ -58,6 +61,27 @@ public class AssetRepositoryTest extends BaseIntegrationTest {
                 .created(LocalDateTime.of(2018, 4, 11, 2, 0).toInstant(ZoneOffset.UTC))
                 .fileSize(2345L)
                 .build());
+        mongoTemplate.save(AssetMongoEntity.builder()
+                .type(AssetType.PDF)
+                .originalFilename("eol.pdf")
+                .created(LocalDateTime.of(2019, 12, 31, 11, 0).toInstant(ZoneOffset.UTC))
+                .eol(Instant.now().minus(5, ChronoUnit.MINUTES))
+                .fileSize(4567L)
+                .build());
+        mongoTemplate.save(AssetMongoEntity.builder()
+                .type(AssetType.JPEG)
+                .originalFilename("should-expire-future.jpg")
+                .created(LocalDateTime.of(2020, 1, 14, 13, 30).toInstant(ZoneOffset.UTC))
+                .eol(Instant.now().plus(10, ChronoUnit.DAYS))
+                .fileSize(1568L)
+                .build());
+        mongoTemplate.save(AssetMongoEntity.builder()
+                .type(AssetType.GIF)
+                .originalFilename("expired.gif")
+                .created(LocalDateTime.of(2020, 2, 2, 22, 30).toInstant(ZoneOffset.UTC))
+                .eol(Instant.now().minus(10, ChronoUnit.DAYS))
+                .fileSize(968L)
+                .build());
     }
 
     @Test
@@ -72,7 +96,7 @@ public class AssetRepositoryTest extends BaseIntegrationTest {
 
         // then
         assertThat(page, notNullValue());
-        assertThat(page.getNumberOfElements(), equalTo(2));
+        assertThat(page.getNumberOfElements(), equalTo(3));
         Set<AssetType> assetTypes = page.getContent().stream().map(AssetEntity::getType).collect(Collectors.toSet());
         assertThat(assetTypes.size(), equalTo(1));
         assertThat(assetTypes.iterator().next(), equalTo(AssetType.JPEG));
@@ -103,7 +127,7 @@ public class AssetRepositoryTest extends BaseIntegrationTest {
 
         // then
         assertThat(page, notNullValue());
-        assertThat(page.getNumberOfElements(), equalTo(3));
+        assertThat(page.getNumberOfElements(), equalTo(6));
     }
 
     @Test
@@ -165,5 +189,59 @@ public class AssetRepositoryTest extends BaseIntegrationTest {
         // then
         assertThat(page, notNullValue());
         assertThat(page.getNumberOfElements(), equalTo(1));
+    }
+
+    @Test
+    public void findHasEol() {
+        // given
+        QueryAsset query = QueryAsset.builder()
+                .hasEolValue(true)
+                .build();
+        // when
+        Page<AssetEntity> page = assetRepository.findAll(query, pageable);
+
+        // then
+        assertThat(page, notNullValue());
+        assertThat(page.getNumberOfElements(), equalTo(3));
+        assertThat(page.getContent().get(0).getEol(), notNullValue());
+        assertThat(page.getContent().get(1).getEol(), notNullValue());
+        assertThat(page.getContent().get(2).getEol(), notNullValue());
+    }
+
+    @Test
+    public void findEol() {
+        // given
+        QueryAsset query = QueryAsset.builder()
+                .isEol(true)
+                .build();
+        // when
+        Page<AssetEntity> page = assetRepository.findAll(query, pageable);
+
+        // then
+        assertThat(page, notNullValue());
+        assertThat(page.getNumberOfElements(), equalTo(2));
+        assertThat(page.getContent().get(0).getEol(), notNullValue());
+        assertThat(page.getContent().get(0).getEol(), lessThan(Instant.now()));
+        assertThat(page.getContent().get(1).getEol(), notNullValue());
+        assertThat(page.getContent().get(1).getEol(), lessThan(Instant.now()));
+    }
+
+    @Test
+    public void findCombinedEol() {
+        // given
+        QueryAsset query = QueryAsset.builder()
+                .after(LocalDateTime.of(2018, 3, 1, 9, 0).toInstant(ZoneOffset.UTC))
+                .type(AssetType.JPEG)
+                .type(AssetType.PDF)
+                .isEol(true)
+                .build();
+        // when
+        Page<AssetEntity> page = assetRepository.findAll(query, pageable);
+
+        // then
+        assertThat(page, notNullValue());
+        assertThat(page.getNumberOfElements(), equalTo(1));
+        assertThat(page.getContent().get(0).getEol(), notNullValue());
+        assertThat(page.getContent().get(0).getEol(), lessThan(Instant.now()));
     }
 }
