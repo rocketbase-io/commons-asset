@@ -1,13 +1,13 @@
 package io.rocketbase.commons.resource;
 
 import com.google.common.io.ByteStreams;
+import io.rocketbase.commons.converter.QueryAssetConverter;
 import io.rocketbase.commons.dto.PageableResult;
 import io.rocketbase.commons.dto.asset.*;
 import io.rocketbase.commons.dto.batch.AssetBatchAnalyseResult;
 import io.rocketbase.commons.dto.batch.AssetBatchResult;
 import io.rocketbase.commons.dto.batch.AssetBatchWrite;
 import io.rocketbase.commons.exception.NotFoundException;
-import io.rocketbase.commons.util.QueryParamBuilder;
 import lombok.SneakyThrows;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.core.io.ByteArrayResource;
@@ -75,22 +75,7 @@ public class AssetResource implements BaseRestResource {
 
     public PageableResult<AssetRead> findAll(Pageable pageable, QueryAsset query) {
         UriComponentsBuilder uriBuilder = appendParams(getUriBuilder(), pageable);
-        if (query != null) {
-            QueryParamBuilder.appendParams(uriBuilder, "before", query.getBefore());
-            QueryParamBuilder.appendParams(uriBuilder, "after", query.getAfter());
-            if (query.getOriginalFilename() != null) {
-                uriBuilder.queryParam("originalFilename", query.getOriginalFilename());
-            }
-            if (query.getReferenceUrl() != null) {
-                uriBuilder.queryParam("referenceUrl", query.getReferenceUrl());
-            }
-            if (query.getContext() != null) {
-                uriBuilder.queryParam("context", query.getContext());
-            }
-            if (query.getTypes() != null) {
-                uriBuilder.queryParam("type", query.getTypes());
-            }
-        }
+        QueryAssetConverter.addParams(uriBuilder, query);
         return query(uriBuilder);
     }
 

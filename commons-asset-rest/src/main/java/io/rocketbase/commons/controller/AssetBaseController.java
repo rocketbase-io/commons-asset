@@ -39,8 +39,6 @@ public class AssetBaseController implements BaseAssetController {
     @Resource
     private AssetService assetService;
 
-    private QueryAssetConverter queryAssetConverter = new QueryAssetConverter();
-
     @SneakyThrows
     @RequestMapping(method = RequestMethod.POST)
     public AssetRead handleFileUpload(@RequestParam("file") MultipartFile file,
@@ -70,7 +68,7 @@ public class AssetBaseController implements BaseAssetController {
     @RequestMapping(method = RequestMethod.GET)
     public PageableResult<AssetRead> findAll(@RequestParam(required = false) MultiValueMap<String, String> params) {
 
-        Page<AssetEntity> pageResult = assetRepository.findAll(queryAssetConverter.fromParams(params), parsePageRequest(params));
+        Page<AssetEntity> pageResult = assetRepository.findAll(QueryAssetConverter.fromParams(params), parsePageRequest(params));
 
         return PageableResult.contentPage(assetConverter.fromEntities(pageResult.getContent(), getPreviewSizes(params)), pageResult);
     }
