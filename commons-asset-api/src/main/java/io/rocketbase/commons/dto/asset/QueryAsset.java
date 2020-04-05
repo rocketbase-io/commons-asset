@@ -22,6 +22,10 @@ public class QueryAsset implements Serializable {
     @Nullable
     private String originalFilename;
 
+    /**
+     * in mongo-implementation it's a regex "like" search<br>
+     * in mysql it's an exact hash compare (limitations within mysql of column/index length)
+     */
     @Nullable
     private String referenceUrl;
 
