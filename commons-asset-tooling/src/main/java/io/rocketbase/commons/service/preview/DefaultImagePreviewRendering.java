@@ -14,6 +14,7 @@ import net.coobird.thumbnailator.filters.Canvas;
 import net.coobird.thumbnailator.geometry.Positions;
 
 import java.awt.*;
+import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 import java.util.Map;
@@ -56,11 +57,20 @@ public class DefaultImagePreviewRendering implements ImagePreviewRendering {
         return thumbOs;
     }
 
-    @SneakyThrows
+    @Override
+    public String getLqip(AssetType assetType, BufferedImage bufferedImage) {
+        return getLqip(assetType, Thumbnails.of(bufferedImage));
+    }
+
     @Override
     public String getLqip(AssetType assetType, InputStream inputStream) {
+        return getLqip(assetType, Thumbnails.of(inputStream));
+    }
+
+    @SneakyThrows
+    protected String getLqip(AssetType assetType, Thumbnails.Builder thumbBuilder) {
         ByteArrayOutputStream thumbOs = new ByteArrayOutputStream();
-        Thumbnails.Builder<? extends InputStream> thumbBuilder = Thumbnails.of(inputStream)
+        thumbBuilder
                 .size(lqipSize.getWidth(), lqipSize.getHeight())
                 .outputQuality(lqipQuality)
                 .outputFormat("jpg");

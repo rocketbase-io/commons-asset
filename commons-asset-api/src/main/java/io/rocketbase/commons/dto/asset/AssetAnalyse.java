@@ -15,12 +15,18 @@ public class AssetAnalyse extends AssetMeta {
 
     private AssetType type;
 
+    /**
+     * in case of enabeled lqip contain base64 image preview
+     */
+    private String lqip;
+
     @JsonCreator
-    @ConstructorProperties({"created", "originalFilename", "fileSize", "resolution", "colorPalette", "referenceUrl", "type"})
+    @ConstructorProperties({"created", "originalFilename", "fileSize", "resolution", "colorPalette", "referenceUrl", "type", "lqip"})
     @Builder(builderMethodName = "builderAnalyse")
-    public AssetAnalyse(Instant created, String originalFilename, long fileSize, Resolution resolution, ColorPalette colorPalette, String referenceUrl, AssetType type) {
+    public AssetAnalyse(Instant created, String originalFilename, long fileSize, Resolution resolution, ColorPalette colorPalette, String referenceUrl, AssetType type, String lqip) {
         super(created, originalFilename, fileSize, resolution, colorPalette, referenceUrl);
         this.type = type;
+        this.lqip = lqip;
     }
 
     @Override

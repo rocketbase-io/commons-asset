@@ -20,7 +20,10 @@ import org.apache.tika.Tika;
 import javax.annotation.Resource;
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
-import java.io.*;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.time.Instant;
 import java.util.Map;
 import java.util.Optional;
@@ -166,20 +169,12 @@ public class AssetService {
         entity.setResolution(analyse.getResolution());
         entity.setColorPalette(analyse.getColorPalette());
         entity.setEol(Nulls.notNull(uploadMeta, AssetUploadMeta::getEol, null));
+        entity.setLqip(analyse.getLqip());
 
         handleKeyValues(entity, Nulls.notNull(uploadMeta, AssetUploadMeta::getKeyValues, null));
 
         try {
             fileStorageService.upload(entity, file);
-
-            if (lqipProperties.isEnabled() && type.isImage()) {
-                try {
-                    entity.setLqip(imagePreviewRendering.getLqip(type, new FileInputStream(file)));
-                } catch (Exception e) {
-                    log.error("got problem with lqip generation. {}", e.getMessage());
-                }
-            }
-
             assetRepository.save(entity);
         } catch (Exception e) {
             log.error("couldn't upload entity. {}", e.getMessage());
@@ -202,13 +197,14 @@ public class AssetService {
                 .colorPalette(analyse.getColorPalette())
                 .created(Instant.now())
                 .originalFilename(originalFilename)
+                .lqip(analyse.getLqip())
                 .build();
         return result;
     }
 
     private AnalyseResult analyse(AssetType type, File file) {
         AnalyseResult.AnalyseResultBuilder builder = AnalyseResult.builder();
-        if (type.isImage() && (assetApiProperties.isDetectResolution() || assetApiProperties.isDetectColors())) {
+        if (type.isImage() && (assetApiProperties.isDetectResolution() || assetApiProperties.isDetectColors() || lqipProperties.isEnabled())) {
             try {
                 BufferedImage bufferedImage = ImageIO.read(file);
                 if (assetApiProperties.isDetectResolution()) {
@@ -220,6 +216,9 @@ public class AssetService {
                 }
                 if (assetApiProperties.isDetectColors()) {
                     builder.colorPalette(ColorDetection.detect(bufferedImage));
+                }
+                if (lqipProperties.isEnabled()) {
+                    builder.lqip(imagePreviewRendering.getLqip(type, bufferedImage));
                 }
             } catch (Exception e) {
                 log.error("could not read file information from file {}", file.getPath());
@@ -233,5 +232,6 @@ public class AssetService {
     public static class AnalyseResult {
         private Resolution resolution;
         private ColorPalette colorPalette;
+        private String lqip;
     }
 }

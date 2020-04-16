@@ -42,6 +42,7 @@ public class AssetAnalyseControllerIntegrationTest extends BaseIntegrationTest {
         assertThat(result.getFileSize(), equalTo(3572L));
         assertThat(result.getResolution(), equalTo(new Resolution(200, 40)));
         assertThat(result.getColorPalette(), notNullValue());
+        assertThat(result.getLqip(), notNullValue());
     }
 
     @SneakyThrows
