@@ -10,6 +10,10 @@ spring:
       INDENT_OUTPUT: true
     default-property-inclusion: NON_NULL
 
+  servlet:
+    multipart:
+      max-file-size: 10MB
+
 logging:
   level:
     io.rocketbase: TRACE
@@ -23,3 +27,8 @@ asset:
       L: 0.3
   lqip:
     enabled: true
+  shrink:
+    enabled: true
+    max-width: 3000
+    max-height: 3000
+    quality: 0.8

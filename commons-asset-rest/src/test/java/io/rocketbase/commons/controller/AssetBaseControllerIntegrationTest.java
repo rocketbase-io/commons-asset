@@ -271,6 +271,25 @@ public class AssetBaseControllerIntegrationTest extends BaseIntegrationTest {
         assertThat(entity.getKeyValues().get(_hidden), equalTo(_hiddenValue));
     }
 
+    @SneakyThrows
+    @Test
+    public void testUploadTooBigAsset() {
+        // given
+        AssetResource assetResource = getAssetResource();
+
+        // when
+        File uploadFile = resourceLoader.getResource("classpath:assets/pierre-bamin-X16N5J0uRD4-unsplash.jpg")
+                .getFile();
+        AssetRead result = assetResource.uploadFile(new FileInputStream(uploadFile), uploadFile.getName());
+
+        // then
+        assertThat(result, notNullValue());
+        assertThat(result.getType(), equalTo(AssetType.JPEG));
+        assertThat(result.getMeta().getFileSize(), lessThan(uploadFile.length()));
+        assertThat(result.getMeta().getResolution(), equalTo(new Resolution(3000, 2000)));
+        assertThat(result.getMeta().getOriginalFilename(), equalTo(uploadFile.getName()));
+    }
+
     private AssetResource getAssetResource() {
         return new AssetResource(getBaseUrl());
     }

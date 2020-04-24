@@ -19,12 +19,13 @@ import java.util.HashMap;
 import java.util.Map;
 
 @Configuration
-@EnableConfigurationProperties({AssetApiProperties.class, AssetLqipProperties.class})
+@EnableConfigurationProperties({AssetApiProperties.class, AssetLqipProperties.class, AssetShrinkProperties.class})
 @RequiredArgsConstructor
 public class AssetCoreAutoConfiguration implements Serializable {
 
     private final AssetApiProperties assetApiProperties;
     private final AssetLqipProperties assetLqipProperties;
+    private final AssetShrinkProperties assetShrinkProperties;
 
     @Bean
     @ConditionalOnMissingBean
@@ -51,6 +52,20 @@ public class AssetCoreAutoConfiguration implements Serializable {
     @ConditionalOnProperty(name = "asset.converter.enabled", matchIfMissing = true)
     public AssetConverter assetConverter(@Autowired AssetPreviewService assetPreviewService) {
         return new AssetConverter(assetApiProperties, assetPreviewService);
+    }
+
+    @Bean
+    @ConditionalOnMissingBean
+    @ConditionalOnProperty(name = "asset.shrink.enabled", havingValue = "false", matchIfMissing = true)
+    public OriginalUploadModifier defaultOriginalUploadModifier() {
+        return new DefaultOriginalUploadModifier();
+    }
+
+    @Bean
+    @ConditionalOnMissingBean
+    @ConditionalOnProperty(name = "asset.shrink.enabled", havingValue = "true")
+    public OriginalUploadModifier shrinkOriginalUploadModifier(@Autowired ImagePreviewRendering imagePreviewRendering) {
+        return new DefaultShrinkOriginalUploadModifier(assetShrinkProperties, imagePreviewRendering);
     }
 
     @Bean

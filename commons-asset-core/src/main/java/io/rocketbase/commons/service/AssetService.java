@@ -10,9 +10,6 @@ import io.rocketbase.commons.service.AssetTypeFilterService.AssetUploadDetail;
 import io.rocketbase.commons.service.preview.ImagePreviewRendering;
 import io.rocketbase.commons.tooling.ColorDetection;
 import io.rocketbase.commons.util.Nulls;
-import lombok.Builder;
-import lombok.Cleanup;
-import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.IOUtils;
@@ -49,6 +46,9 @@ public class AssetService {
 
     @Resource
     private ImagePreviewRendering imagePreviewRendering;
+
+    @Resource
+    private OriginalUploadModifier originalUploadModifier;
 
     public AssetEntity store(InputStream inputStream, String originalFilename, long size, String systemRefId, String context) {
         return store(inputStream, originalFilename, size, null, DefaultAssetUploadMeta.builder()
@@ -158,7 +158,7 @@ public class AssetService {
             }
         }
 
-        AnalyseResult analyse = analyse(type, file);
+        OriginalUploadModifier.Modification modification = originalUploadModifier.modifyUploadBeforeSave(analyse(type, file, originalFilename, size), file, uploadMeta);
 
         AssetEntity entity = assetRepository.initNewInstance();
         entity.setType(type);
@@ -166,17 +166,20 @@ public class AssetService {
         entity.setReferenceUrl(referenceUrl);
         entity.setSystemRefId(Nulls.notNull(uploadMeta, AssetUploadMeta::getSystemRefId, null));
         entity.setContext(Nulls.notNull(uploadMeta, AssetUploadMeta::getContext, null));
-        entity.setFileSize(size);
-        entity.setResolution(analyse.getResolution());
-        entity.setColorPalette(analyse.getColorPalette());
+        entity.setFileSize(modification.getAnalyse().getFileSize());
+        entity.setResolution(modification.getAnalyse().getResolution());
+        entity.setColorPalette(modification.getAnalyse().getColorPalette());
         entity.setEol(Nulls.notNull(uploadMeta, AssetUploadMeta::getEol, null));
-        entity.setLqip(analyse.getLqip());
+        entity.setLqip(modification.getAnalyse().getLqip());
 
         handleKeyValues(entity, Nulls.notNull(uploadMeta, AssetUploadMeta::getKeyValues, null));
 
         try {
-            fileStorageService.upload(entity, file);
+            fileStorageService.upload(entity, modification.getFile());
             assetRepository.save(entity);
+            if (!modification.getFile().equals(file)) {
+                modification.getFile().delete();
+            }
         } catch (Exception e) {
             log.error("couldn't upload entity. {}", e.getMessage());
             throw new UnprocessableAssetException();
@@ -186,25 +189,18 @@ public class AssetService {
     }
 
     public AssetAnalyse analyse(File file, String originalFilename) throws IOException {
-        AssetAnalyse result = null;
         long fileSize = file.length();
         AssetType assetType = detectAssetTypeWithChecks(file, originalFilename, fileSize, null, null);
-        AnalyseResult analyse = analyse(assetType, file);
-
-        result = AssetAnalyse.builderAnalyse()
-                .type(assetType)
-                .fileSize(fileSize)
-                .resolution(analyse.getResolution())
-                .colorPalette(analyse.getColorPalette())
-                .created(Instant.now())
-                .originalFilename(originalFilename)
-                .lqip(analyse.getLqip())
-                .build();
-        return result;
+        return analyse(assetType, file, originalFilename, fileSize);
     }
 
-    private AnalyseResult analyse(AssetType type, File file) {
-        AnalyseResult.AnalyseResultBuilder builder = AnalyseResult.builder();
+    private AssetAnalyse analyse(AssetType type, File file, String originalFilename, long fileSize) {
+        AssetAnalyse.AssetAnalyseBuilder builder = AssetAnalyse.builderAnalyse()
+                .type(type)
+                .fileSize(fileSize)
+                .created(Instant.now())
+                .originalFilename(originalFilename);
+
         if (type.isImage() && (assetApiProperties.isDetectResolution() || assetApiProperties.isDetectColors() || lqipProperties.isEnabled())) {
             try {
                 BufferedImage bufferedImage = ImageIO.read(file);
@@ -228,11 +224,4 @@ public class AssetService {
         return builder.build();
     }
 
-    @Builder
-    @Getter
-    public static class AnalyseResult {
-        private Resolution resolution;
-        private ColorPalette colorPalette;
-        private String lqip;
-    }
 }

@@ -2,10 +2,12 @@ package io.rocketbase.commons.service.preview;
 
 import io.rocketbase.commons.colors.RgbColor;
 import io.rocketbase.commons.dto.asset.AssetType;
+import io.rocketbase.commons.dto.asset.PreviewParameter;
 import io.rocketbase.commons.dto.asset.PreviewSize;
 import io.rocketbase.commons.dto.asset.Resolution;
 import io.rocketbase.commons.tooling.ImageHandler;
 import io.rocketbase.commons.util.Nulls;
+import lombok.Cleanup;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import net.coobird.thumbnailator.ThumbnailParameter;
@@ -16,6 +18,7 @@ import net.coobird.thumbnailator.geometry.Positions;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.io.InputStream;
 import java.util.Map;
 
@@ -30,7 +33,23 @@ public class DefaultImagePreviewRendering implements ImagePreviewRendering {
     @Override
     public ByteArrayOutputStream getPreview(AssetType assetType, InputStream inputStream, PreviewConfig previewConfig) {
         ByteArrayOutputStream thumbOs = new ByteArrayOutputStream();
-        PreviewSize previewSize = Nulls.notNull(previewConfig.getPreviewSize(), PreviewSize.S);
+
+        Thumbnails.Builder<? extends InputStream> thumbBuilder = buildBuilder(assetType, inputStream, previewConfig);
+        thumbBuilder.toOutputStream(thumbOs);
+        return thumbOs;
+    }
+
+    @SneakyThrows
+    @Override
+    public File getPreviewAsFile(AssetType assetType, InputStream inputStream, PreviewConfig previewConfig) {
+        File tempFile = File.createTempFile("asset-preview", assetType.getFileExtensionForSuffix());
+        Thumbnails.Builder<? extends InputStream> thumbBuilder = buildBuilder(assetType, inputStream, previewConfig);
+        thumbBuilder.toFile(tempFile);
+        return tempFile;
+    }
+
+    protected Thumbnails.Builder<? extends InputStream> buildBuilder(AssetType assetType, InputStream inputStream, PreviewConfig previewConfig) {
+        PreviewParameter previewSize = Nulls.notNull(previewConfig.getPreviewSize(), PreviewSize.S);
         Thumbnails.Builder<? extends InputStream> thumbBuilder = Thumbnails.of(inputStream)
                 .size(previewSize.getMaxWidth(), previewSize.getMaxHeight());
 
@@ -51,10 +70,7 @@ public class DefaultImagePreviewRendering implements ImagePreviewRendering {
             thumbBuilder
                     .outputQuality(previewQuality.getOrDefault(previewSize, 0.8f));
         }
-
-
-        thumbBuilder.toOutputStream(thumbOs);
-        return thumbOs;
+        return thumbBuilder;
     }
 
     @Override
@@ -69,7 +85,7 @@ public class DefaultImagePreviewRendering implements ImagePreviewRendering {
 
     @SneakyThrows
     protected String getLqip(AssetType assetType, Thumbnails.Builder thumbBuilder) {
-        ByteArrayOutputStream thumbOs = new ByteArrayOutputStream();
+        @Cleanup ByteArrayOutputStream thumbOs = new ByteArrayOutputStream();
         thumbBuilder
                 .size(lqipSize.getWidth(), lqipSize.getHeight())
                 .outputQuality(lqipQuality)

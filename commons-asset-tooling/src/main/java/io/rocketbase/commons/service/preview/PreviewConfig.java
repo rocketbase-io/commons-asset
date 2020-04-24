@@ -1,6 +1,6 @@
 package io.rocketbase.commons.service.preview;
 
-import io.rocketbase.commons.dto.asset.PreviewSize;
+import io.rocketbase.commons.dto.asset.PreviewParameter;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -14,7 +14,7 @@ import java.io.Serializable;
 @NoArgsConstructor
 public class PreviewConfig implements Serializable {
 
-    private PreviewSize previewSize;
+    private PreviewParameter previewSize;
 
     private Integer rotation;
 
