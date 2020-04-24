@@ -88,7 +88,7 @@ public class AssetBaseController implements BaseAssetController {
                                  @RequestParam(required = false) MultiValueMap<String, String> params) {
         AssetEntity entity = assetService.findByIdOrSystemRefId(sid)
                 .orElseThrow(() -> new NotFoundException());
-        return assetConverter.fromEntityByRequestContext(assetService.updateKeyValues(entity, update.getKeyValues()), getPreviewSizes(params));
+        return assetConverter.fromEntityByRequestContext(assetService.update(entity, update), getPreviewSizes(params));
     }
 
 

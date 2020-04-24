@@ -92,11 +92,14 @@ public class AssetService {
      * will add/update key values and removes those with value = null<br>
      * is only an update so that not mentioned keys will still be saved within entity
      */
-    public AssetEntity updateKeyValues(AssetEntity asset, Map<String, String> keyValues) {
-        AssetEntity entity = assetRepository.findById(asset.getId())
-                .orElseThrow(NotFoundException::new);
-        handleKeyValues(entity, keyValues);
-        return assetRepository.save(entity);
+    public AssetEntity update(AssetEntity asset, AssetUpdate update) {
+        handleKeyValues(asset, update.getKeyValues());
+        if (assetRepository.findBySystemRefId(update.getSystemRefId()).isPresent()) {
+            throw new SystemRefIdAlreadyUsedException();
+        }
+        asset.setSystemRefId(update.getSystemRefId());
+        asset.setEol(update.getEol());
+        return assetRepository.save(asset);
     }
 
     protected void handleKeyValues(AssetEntity entity, Map<String, String> keyValues) {
