@@ -18,6 +18,13 @@ import java.util.Map;
 @NoArgsConstructor
 @AllArgsConstructor
 public class AssetUpdate implements Serializable {
+
+    /**
+     * update it with care - needs to get updated in AssetReferences if stored anywhere...
+     */
+    @Nullable
+    private String systemRefId;
+
     /**
      * will removed key that have value of null <br>
      * will only add/replace new/existing key values<br>
