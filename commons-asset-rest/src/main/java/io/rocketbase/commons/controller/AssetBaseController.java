@@ -12,6 +12,7 @@ import io.rocketbase.commons.exception.NotFoundException;
 import io.rocketbase.commons.model.AssetEntity;
 import io.rocketbase.commons.service.AssetRepository;
 import io.rocketbase.commons.service.AssetService;
+import lombok.Cleanup;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -22,6 +23,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.Resource;
 import javax.validation.constraints.NotNull;
+import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -46,7 +48,8 @@ public class AssetBaseController implements BaseAssetController {
         if (file.isEmpty()) {
             throw new EmptyFileException();
         }
-        AssetEntity asset = assetService.store(file.getInputStream(), file.getOriginalFilename(), file.getSize(), null, convert(params));
+        @Cleanup InputStream inputStream = file.getInputStream();
+        AssetEntity asset = assetService.store(inputStream, file.getOriginalFilename(), file.getSize(), null, convert(params));
         return assetConverter.fromEntityByRequestContext(asset, getPreviewSizes(null));
     }
 

@@ -2,6 +2,7 @@ package io.rocketbase.commons.service;
 
 import io.rocketbase.commons.dto.asset.AssetType;
 import io.rocketbase.commons.exception.AssetErrorCodes;
+import lombok.Cleanup;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import okhttp3.Headers;
@@ -110,9 +111,8 @@ public class DefaultDownloadService implements DownloadService {
             }
             AssetType type = AssetType.findByFileExtension(FilenameUtils.getExtension(filename));
             File tempFile = File.createTempFile("asset-", "." + (type != null ? type.getFileExtension() : "tmp"));
-            FileOutputStream outputStream = new FileOutputStream(tempFile);
+            @Cleanup FileOutputStream outputStream = new FileOutputStream(tempFile);
             IOUtils.copy(response.body().byteStream(), outputStream);
-            outputStream.close();
             return new TempDownload(tempFile, filename, type);
         } else {
             throw new DownloadError(AssetErrorCodes.NOT_DOWNLOADABLE);

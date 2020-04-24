@@ -11,6 +11,7 @@ import io.rocketbase.commons.service.preview.ImagePreviewRendering;
 import io.rocketbase.commons.tooling.ColorDetection;
 import io.rocketbase.commons.util.Nulls;
 import lombok.Builder;
+import lombok.Cleanup;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
