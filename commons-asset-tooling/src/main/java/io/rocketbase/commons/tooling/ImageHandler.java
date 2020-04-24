@@ -4,6 +4,7 @@ import com.google.common.io.BaseEncoding;
 import io.rocketbase.commons.dto.asset.AssetType;
 import io.rocketbase.commons.service.DefaultDownloadService;
 import io.rocketbase.commons.service.DownloadService;
+import lombok.Cleanup;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import net.coobird.thumbnailator.Thumbnails;
@@ -47,7 +48,7 @@ public final class ImageHandler {
             } else {
                 thumbBuilder.scale(config.width, config.height);
             }
-            ByteArrayOutputStream thumbOs = new ByteArrayOutputStream();
+            @Cleanup ByteArrayOutputStream thumbOs = new ByteArrayOutputStream();
             thumbBuilder.toOutputStream(thumbOs);
 
             // delete temp file
