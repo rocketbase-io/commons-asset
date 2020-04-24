@@ -98,8 +98,6 @@ An usecase example could be found here [codepen - low quality image placeholder]
 | asset.shrink.maxHeight | 2560      | max height of the image       |
 | asset.shrink.quality   | 0.9    | quality of image - default mean 90% |
 
-An usecase example could be found here [codepen - low quality image placeholder](https://codepen.io/alxdr/pen/oNgKNGY)
-
 
 ### custom preview service
 
