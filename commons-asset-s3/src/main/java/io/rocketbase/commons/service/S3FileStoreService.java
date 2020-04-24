@@ -46,7 +46,7 @@ public class S3FileStoreService implements FileStorageService {
     @SneakyThrows
     @Override
     public InputStreamResource download(AssetEntity entity) {
-        File tempFile = File.createTempFile("asset", entity.getType().getFileExtension());
+        File tempFile = File.createTempFile("asset", entity.getType().getFileExtensionForSuffix());
         // not the best cleanup...
         tempFile.deleteOnExit();
 

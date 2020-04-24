@@ -78,4 +78,8 @@ public enum AssetType {
     public String getFileExtension() {
         return JPEG.equals(this) ? "jpg" : name().toLowerCase();
     }
+
+    public String getFileExtensionForSuffix() {
+        return "." + getFileExtension();
+    }
 }

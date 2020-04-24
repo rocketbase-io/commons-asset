@@ -110,7 +110,7 @@ public class DefaultDownloadService implements DownloadService {
                 filename = extractedFilename;
             }
             AssetType type = AssetType.findByFileExtension(FilenameUtils.getExtension(filename));
-            File tempFile = File.createTempFile("asset-", "." + (type != null ? type.getFileExtension() : "tmp"));
+            File tempFile = File.createTempFile("asset-", type != null ? type.getFileExtensionForSuffix() : ".tmp");
             @Cleanup FileOutputStream outputStream = new FileOutputStream(tempFile);
             IOUtils.copy(response.body().byteStream(), outputStream);
             return new TempDownload(tempFile, filename, type);
