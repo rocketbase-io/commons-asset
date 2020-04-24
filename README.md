@@ -89,6 +89,17 @@ Containing an implementation for storing asset references...
 
 An usecase example could be found here [codepen - low quality image placeholder](https://codepen.io/alxdr/pen/oNgKNGY)
 
+**Shrink-options** in some cases it's useful not to store the original imagesize. Therefore some new options had been added sine 3.5.x
+
+|                      | default | explanation                   |
+| -------------------- | ------- | ----------------------------- |
+| asset.shrink.enabled   | false   | by default disabled feature   |
+| asset.shrink.maxWidth  | 2560      | max with of the image         |
+| asset.shrink.maxHeight | 2560      | max height of the image       |
+| asset.shrink.quality   | 0.9    | quality of image - default mean 90% |
+
+An usecase example could be found here [codepen - low quality image placeholder](https://codepen.io/alxdr/pen/oNgKNGY)
+
 
 ### custom preview service
 
@@ -223,7 +234,7 @@ public class CustomBucketResolver implements BucketResolver {
 ````
 
 ### The MIT License (MIT)
-Copyright (c) 2018 rocketbase.io
+Copyright (c) 2020 rocketbase.io
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
 
