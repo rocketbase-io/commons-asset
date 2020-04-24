@@ -9,7 +9,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
-public enum PreviewSize {
+public enum PreviewSize implements PreviewParameter {
     XS(150, 150, 0.7f),
     S(300, 300, 0.75f),
     M(600, 600, 0.8f),
