@@ -15,11 +15,20 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 
+/**
+ * Helper for downloading an image and get as result the detected type, binary + optional base64 string
+ */
 public final class ImageHandler {
 
     public static final DefaultDownloadService DEFAULT_DOWNLOAD_SERVICE = new DefaultDownloadService();
     private static final Tika TIKA = new Tika();
 
+    /**
+     * begin download url and instruct by fluent methods
+     *
+     * @param url source of image
+     * @return fluent builder
+     */
     public static ImageHandlingBuilder download(String url) {
         return new ImageHandlingBuilder(url);
     }
