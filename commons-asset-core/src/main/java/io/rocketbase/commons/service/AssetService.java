@@ -14,6 +14,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.IOUtils;
 import org.apache.tika.Tika;
+import org.springframework.util.StringUtils;
 
 import javax.annotation.Resource;
 import javax.imageio.ImageIO;
@@ -94,7 +95,7 @@ public class AssetService {
      */
     public AssetEntity update(AssetEntity asset, AssetUpdate update) {
         handleKeyValues(asset, update.getKeyValues());
-        if (assetRepository.findBySystemRefId(update.getSystemRefId()).isPresent()) {
+        if (!StringUtils.isEmpty(update.getSystemRefId()) && assetRepository.findBySystemRefId(update.getSystemRefId()).isPresent()) {
             throw new SystemRefIdAlreadyUsedException();
         }
         asset.setSystemRefId(update.getSystemRefId());
