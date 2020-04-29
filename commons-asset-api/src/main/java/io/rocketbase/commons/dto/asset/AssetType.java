@@ -14,6 +14,7 @@ public enum AssetType {
     GIF("image/gif"),
     TIFF("image/tiff"),
     SVG("image/svg+xml"),
+    WEBP("image/webp"),
     PDF("application/pdf"),
     ZIP("application/zip"),
     XLS("application/msexcel"),
@@ -68,11 +69,12 @@ public enum AssetType {
         return null;
     }
 
-    /**
-     * image in case of preview rendering possible
-     */
     public boolean isImage() {
-        return getContentType().contains("image") && !this.equals(SVG);
+        return getContentType().contains("image");
+    }
+
+    public boolean isJavaProcessableImage() {
+        return isImage() && !Arrays.asList(SVG, WEBP).contains(this);
     }
 
     public String getFileExtension() {

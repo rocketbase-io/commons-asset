@@ -46,7 +46,7 @@ public class AssetPreviewController implements BaseAssetController {
         AssetEntity entity = assetService.findByIdOrSystemRefId(sid)
                 .orElseThrow(() -> new NotFoundException());
 
-        if (!entity.getType().isImage()) {
+        if (!entity.getType().isJavaProcessableImage()) {
             throw new NotFoundException();
         }
 

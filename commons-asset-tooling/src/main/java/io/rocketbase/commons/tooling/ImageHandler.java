@@ -42,7 +42,7 @@ public final class ImageHandler {
         }
 
 
-        if (tempDownload.getType() == null || !tempDownload.getType().isImage()) {
+        if (tempDownload.getType() == null || !tempDownload.getType().isJavaProcessableImage()) {
             throw new RuntimeException("Source is not an image!");
         }
 

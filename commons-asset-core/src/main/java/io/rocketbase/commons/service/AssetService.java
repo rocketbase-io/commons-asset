@@ -205,7 +205,7 @@ public class AssetService {
                 .created(Instant.now())
                 .originalFilename(originalFilename);
 
-        if (type.isImage() && (assetApiProperties.isDetectResolution() || assetApiProperties.isDetectColors() || lqipProperties.isEnabled())) {
+        if (type.isJavaProcessableImage() && (assetApiProperties.isDetectResolution() || assetApiProperties.isDetectColors() || lqipProperties.isEnabled())) {
             try {
                 BufferedImage bufferedImage = ImageIO.read(file);
                 if (assetApiProperties.isDetectResolution()) {
