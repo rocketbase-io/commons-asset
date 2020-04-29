@@ -10,7 +10,7 @@
         <version>LATEST-SNAPSHOT</version>
     </parent>
 
-    <artifactId>commons-asset-rest</artifactId>
+    <artifactId>commons-asset-server</artifactId>
 
     <dependencies>
         <dependency>
@@ -56,7 +56,19 @@
         </dependency>
         <dependency>
             <groupId>io.rocketbase.commons</groupId>
-            <artifactId>commons-asset-mongo</artifactId>
+            <artifactId>commons-asset-entity-mongo</artifactId>
+            <version>${project.version}</version>
+            <scope>test</scope>
+            <exclusions>
+                <exclusion>
+                    <groupId>io.rocketbase.commons</groupId>
+                    <artifactId>commons-asset-core</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>io.rocketbase.commons</groupId>
+            <artifactId>commons-asset-storage-mongo</artifactId>
             <version>${project.version}</version>
             <scope>test</scope>
             <exclusions>
