@@ -290,6 +290,45 @@ public class AssetBaseControllerIntegrationTest extends BaseIntegrationTest {
         assertThat(result.getMeta().getOriginalFilename(), equalTo(uploadFile.getName()));
     }
 
+    @SneakyThrows
+    @Test
+    public void testUploadWebpJpeg() {
+        // given
+        AssetResource assetResource = getAssetResource();
+
+        // when
+        File uploadFile = resourceLoader.getResource("classpath:assets/jpeg.webp")
+                .getFile();
+        AssetRead result = assetResource.uploadFile(new FileInputStream(uploadFile), uploadFile.getName());
+
+        // then
+        assertThat(result, notNullValue());
+        assertThat(result.getType(), equalTo(AssetType.WEBP));
+        assertThat(result.getMeta().getFileSize(), equalTo(20772L));
+        assertThat(result.getMeta().getResolution(), nullValue());
+        assertThat(result.getMeta().getOriginalFilename(), equalTo(uploadFile.getName()));
+    }
+
+    @SneakyThrows
+    @Test
+    public void testUploadWebpPng() {
+        // given
+        AssetResource assetResource = getAssetResource();
+
+        // when
+        File uploadFile = resourceLoader.getResource("classpath:assets/png.webp")
+                .getFile();
+        AssetRead result = assetResource.uploadFile(new FileInputStream(uploadFile), uploadFile.getName());
+
+        // then
+        assertThat(result, notNullValue());
+        assertThat(result.getType(), equalTo(AssetType.WEBP));
+        assertThat(result.getMeta().getFileSize(), equalTo(16674L));
+        assertThat(result.getMeta().getResolution(), nullValue());
+        assertThat(result.getMeta().getOriginalFilename(), equalTo(uploadFile.getName()));
+    }
+
+
     private AssetResource getAssetResource() {
         return new AssetResource(getBaseUrl());
     }
