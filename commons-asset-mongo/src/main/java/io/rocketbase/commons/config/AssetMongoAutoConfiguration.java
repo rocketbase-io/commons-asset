@@ -30,7 +30,7 @@ public class AssetMongoAutoConfiguration implements Serializable {
     private boolean mongoEnsureIndex;
 
     @Bean
-    @ConditionalOnMissingClass(value = {"io.rocketbase.commons.config.S3Properties"})
+    @ConditionalOnMissingClass(value = {"io.rocketbase.commons.config.AssetS3Properties"})
     @ConditionalOnMissingBean
     public FileStorageService fileStorageService() {
         return new MongoFileStorageService(gridFsTemplate);

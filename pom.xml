@@ -99,17 +99,17 @@ SOFTWARE.
         <maven.javadoc.failOnError>false</maven.javadoc.failOnError>
 
         <spring-boot.version>2.2.6.RELEASE</spring-boot.version>
-        <spring-cloud-dependencies.version>Hoxton.SR3</spring-cloud-dependencies.version>
 
         <commons-rest.version>2.0.2</commons-rest.version>
         <guava.version>28.2-jre</guava.version>
         <commons-fileupload.version>1.4</commons-fileupload.version>
         <commons-io.version>2.6</commons-io.version>
-        <tika-core.version>1.24</tika-core.version>
+        <tika-core.version>1.24.1</tika-core.version>
         <thumbnailator.version>0.4.11</thumbnailator.version>
         <okhttp.version>4.4.1</okhttp.version>
         <jacoco.version>0.8.5</jacoco.version>
         <colors.version>0.5.1</colors.version>
+        <aws-sdk-java.version>1.11.771</aws-sdk-java.version>
     </properties>
 
     <dependencyManagement>
@@ -119,13 +119,6 @@ SOFTWARE.
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-dependencies</artifactId>
                 <version>${spring-boot.version}</version>
-                <type>pom</type>
-                <scope>import</scope>
-            </dependency>
-            <dependency>
-                <groupId>org.springframework.cloud</groupId>
-                <artifactId>spring-cloud-dependencies</artifactId>
-                <version>${spring-cloud-dependencies.version}</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
