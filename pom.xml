@@ -42,10 +42,15 @@ SOFTWARE.
         <module>commons-asset-api</module>
         <module>commons-asset-tooling</module>
         <module>commons-asset-core</module>
-        <module>commons-asset-s3</module>
-        <module>commons-asset-rest</module>
-        <module>commons-asset-mongo</module>
-        <module>commons-asset-jpa</module>
+        <module>commons-asset-server</module>
+        <!-- mongo -->
+        <module>commons-asset-entity-mongo</module>
+        <module>commons-asset-storage-mongo</module>
+        <!-- jpa -->
+        <module>commons-asset-entity-jpa</module>
+        <module>commons-asset-storage-jpa</module>
+        <!-- s3 -->
+        <module>commons-asset-storage-s3</module>
     </modules>
 
     <licenses>
