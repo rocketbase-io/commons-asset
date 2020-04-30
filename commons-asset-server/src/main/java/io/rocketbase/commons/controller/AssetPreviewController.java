@@ -5,13 +5,13 @@ import io.rocketbase.commons.exception.NotFoundException;
 import io.rocketbase.commons.model.AssetEntity;
 import io.rocketbase.commons.service.AssetService;
 import io.rocketbase.commons.service.FileStorageService;
-import io.rocketbase.commons.service.preview.ImagePreviewRendering;
-import io.rocketbase.commons.service.preview.PreviewConfig;
-import lombok.Cleanup;
+import io.rocketbase.commons.service.handler.AssetHandler;
+import io.rocketbase.commons.service.handler.PreviewConfig;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.io.IOUtils;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
-import org.springframework.core.io.ByteArrayResource;
+import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.CacheControl;
 import org.springframework.http.MediaType;
@@ -20,7 +20,8 @@ import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
-import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileOutputStream;
 import java.util.concurrent.TimeUnit;
 
 @RestController
@@ -36,12 +37,12 @@ public class AssetPreviewController implements BaseAssetController {
     private AssetService assetService;
 
     @Resource
-    private ImagePreviewRendering imagePreviewRendering;
+    private AssetHandler assetHandler;
 
     @SneakyThrows
     @RequestMapping(value = "/{sid}/{size}", method = RequestMethod.GET)
     @ResponseBody
-    public ResponseEntity<ByteArrayResource> getPreview(@PathVariable("sid") String sid, @PathVariable("size") String size, @RequestParam(required = false) MultiValueMap<String, String> params) {
+    public ResponseEntity<FileSystemResource> getPreview(@PathVariable("sid") String sid, @PathVariable("size") String size, @RequestParam(required = false) MultiValueMap<String, String> params) {
         PreviewSize previewSize = PreviewSize.getByName(size, PreviewSize.S);
         AssetEntity entity = assetService.findByIdOrSystemRefId(sid)
                 .orElseThrow(() -> new NotFoundException());
@@ -52,19 +53,29 @@ public class AssetPreviewController implements BaseAssetController {
 
         InputStreamResource streamResource = fileStorageService.download(entity);
 
-        @Cleanup ByteArrayOutputStream thumbOs = imagePreviewRendering.getPreview(entity.getType(), streamResource.getInputStream(), PreviewConfig.builder()
-                .previewSize(previewSize)
-                .rotation(parseInteger(params, "rotation", null))
-                .bg(params.getFirst("bg"))
-                .build());
+        File download = null;
+        try {
+            download = File.createTempFile("asset-download", entity.getType().getFileExtensionForSuffix());
+            IOUtils.copy(streamResource.getInputStream(), new FileOutputStream(download));
 
-        ByteArrayResource resource = new ByteArrayResource(thumbOs.toByteArray());
-        return ResponseEntity.ok()
-                .contentLength(resource.contentLength())
-                .contentType(MediaType.parseMediaType(entity.getType().getContentType()))
-                .eTag(String.format("%s-%s", entity.getId(), previewSize.name().toLowerCase()))
-                .cacheControl(CacheControl.maxAge(30, TimeUnit.DAYS))
-                .body(resource);
+            File preview = assetHandler.getPreview(entity.getType(), streamResource.getFile(), PreviewConfig.builder()
+                    .previewSize(previewSize)
+                    .rotation(parseInteger(params, "rotation", null))
+                    .bg(params.getFirst("bg"))
+                    .build());
+
+            FileSystemResource resource = new FileSystemResource(preview);
+            return ResponseEntity.ok()
+                    .contentLength(resource.contentLength())
+                    .contentType(MediaType.parseMediaType(entity.getType().getContentType()))
+                    .eTag(String.format("%s-%s", entity.getId(), previewSize.name().toLowerCase()))
+                    .cacheControl(CacheControl.maxAge(30, TimeUnit.DAYS))
+                    .body(resource);
+        } finally {
+            if (download != null) {
+                download.delete();
+            }
+        }
     }
 
 

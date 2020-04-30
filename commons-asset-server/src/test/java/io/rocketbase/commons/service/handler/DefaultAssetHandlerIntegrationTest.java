@@ -1,9 +1,7 @@
-package io.rocketbase.commons.service.preview;
+package io.rocketbase.commons.service.handler;
 
 import io.rocketbase.commons.BaseIntegrationTest;
 import io.rocketbase.commons.dto.asset.PreviewSize;
-import io.rocketbase.commons.service.preview.DefaultImagePreviewRendering;
-import io.rocketbase.commons.service.preview.ImagePreviewRendering;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.Test;
 
@@ -15,19 +13,18 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.notNullValue;
 
 @Slf4j
-public class DefaultImagePreviewRenderingIntegrationTest extends BaseIntegrationTest {
+public class DefaultAssetHandlerIntegrationTest extends BaseIntegrationTest {
 
     @Resource
-    private ImagePreviewRendering imagePreviewRendering;
-
+    private AssetHandler assetHandler;
 
     @Test
     public void correctConfiguration() throws Exception {
         // given
-        DefaultImagePreviewRendering casted = (DefaultImagePreviewRendering) imagePreviewRendering;
+        DefaultJavaAssetHandler casted = (DefaultJavaAssetHandler) assetHandler;
 
         // when
-        Map<PreviewSize, Float> qualityMap = casted.previewQuality;
+        Map<PreviewSize, Float> qualityMap = casted.config.getPreviewQuality();
 
         // then
         assertThat(qualityMap, notNullValue());

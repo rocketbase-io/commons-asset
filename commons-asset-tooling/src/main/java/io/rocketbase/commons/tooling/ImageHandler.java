@@ -1,9 +1,9 @@
 package io.rocketbase.commons.tooling;
 
-import com.google.common.io.BaseEncoding;
+import io.rocketbase.commons.dto.ImageHandlingResult;
 import io.rocketbase.commons.dto.asset.AssetType;
-import io.rocketbase.commons.service.DefaultDownloadService;
-import io.rocketbase.commons.service.DownloadService;
+import io.rocketbase.commons.service.download.DefaultDownloadService;
+import io.rocketbase.commons.service.download.DownloadService;
 import lombok.Cleanup;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
@@ -67,25 +67,6 @@ public final class ImageHandler {
         } else {
             return new ImageHandlingResult(IOUtils.toByteArray(new FileInputStream(tempDownload.getFile())), tempDownload.getType());
         }
-    }
-
-    @RequiredArgsConstructor
-    public static class ImageHandlingResult {
-        private final byte[] binary;
-        private final AssetType assetType;
-
-        public String base64() {
-            return "data:" + assetType.getContentType() + ";base64," + BaseEncoding.base64().encode(binary);
-        }
-
-        public byte[] binary() {
-            return binary;
-        }
-
-        public AssetType assetType() {
-            return assetType;
-        }
-
     }
 
     @RequiredArgsConstructor

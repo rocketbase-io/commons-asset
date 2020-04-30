@@ -2,9 +2,8 @@ package io.rocketbase.commons.config;
 
 
 import io.rocketbase.commons.dto.asset.PreviewParameter;
+import io.rocketbase.commons.dto.asset.SimplePreviewParameter;
 import lombok.Data;
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
 import java.io.Serializable;
@@ -26,17 +25,6 @@ public class AssetShrinkProperties implements Serializable {
 
     public PreviewParameter getPreviewParameter() {
         return new SimplePreviewParameter(maxWidth, maxHeight, quality);
-    }
-
-    @Getter
-    @RequiredArgsConstructor
-    public static class SimplePreviewParameter implements PreviewParameter {
-
-        private final int maxWidth;
-
-        private final int maxHeight;
-
-        private final float defaultQuality;
     }
 
 }

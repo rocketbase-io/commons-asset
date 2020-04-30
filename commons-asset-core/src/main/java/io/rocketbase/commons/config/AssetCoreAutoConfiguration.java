@@ -2,10 +2,13 @@ package io.rocketbase.commons.config;
 
 import io.rocketbase.commons.converter.*;
 import io.rocketbase.commons.dto.asset.PreviewSize;
-import io.rocketbase.commons.dto.asset.Resolution;
+import io.rocketbase.commons.dto.asset.SimplePreviewParameter;
 import io.rocketbase.commons.service.*;
-import io.rocketbase.commons.service.preview.DefaultImagePreviewRendering;
-import io.rocketbase.commons.service.preview.ImagePreviewRendering;
+import io.rocketbase.commons.service.download.DefaultDownloadService;
+import io.rocketbase.commons.service.download.DownloadService;
+import io.rocketbase.commons.service.handler.AssetHandler;
+import io.rocketbase.commons.service.handler.AssetHandlerConfig;
+import io.rocketbase.commons.service.handler.DefaultJavaAssetHandler;
 import io.rocketbase.commons.util.Nulls;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -64,14 +67,14 @@ public class AssetCoreAutoConfiguration implements Serializable {
     @Bean
     @ConditionalOnMissingBean
     @ConditionalOnProperty(name = "asset.shrink.enabled", havingValue = "true")
-    public OriginalUploadModifier shrinkOriginalUploadModifier(@Autowired ImagePreviewRendering imagePreviewRendering) {
-        return new DefaultShrinkOriginalUploadModifier(assetShrinkProperties, imagePreviewRendering);
+    public OriginalUploadModifier shrinkOriginalUploadModifier(@Autowired AssetHandler assetHandler) {
+        return new DefaultShrinkOriginalUploadModifier(assetShrinkProperties, assetHandler);
     }
 
     @Bean
     @ConditionalOnBean(value = AssetRepository.class)
     public AssetService assetService() {
-        return new AssetService(assetApiProperties, assetLqipProperties);
+        return new AssetService(assetApiProperties);
     }
 
     @Bean
@@ -97,9 +100,18 @@ public class AssetCoreAutoConfiguration implements Serializable {
     @Bean
     @ConditionalOnBean(value = AssetService.class)
     @ConditionalOnMissingBean
-    public ImagePreviewRendering imagePreviewRendering() {
-        Resolution lqipSize = new Resolution(assetLqipProperties.getMaxWidth(), assetLqipProperties.getMaxHeight());
-        return new DefaultImagePreviewRendering(getPreviewQualityMap(), lqipSize, assetLqipProperties.getQuality());
+    public AssetHandler assetHandler() {
+        return new DefaultJavaAssetHandler(getAssetHandlerConfig());
+    }
+
+    protected AssetHandlerConfig getAssetHandlerConfig() {
+        return AssetHandlerConfig.builder()
+                .previewQuality(getPreviewQualityMap())
+                .detectColors(assetApiProperties.isDetectColors())
+                .detectResolution(assetApiProperties.isDetectResolution())
+                .lqipEnabled(assetLqipProperties.isEnabled())
+                .lqipPreview(new SimplePreviewParameter(assetLqipProperties.getMaxWidth(), assetLqipProperties.getMaxHeight(), assetLqipProperties.getQuality()))
+                .build();
     }
 
     protected Map<PreviewSize, Float> getPreviewQualityMap() {

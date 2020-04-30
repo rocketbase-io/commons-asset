@@ -1,4 +1,4 @@
-package io.rocketbase.commons.service;
+package io.rocketbase.commons.service.download;
 
 import io.rocketbase.commons.dto.asset.AssetType;
 import io.rocketbase.commons.exception.AssetErrorCodes;

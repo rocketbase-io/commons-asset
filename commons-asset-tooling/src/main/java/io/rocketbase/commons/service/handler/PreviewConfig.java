@@ -1,4 +1,4 @@
-package io.rocketbase.commons.service.preview;
+package io.rocketbase.commons.service.handler;
 
 import io.rocketbase.commons.dto.asset.PreviewParameter;
 import lombok.AllArgsConstructor;

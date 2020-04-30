@@ -1,7 +1,9 @@
-package io.rocketbase.commons.service;
+package io.rocketbase.commons.service.download;
 
 import com.google.common.io.BaseEncoding;
 import io.rocketbase.commons.dto.asset.AssetType;
+import io.rocketbase.commons.service.download.DefaultDownloadService;
+import io.rocketbase.commons.service.download.DownloadService;
 import okhttp3.*;
 import org.junit.Test;
 import org.springframework.http.HttpHeaders;

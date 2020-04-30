@@ -2,12 +2,11 @@ package io.rocketbase.commons.service;
 
 import com.google.common.base.Stopwatch;
 import io.rocketbase.commons.config.AssetApiProperties;
-import io.rocketbase.commons.config.AssetLqipProperties;
 import io.rocketbase.commons.dto.asset.*;
 import io.rocketbase.commons.exception.*;
 import io.rocketbase.commons.model.AssetEntity;
 import io.rocketbase.commons.service.AssetTypeFilterService.AssetUploadDetail;
-import io.rocketbase.commons.service.preview.ImagePreviewRendering;
+import io.rocketbase.commons.service.handler.AssetHandler;
 import io.rocketbase.commons.tooling.ColorDetection;
 import io.rocketbase.commons.util.Nulls;
 import lombok.RequiredArgsConstructor;
@@ -34,7 +33,6 @@ public class AssetService {
 
     private final Tika tika = new Tika();
     private final AssetApiProperties assetApiProperties;
-    private final AssetLqipProperties lqipProperties;
 
     @Resource
     private FileStorageService fileStorageService;
@@ -46,7 +44,7 @@ public class AssetService {
     private AssetTypeFilterService assetTypeFilterService;
 
     @Resource
-    private ImagePreviewRendering imagePreviewRendering;
+    private AssetHandler assetHandler;
 
     @Resource
     private OriginalUploadModifier originalUploadModifier;
@@ -162,7 +160,8 @@ public class AssetService {
             }
         }
 
-        OriginalUploadModifier.Modification modification = originalUploadModifier.modifyUploadBeforeSave(analyse(type, file, originalFilename, size), file, uploadMeta);
+        AssetAnalyse analyse = assetHandler.getAnalyse(type, file, originalFilename);
+        OriginalUploadModifier.Modification modification = originalUploadModifier.modifyUploadBeforeSave(analyse, file, uploadMeta);
 
         AssetEntity entity = assetRepository.initNewInstance();
         entity.setType(type);
@@ -193,39 +192,8 @@ public class AssetService {
     }
 
     public AssetAnalyse analyse(File file, String originalFilename) throws IOException {
-        long fileSize = file.length();
-        AssetType assetType = detectAssetTypeWithChecks(file, originalFilename, fileSize, null, null);
-        return analyse(assetType, file, originalFilename, fileSize);
-    }
-
-    private AssetAnalyse analyse(AssetType type, File file, String originalFilename, long fileSize) {
-        AssetAnalyse.AssetAnalyseBuilder builder = AssetAnalyse.builderAnalyse()
-                .type(type)
-                .fileSize(fileSize)
-                .created(Instant.now())
-                .originalFilename(originalFilename);
-
-        if (type.isJavaProcessableImage() && (assetApiProperties.isDetectResolution() || assetApiProperties.isDetectColors() || lqipProperties.isEnabled())) {
-            try {
-                BufferedImage bufferedImage = ImageIO.read(file);
-                if (assetApiProperties.isDetectResolution()) {
-                    if (bufferedImage != null) {
-                        builder.resolution(new Resolution(bufferedImage.getWidth(), bufferedImage.getHeight()));
-                    } else {
-                        log.trace("file not readable");
-                    }
-                }
-                if (assetApiProperties.isDetectColors()) {
-                    builder.colorPalette(ColorDetection.detect(bufferedImage));
-                }
-                if (lqipProperties.isEnabled()) {
-                    builder.lqip(imagePreviewRendering.getLqip(type, bufferedImage));
-                }
-            } catch (Exception e) {
-                log.error("could not read file information from file {}", file.getPath());
-            }
-        }
-        return builder.build();
+        AssetType assetType = detectAssetTypeWithChecks(file, originalFilename, file.length(), null, null);
+        return assetHandler.getAnalyse(assetType, file, originalFilename);
     }
 
 }

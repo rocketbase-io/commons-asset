@@ -4,15 +4,14 @@ import io.rocketbase.commons.config.AssetShrinkProperties;
 import io.rocketbase.commons.dto.asset.AssetAnalyse;
 import io.rocketbase.commons.dto.asset.AssetUploadMeta;
 import io.rocketbase.commons.dto.asset.Resolution;
-import io.rocketbase.commons.service.preview.ImagePreviewRendering;
-import io.rocketbase.commons.service.preview.PreviewConfig;
+import io.rocketbase.commons.service.handler.AssetHandler;
+import io.rocketbase.commons.service.handler.PreviewConfig;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.File;
-import java.io.FileInputStream;
 import java.util.Optional;
 
 
@@ -22,7 +21,7 @@ public class DefaultShrinkOriginalUploadModifier implements OriginalUploadModifi
 
     final AssetShrinkProperties assetShrinkProperties;
 
-    final ImagePreviewRendering imagePreviewRendering;
+    final AssetHandler assetHandler;
 
     @Override
     public Modification modifyUploadBeforeSave(AssetAnalyse analyse, File file, AssetUploadMeta uploadMeta) {
@@ -45,7 +44,7 @@ public class DefaultShrinkOriginalUploadModifier implements OriginalUploadModifi
         });
         if (resolution != null && analyse.getResolution().isBiggerThan(assetShrinkProperties.getMaxWidth(), assetShrinkProperties.getMaxHeight())) {
             try {
-                File shrinkedFile = imagePreviewRendering.getPreviewAsFile(analyse.getType(), new FileInputStream(file), PreviewConfig.builder()
+                File shrinkedFile = assetHandler.getPreview(analyse.getType(), file, PreviewConfig.builder()
                         .previewSize(assetShrinkProperties.getPreviewParameter())
                         .build());
                 analyse.setResolution(analyse.getResolution().calculateWithAspectRatio(assetShrinkProperties.getMaxWidth(), assetShrinkProperties.getMaxHeight()));

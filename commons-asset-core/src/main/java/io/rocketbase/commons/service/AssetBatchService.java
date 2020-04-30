@@ -7,6 +7,7 @@ import io.rocketbase.commons.dto.batch.*;
 import io.rocketbase.commons.exception.AssetErrorCodes;
 import io.rocketbase.commons.exception.InvalidContentTypeException;
 import io.rocketbase.commons.model.AssetEntity;
+import io.rocketbase.commons.service.download.DownloadService;
 
 import javax.annotation.Resource;
 import java.util.List;
