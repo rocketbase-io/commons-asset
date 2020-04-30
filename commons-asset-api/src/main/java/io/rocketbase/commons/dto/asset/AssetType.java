@@ -15,6 +15,8 @@ public enum AssetType {
     TIFF("image/tiff"),
     SVG("image/svg+xml"),
     WEBP("image/webp"),
+    HEIF("image/heif"),
+    HEIC("image/heic"),
     PDF("application/pdf"),
     ZIP("application/zip"),
     XLS("application/msexcel"),
