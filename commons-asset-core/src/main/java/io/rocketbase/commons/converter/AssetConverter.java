@@ -36,7 +36,7 @@ public class AssetConverter {
 
     protected void injectPreviewsAndDownload(AssetRead result, List<PreviewSize> sizes) {
         if (result != null) {
-            if (result.getType() != null && result.getType().isImage()) {
+            if (result.getType() != null && assetPreviewService.isPreviewSupported(result.getType())) {
                 result.setPreviews(AssetPreviews.builder()
                         .previewMap(new HashMap<>())
                         .build());

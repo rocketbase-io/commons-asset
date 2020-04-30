@@ -7,6 +7,7 @@ import io.rocketbase.commons.config.AssetImgproxyProperties;
 import io.rocketbase.commons.config.AssetS3Properties;
 import io.rocketbase.commons.converter.AssetPreviewService;
 import io.rocketbase.commons.dto.asset.AssetReferenceType;
+import io.rocketbase.commons.dto.asset.AssetType;
 import io.rocketbase.commons.dto.asset.PreviewSize;
 import lombok.RequiredArgsConstructor;
 
@@ -16,6 +17,11 @@ public class ImgproxyS3AssetPreviewService implements AssetPreviewService {
     final AssetImgproxyProperties imgproxyProperties;
     final AssetS3Properties s3Properties;
     final BucketResolver bucketResolver;
+
+    @Override
+    public boolean isPreviewSupported(AssetType assetType) {
+        return assetType.isImage();
+    }
 
     @Override
     public String getPreviewUrl(AssetReferenceType assetReferenceType, PreviewSize previewSize) {

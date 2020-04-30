@@ -14,12 +14,15 @@ import org.apache.tika.Tika;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
+import java.util.Arrays;
+import java.util.Collection;
 
 /**
  * Helper for downloading an image and get as result the detected type, binary + optional base64 string
  */
 public final class ImageHandler {
 
+    public static final Collection<AssetType> SUPPORTED_ASSET_TYPES = Arrays.asList(AssetType.JPEG, AssetType.PNG, AssetType.GIF, AssetType.TIFF);
     public static final DefaultDownloadService DEFAULT_DOWNLOAD_SERVICE = new DefaultDownloadService();
     private static final Tika TIKA = new Tika();
 
@@ -42,7 +45,7 @@ public final class ImageHandler {
         }
 
 
-        if (tempDownload.getType() == null || !tempDownload.getType().isJavaProcessableImage()) {
+        if (tempDownload.getType() == null || !SUPPORTED_ASSET_TYPES.contains(tempDownload.getType())) {
             throw new RuntimeException("Source is not an image!");
         }
 

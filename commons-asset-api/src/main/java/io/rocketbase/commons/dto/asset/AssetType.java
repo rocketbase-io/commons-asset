@@ -75,10 +75,6 @@ public enum AssetType {
         return getContentType().contains("image");
     }
 
-    public boolean isJavaProcessableImage() {
-        return isImage() && !Arrays.asList(SVG, WEBP).contains(this);
-    }
-
     public String getFileExtension() {
         return JPEG.equals(this) ? "jpg" : name().toLowerCase();
     }

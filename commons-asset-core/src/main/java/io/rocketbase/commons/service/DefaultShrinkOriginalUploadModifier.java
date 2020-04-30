@@ -25,7 +25,7 @@ public class DefaultShrinkOriginalUploadModifier implements OriginalUploadModifi
 
     @Override
     public Modification modifyUploadBeforeSave(AssetAnalyse analyse, File file, AssetUploadMeta uploadMeta) {
-        if (analyse == null || analyse.getType() == null || !analyse.getType().isJavaProcessableImage()) {
+        if (analyse == null || analyse.getType() == null || !assetHandler.isPreviewSupported(analyse.getType())) {
             return new Modification(analyse, file);
         }
         Resolution resolution = Optional.ofNullable(analyse.getResolution()).orElseGet(() -> {
