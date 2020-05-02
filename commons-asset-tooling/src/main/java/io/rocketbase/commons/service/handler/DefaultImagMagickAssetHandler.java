@@ -22,7 +22,7 @@ import java.time.Instant;
 @Slf4j
 public class DefaultImagMagickAssetHandler implements AssetHandler {
 
-    private static final String BACKGROUND_WHITE = "#ffffff";
+    private static final String BACKGROUND_WHITE = "\"#ffffff\"";
     private static final ConvertCmd convertCmd = new ConvertCmd();
 
     final AssetHandlerConfig config;
@@ -46,7 +46,7 @@ public class DefaultImagMagickAssetHandler implements AssetHandler {
         if (assetType.couldHaveTransparency()) {
             if (previewConfig.getBg() != null) {
                 RgbColor color = RgbColor.readRgbOrHex(previewConfig.getBg());
-                operation.background(color != null ? color.getHexCodeWithLeadingHash() : BACKGROUND_WHITE);
+                operation.background(color != null ? ("\"" + color.getHexCodeWithLeadingHash() + "\"") : BACKGROUND_WHITE);
             }
         } else {
             // quality settings only works for non transparent images
@@ -133,12 +133,14 @@ public class DefaultImagMagickAssetHandler implements AssetHandler {
         // a proper size
         operation.resize(previewSize.getMaxWidth(), previewSize.getMaxHeight());
         operation.quality((double) previewSize.getDefaultQuality());
-        File tempFile = File.createTempFile("asset-lqip", ".jpg");
-        operation.addImage(tempFile.getAbsolutePath());
 
         if (assetType.couldHaveTransparency()) {
             operation.background(BACKGROUND_WHITE);
         }
+
+        File tempFile = File.createTempFile("asset-lqip", ".jpg");
+        operation.addImage(tempFile.getAbsolutePath());
+
         convertCmd.run(operation);
         ImageHandlingResult result = new ImageHandlingResult(IOUtils.toByteArray(tempFile.toURI()), AssetType.JPEG);
         tempFile.delete();
