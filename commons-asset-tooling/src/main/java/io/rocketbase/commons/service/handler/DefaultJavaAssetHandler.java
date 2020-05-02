@@ -95,6 +95,25 @@ public class DefaultJavaAssetHandler implements AssetHandler {
         return builder.build();
     }
 
+    @Override
+    public Resolution getResolution(AssetType type, File file) {
+        if (isPreviewSupported(type)) {
+            try {
+                BufferedImage bufferedImage = ImageIO.read(file);
+                if (config.isDetectResolution()) {
+                    if (bufferedImage != null) {
+                        return new Resolution(bufferedImage.getWidth(), bufferedImage.getHeight());
+                    } else {
+                        log.trace("file not readable");
+                    }
+                }
+            } catch (Exception e) {
+                log.error("could not read resolution from file {}", file.getPath());
+            }
+        }
+        return null;
+    }
+
     public ImageHandlingResult getLqip(AssetType assetType, File file) {
         if (!isPreviewSupported(assetType)) {
             throw new UnsupportedOperationException("assetType " + assetType.name() + " is not supported");

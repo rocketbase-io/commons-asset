@@ -44,6 +44,12 @@
         </dependency>
 
         <dependency>
+            <groupId>com.github.geko444</groupId>
+            <artifactId>im4java</artifactId>
+            <version>${im4java.version}</version>
+        </dependency>
+
+        <dependency>
             <groupId>commons-io</groupId>
             <artifactId>commons-io</artifactId>
             <version>${commons-io.version}</version>
