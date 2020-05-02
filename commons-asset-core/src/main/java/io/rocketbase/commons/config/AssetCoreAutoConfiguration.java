@@ -8,6 +8,7 @@ import io.rocketbase.commons.service.download.DefaultDownloadService;
 import io.rocketbase.commons.service.download.DownloadService;
 import io.rocketbase.commons.service.handler.AssetHandler;
 import io.rocketbase.commons.service.handler.AssetHandlerConfig;
+import io.rocketbase.commons.service.handler.DefaultImagMagickAssetHandler;
 import io.rocketbase.commons.service.handler.DefaultJavaAssetHandler;
 import io.rocketbase.commons.util.Nulls;
 import lombok.RequiredArgsConstructor;
@@ -98,10 +99,17 @@ public class AssetCoreAutoConfiguration implements Serializable {
     }
 
     @Bean
-    @ConditionalOnBean(value = AssetService.class)
     @ConditionalOnMissingBean
+    @ConditionalOnProperty(name = "asset.imagemagick.enabled", havingValue = "false", matchIfMissing = true)
     public AssetHandler assetHandler() {
         return new DefaultJavaAssetHandler(getAssetHandlerConfig());
+    }
+
+    @Bean
+    @ConditionalOnMissingBean
+    @ConditionalOnProperty(name = "asset.imagemagick.enabled", havingValue = "true")
+    public AssetHandler imageMagickAssetHandler() {
+        return new DefaultImagMagickAssetHandler(getAssetHandlerConfig());
     }
 
     protected AssetHandlerConfig getAssetHandlerConfig() {

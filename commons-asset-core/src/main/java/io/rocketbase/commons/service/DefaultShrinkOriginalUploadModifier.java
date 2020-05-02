@@ -9,8 +9,6 @@ import io.rocketbase.commons.service.handler.PreviewConfig;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
-import javax.imageio.ImageIO;
-import java.awt.image.BufferedImage;
 import java.io.File;
 import java.util.Optional;
 
@@ -28,20 +26,9 @@ public class DefaultShrinkOriginalUploadModifier implements OriginalUploadModifi
         if (analyse == null || analyse.getType() == null || !assetHandler.isPreviewSupported(analyse.getType())) {
             return new Modification(analyse, file);
         }
-        Resolution resolution = Optional.ofNullable(analyse.getResolution()).orElseGet(() -> {
-            try {
-                BufferedImage bufferedImage = ImageIO.read(file);
-                if (bufferedImage != null) {
-                    return new Resolution(bufferedImage.getWidth(), bufferedImage.getHeight());
-                } else {
-                    log.trace("file not readable");
-                }
-
-            } catch (Exception e) {
-                log.error("could not read file information from file {}", file.getPath());
-            }
-            return null;
-        });
+        Resolution resolution = Optional.ofNullable(analyse.getResolution()).orElseGet(() ->
+                // in case resolution detection is disabled
+                assetHandler.getResolution(analyse.getType(), file));
         if (resolution != null && analyse.getResolution().isBiggerThan(assetShrinkProperties.getMaxWidth(), assetShrinkProperties.getMaxHeight())) {
             try {
                 File shrinkedFile = assetHandler.getPreview(analyse.getType(), file, PreviewConfig.builder()
