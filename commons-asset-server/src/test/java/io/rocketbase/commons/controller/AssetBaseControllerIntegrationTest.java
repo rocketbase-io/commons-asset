@@ -311,6 +311,25 @@ public class AssetBaseControllerIntegrationTest extends BaseIntegrationTest {
 
     @SneakyThrows
     @Test
+    public void testUploadHeic() {
+        // given
+        AssetResource assetResource = getAssetResource();
+
+        // when
+        File uploadFile = resourceLoader.getResource("classpath:assets/sample.heic")
+                .getFile();
+        AssetRead result = assetResource.uploadFile(new FileInputStream(uploadFile), uploadFile.getName());
+
+        // then
+        assertThat(result, notNullValue());
+        assertThat(result.getType(), equalTo(AssetType.HEIC));
+        assertThat(result.getMeta().getFileSize(), equalTo(718114L));
+        assertThat(result.getMeta().getResolution(), nullValue());
+        assertThat(result.getMeta().getOriginalFilename(), equalTo(uploadFile.getName()));
+    }
+
+    @SneakyThrows
+    @Test
     public void testUploadWebpPng() {
         // given
         AssetResource assetResource = getAssetResource();
