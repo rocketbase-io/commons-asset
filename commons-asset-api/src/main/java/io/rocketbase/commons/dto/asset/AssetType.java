@@ -75,6 +75,10 @@ public enum AssetType {
         return getContentType().contains("image");
     }
 
+    public boolean couldHaveTransparency() {
+        return Arrays.asList(PNG, GIF).contains(this);
+    }
+
     public String getFileExtension() {
         return JPEG.equals(this) ? "jpg" : name().toLowerCase();
     }
