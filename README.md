@@ -8,17 +8,17 @@
 [![Maintainability](https://api.codeclimate.com/v1/badges/f09af44278b226f1f54c/maintainability)](https://codeclimate.com/github/rocketbase-io/commons-asset/maintainability)
 [![Test Coverage](https://api.codeclimate.com/v1/badges/f09af44278b226f1f54c/test_coverage)](https://codeclimate.com/github/rocketbase-io/commons-asset/test_coverage)
 
-Add a simple asset service with basic features to your spring-boot applications. 
+Add a flexible asset service with a bunch of features to your spring-boot applications. 
 
 I've added a swagger api-documentation. You can find it within [src](./commons-asset-api/src/doc/swagger) of [swaggerHub](https://app.swaggerhub.com/apis-docs/melistik/commons-asset)
 
 
 **Features:**
 * api and controller to handle asset-uploads
-* works with images: jpeg, gif, png, tiff and documents like: pdf, excel, word, powerpoint and zip
+* works with images: jpeg, gif, png, tiff, svg, webp, heic/heif and documents like: pdf, excel, word, powerpoint and zip
 * you can configure the allowed contentTypes via property *("asset.api.types")*
-* 3 different storage implementations (mongo-grid-fs / aws-s3 / jpa-blob)
-* embedded thumb service for mongo-grid-fs/jpa-blob - for s3 use custom AssetPreviewService (example below)
+* 4 different storage implementations (mongo-grid-fs / aws-s3 / jpa-blob / local-file)
+* embedded thumb service with different implementations (java / command-line ImageMagick or extermal services like imgproxy/thumbor)
 * java resource to communicate with api
 * batch downloading urls and storing them / analyzing
 * intergrated [color-thief](https://github.com/SvenWoltmann/color-thief-java) in order to get primary and other colors from photo
@@ -49,7 +49,11 @@ The main Objects are: **AssetReference** that is used to store in MongoDb in cas
             "primary": "#395427",
             "colors": ["#ced5dd", "#80c9f3", "#74a043"]
         }
-    }
+    },
+  	"keyValues": {
+      "extra": "value"
+    },
+  	"eol": "data:image/jpeg;base64...."
 }
 ```
 
@@ -72,6 +76,7 @@ Containing an implementation for storing asset references...
 | asset.api.download | true              | you can disable endpoint                                     |
 | asset.api.delete   | true              | when false no delete is possible                             |
 | asset.api.batch    | true              | you can disable batch endpoint                               |
+| asset.api.analyse | tru | you can disable analyse endpoint |
 | asset.api.preview  | true              | should only been taken in case of mongo-storage<br />please consider also using outside caching |
 | asset.api.detectResolution    | true              | you can disable image resolution detection                              |
 | asset.api.detectColor    | true              | you can disable image colorThief                              |
@@ -139,79 +144,67 @@ public abstract class ThumborPreviewService implements AssetPreviewService {
 }
 ````
 
-````java
-/*
- * <dependency>
- *     <groupId>io.rocketbase.asset</groupId>
- *     <artifactId>imgproxy</artifactId>
- *     <version>0.1.0</version>
- * </dependency>
- */
-@Service
-@RequiredArgsConstructor
-public abstract class ImgproxyPreviewService implements AssetPreviewService {
-    
-    private final ImgproxyProperties imgproxyProperties;
 
-    private final BucketResolver bucketResolver;
+## commons-asset-entity-mongo
 
-    private SignatureConfiguration signatureConfiguration;
+Implementation for MongoRepository + Mongo Entity...
 
-    public String getPreviewUrl(AssetReferenceType assetReference, PreviewSize size) { 
-        return Signature.of(getConfig())
-                .resize(ResizeType.fit, 300, 300, true)
-                .url("s3://"+ bucketResolver.resolveBucketName(assetReference) +"/" + assetReference.getUrlPath());
-    }
-    
-    private SignatureConfiguration getConfig() {
-        if (signatureConfiguration == null) {
-            signatureConfiguration = new SignatureConfiguration(imgproxyProperties.getBaseurl(),
-                                                             imgproxyProperties.getKey(),
-                                                             imgproxyProperties.getSalt());
-        }
-        return signatureConfiguration;
-    }
+## commons-asset-entity-jpa
 
+Implementation for JpaRepository + Jpa Entity...
 
-}
-````
+## commons-asset-storage-fs
 
+Local-FileStorageService
 
-## commons-asset-mongo
+|                    | default      | explanation                             |
+| ------------------ | ------------ | --------------------------------------- |
+| asset.fs.base-path | **required** | required base start path to store files |
 
-Implementation for MongoRepository + Mongo-FileStorageService...
+## commons-asset-storage-jpa
 
-## commons-asset-jpa
+Stores files as blob in database.
 
-Implementation for JpaRepository + Jpa-FileStorageService...
+## commons-asset-storage-mongo
 
-## commons-asset-rest
+Store files in mongo-database with grid-fs
 
-Containing an all controllers for the rest implementation...
+## commons-asset-storage-s3
 
-**Hint:** The maximum fileupload size within a spring-boot application is by default just 1Mb you can change this via a property: **spring.servlet.multipart.max-file-size=5MB**
+Containing a communication layer with s3 in order to use it as file storage. Uses the official [aws-java-sdk-s3](https://aws.amazon.com/de/sdk-for-java/)
 
-## commons-asset-s3
+| property                           | default      | explanation                                                  |
+| ---------------------------------- | ------------ | ------------------------------------------------------------ |
+| asset.s3.bucket                    | **required** | bucket name where files should get stored                    |
+| asset.s3.access-key                | **required** |                                                              |
+| asset.s3.secret-key                | **required** |                                                              |
+| asset.s3.region                    | **required** |                                                              |
+| asset.s3.endpoint                  | *optional*   | allow to connect to replacements of aws s3<br />by for example  [minio](https://www.minio.io/) you can specify the endpoint |
+| asset.s3.instance-profile          | *optional*   | property to configure aws-java-sdk                           |
+| asset.s3.path-style-access-enabled | *optional*   | property to configure aws-java-sdk                           |
+| asset.s3.signer-override           | *optional*   | property to configure aws-java-sdk                           |
 
-Containing a communication layer with s3 in order to use it as file storage.
-
-You need to provide all required credentials that [spring-cloud](https://cloud.spring.io/spring-cloud-aws/spring-cloud-aws.html#_amazon_sdk_configuration) needs
+### examaple configs
 
 ```yaml
-cloud:
-  aws:
-    credentials:
-      accessKey: KEY
-        secretKey: SECRET
-        instanceProfile: true
-      region:
-        static: eu-central-1
+## minio
+asset:
+	s3:
+		access-key: XXX
+		secret-key:	XXX
+		region:	us-east-1
+		instant-profile: true
+		path-style-acess-enabled: true
+		signer-override: AWSS3V4SignerType
+		endpoint: "https://minio.example.com"
+## aws
+asset:
+	s3:
+		access-key: XXX
+		secret-key:	XXX
+		region:	eu-central-1
+		instant-profile: true
 ```
-
-| property          | default      | explanation                                                  |
-| ----------------- | ------------ | ------------------------------------------------------------ |
-| asset.s3.bucket   | **required** | bucket name where files should get stored                    |
-| asset.s3.endpoint | *optional*   | allow to connect to replacements of aws s3<br />by for example  [minio](https://www.minio.io/) you can specify the endpoint |
 
 ### multiple buckets
 
@@ -231,7 +224,26 @@ public class CustomBucketResolver implements BucketResolver {
 }
 ````
 
+## commons-asset-rest
+
+Containing an all controllers for the rest implementation...
+
+**Hint:** The maximum fileupload size within a spring-boot application is by default just 1Mb you can change this via a property: **spring.servlet.multipart.max-file-size=5MB**
+
+## commons-asset-imgproxy
+
+Simple preconfiguration to use imgproxy for rendering thumbs via [imgproxy](https://imgproxy.net/) and currently only configured for s3 use...
+
+|                         | default      | explanation                             |
+| ----------------------- | ------------ | --------------------------------------- |
+| asset.imgproxy.base-url | **required** | required base start path to store files |
+| asset.imgproxy.key      | optional     |                                         |
+| asset.imgproxy.salt     | optional     |                                         |
+
+## 
+
 ### The MIT License (MIT)
+
 Copyright (c) 2020 rocketbase.io
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
