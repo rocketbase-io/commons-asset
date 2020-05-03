@@ -48,6 +48,13 @@ SOFTWARE.
             <artifactId>aws-java-sdk-s3</artifactId>
             <version>${aws-sdk-java.version}</version>
         </dependency>
+
+        <!-- tests -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-test</artifactId>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
 
 
