@@ -37,7 +37,7 @@ public class DefaultJavaAssetHandler implements AssetHandler {
     }
 
     @SneakyThrows
-    public File getPreview(AssetType assetType, File file, PreviewConfig previewConfig) {
+    public File getPreview(AssetType type, File file, PreviewConfig previewConfig) {
         PreviewParameter previewSize = Nulls.notNull(previewConfig.getPreviewSize(), PreviewSize.S);
         Thumbnails.Builder<? extends File> thumbBuilder = Thumbnails.of(file)
                 .size(previewSize.getMaxWidth(), previewSize.getMaxHeight());
@@ -46,7 +46,7 @@ public class DefaultJavaAssetHandler implements AssetHandler {
             thumbBuilder.rotate(previewConfig.getRotation());
         }
 
-        if ((AssetType.PNG.equals(assetType) || AssetType.GIF.equals(assetType))) {
+        if (type.couldHaveTransparency()) {
             if (previewConfig.getBg() != null) {
                 // optional set background color
                 RgbColor rgbColor = Nulls.notNull(RgbColor.readRgb(previewConfig.getBg()), RgbColor.hex2rgb(previewConfig.getBg()));
@@ -59,7 +59,7 @@ public class DefaultJavaAssetHandler implements AssetHandler {
             thumbBuilder
                     .outputQuality(config.getPreviewQuality().getOrDefault(previewSize, 0.8f));
         }
-        File tempFile = File.createTempFile("asset-preview", assetType.getFileExtensionForSuffix());
+        File tempFile = File.createTempFile("asset-preview", type.getFileExtensionForSuffix());
         thumbBuilder.toFile(tempFile);
         return tempFile;
     }
@@ -122,13 +122,13 @@ public class DefaultJavaAssetHandler implements AssetHandler {
     }
 
     @SneakyThrows
-    protected ImageHandlingResult getLqip(AssetType assetType, Thumbnails.Builder builder) {
+    protected ImageHandlingResult getLqip(AssetType type, Thumbnails.Builder builder) {
         PreviewParameter previewSize = Nulls.notNull(config.getLqipPreview(), PreviewSize.XS);
         builder
                 .size(previewSize.getMaxWidth(), previewSize.getMaxHeight())
                 .outputQuality(previewSize.getDefaultQuality())
                 .outputFormat("jpg");
-        if (AssetType.PNG.equals(assetType) || AssetType.GIF.equals(assetType)) {
+        if (type.couldHaveTransparency()) {
             builder.addFilter(new Canvas(previewSize.getMaxWidth(), previewSize.getMaxHeight(), Positions.CENTER, Color.WHITE))
                     .imageType(ThumbnailParameter.DEFAULT_IMAGE_TYPE);
         }

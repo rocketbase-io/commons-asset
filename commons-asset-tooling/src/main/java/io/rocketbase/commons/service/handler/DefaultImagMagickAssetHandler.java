@@ -34,7 +34,7 @@ public class DefaultImagMagickAssetHandler implements AssetHandler {
     }
 
     @SneakyThrows
-    public File getPreview(AssetType assetType, File file, PreviewConfig previewConfig) {
+    public File getPreview(AssetType type, File file, PreviewConfig previewConfig) {
         PreviewParameter previewSize = Nulls.notNull(previewConfig.getPreviewSize(), PreviewSize.S);
         IMOperation operation = new IMOperation();
         operation.addImage(file.getAbsolutePath() + FIRST_FRAME);
@@ -44,7 +44,7 @@ public class DefaultImagMagickAssetHandler implements AssetHandler {
             operation.rotate((double) previewConfig.getRotation());
         }
 
-        if (assetType.couldHaveTransparency()) {
+        if (type.couldHaveTransparency()) {
             if (previewConfig.getBg() != null) {
                 RgbColor color = RgbColor.readRgbOrHex(previewConfig.getBg());
                 operation.background(color != null ? ("\"" + color.getHexCodeWithLeadingHash() + "\"") : BACKGROUND_WHITE);
@@ -54,7 +54,7 @@ public class DefaultImagMagickAssetHandler implements AssetHandler {
             operation.quality((double) config.getPreviewQuality().getOrDefault(previewSize, 0.8f) * 100);
         }
 
-        File tempFile = File.createTempFile("asset-preview", assetType.getFileExtensionForSuffix());
+        File tempFile = File.createTempFile("asset-preview", type.getFileExtensionForSuffix());
         operation.addImage(tempFile.getAbsolutePath());
         convertCmd.run(operation);
 
@@ -122,9 +122,9 @@ public class DefaultImagMagickAssetHandler implements AssetHandler {
     }
 
     @SneakyThrows
-    public ImageHandlingResult getLqip(AssetType assetType, File file) {
-        if (!isPreviewSupported(assetType)) {
-            throw new UnsupportedOperationException("assetType " + assetType.name() + " is not supported");
+    public ImageHandlingResult getLqip(AssetType type, File file) {
+        if (!isPreviewSupported(type)) {
+            throw new UnsupportedOperationException("type " + type.name() + " is not supported");
         }
         PreviewParameter previewSize = Nulls.notNull(config.getLqipPreview(), PreviewSize.XS);
 
@@ -135,7 +135,7 @@ public class DefaultImagMagickAssetHandler implements AssetHandler {
         operation.resize(previewSize.getMaxWidth(), previewSize.getMaxHeight());
         operation.quality((double) previewSize.getDefaultQuality());
 
-        if (assetType.couldHaveTransparency()) {
+        if (type.couldHaveTransparency()) {
             operation.background(BACKGROUND_WHITE);
         }
 

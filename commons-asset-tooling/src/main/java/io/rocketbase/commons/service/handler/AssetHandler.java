@@ -13,9 +13,9 @@ public interface AssetHandler {
     /**
      * detect if preview is possible for given assetType
      */
-    boolean isPreviewSupported(AssetType assetType);
+    boolean isPreviewSupported(AssetType type);
 
-    File getPreview(AssetType assetType, File file, PreviewConfig previewConfig);
+    File getPreview(AssetType type, File file, PreviewConfig previewConfig);
 
     AssetAnalyse getAnalyse(AssetType type, File file, String originalFilename);
 
@@ -24,5 +24,5 @@ public interface AssetHandler {
     /**
      * an ultra lowres image preview in base64 encoding
      */
-    ImageHandlingResult getLqip(AssetType assetType, File file);
+    ImageHandlingResult getLqip(AssetType type, File file);
 }
