@@ -32,12 +32,6 @@ public class AssetS3StorageAutoConfiguration {
 
     @Bean
     @ConditionalOnMissingBean
-    public PathResolver pathResolver() {
-        return new DefaultPathResolver();
-    }
-
-    @Bean
-    @ConditionalOnMissingBean
     public FileStorageService fileStorageService(@Autowired BucketResolver bucketResolver, @Autowired PathResolver pathResolver, @Autowired S3ClientProvider s3ClientProvider) {
         return new S3FileStoreService(bucketResolver, pathResolver, s3ClientProvider.getClient());
     }

@@ -112,6 +112,12 @@ public class AssetCoreAutoConfiguration implements Serializable {
         return new DefaultImagMagickAssetHandler(getAssetHandlerConfig());
     }
 
+    @Bean
+    @ConditionalOnMissingBean
+    public PathResolver pathResolver() {
+        return new DefaultPathResolver();
+    }
+
     protected AssetHandlerConfig getAssetHandlerConfig() {
         return AssetHandlerConfig.builder()
                 .previewQuality(getPreviewQualityMap())
