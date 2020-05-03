@@ -33,13 +33,4 @@ public class AssetS3Properties implements Serializable {
 
     private String signerOverride;
 
-    /*
-    aws:
-    credentials:
-      accessKey: KEY
-        secretKey: SECRET
-        instanceProfile: true
-      region:
-        static: eu-central-1
-     */
 }
