@@ -45,7 +45,7 @@ public class QueryAsset implements Serializable {
     private Boolean hasEolValue;
 
     /**
-     * true: queries all assets that has an eol value that is expired <br>
+     * true: queries all assets that has an eol value that is expired<br>
      * false: all without or newer then now<br>
      * null means ignore
      */

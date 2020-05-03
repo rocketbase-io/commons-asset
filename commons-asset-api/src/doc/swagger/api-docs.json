@@ -2,7 +2,7 @@
   "swagger": "2.0",
   "info": {
     "description": "Provides services + rest-controller to handle asset with different storage engines.",
-    "version": "2.5.0",
+    "version": "4.0.0",
     "title": "commons-asset api",
     "contact": {
       "name": "rocketbase.io",
@@ -101,6 +101,20 @@
             "description": "possible types JPEG, PNG, GIF, PDF, ZIP, XLS, XLSX, DOC, DOCX. allows to use multiple types for a list...",
             "required": false,
             "type": "string"
+          },
+          {
+            "name": "hasEolValue",
+            "in": "query",
+            "description": "true: queries all assets that has an eol value, false: all without, null: ignore",
+            "required": false,
+            "type": "boolean"
+          },
+          {
+            "name": "isEol",
+            "in": "query",
+            "description": "true: queries all assets that has an eol value that is expired, false: all without or newer then now, null: ignore",
+            "required": false,
+            "type": "boolean"
           }
         ],
         "responses": {
@@ -385,6 +399,13 @@
             "description": "id or systemRefId (you've given optionally within upload process)",
             "required": true,
             "type": "string"
+          },
+          {
+            "name": "inline",
+            "in": "query",
+            "description": "optional parameter to allow download as inline",
+            "required": false,
+            "type": "boolean"
           }
         ],
         "responses": {
@@ -697,6 +718,10 @@
         },
         "resolution": {
           "$ref": "#/definitions/Resolution"
+        },
+        "lqip": {
+          "type": "string",
+          "description": "in case of enabeled lqip contain base64 image preview"
         }
       },
       "title": "AssetAnalyse"
@@ -747,6 +772,10 @@
             "type": "string"
           }
         },
+        "eol": {
+          "type": "string",
+          "description": "date instant - after this time the asset could get deleted within a cleanup job"
+        },
         "type": {
           "type": "string",
           "enum": [
@@ -779,6 +808,14 @@
             "type": "string"
           },
           "description": "will removed key that have value of null, will only add/replace new/existing key values, not mentioned key will still stay the same"
+        },
+        "systemRefId": {
+          "type": "string",
+          "description": "update it with care - needs to get updated in AssetReferences if stored anywhere..."
+        },
+        "eol": {
+          "type": "string",
+          "description": "date instant - after this time the asset could get deleted within a cleanup job"
         }
       },
       "title": "UpdateAsset"
