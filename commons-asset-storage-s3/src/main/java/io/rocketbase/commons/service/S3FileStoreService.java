@@ -28,8 +28,7 @@ public class S3FileStoreService implements FileStorageService {
     @SneakyThrows
     @Override
     public void upload(AssetEntity entity, File file) {
-        entity.setUrlPath(String.format("%s%s.%s", UrlParts.ensureEndsWithSlash(pathResolver.resolvePath(entity)), entity.getId(), entity.getType().getFileExtension())
-                .toLowerCase());
+        entity.setUrlPath(pathResolver.getAbsolutePath(entity));
 
         TransferManager transferManager = TransferManagerBuilder.standard()
                 .withS3Client(amazonS3)

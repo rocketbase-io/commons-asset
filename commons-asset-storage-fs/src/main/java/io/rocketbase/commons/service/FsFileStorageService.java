@@ -25,26 +25,21 @@ public class FsFileStorageService implements FileStorageService {
     @Override
     @Transactional
     public void upload(AssetEntity entity, File file) {
-        String filePath = getFilePath(entity);
+        String filePath = pathResolver.getAbsolutePath(entity);
         FileUtils.copyFile(file, new File(basePath + filePath));
         entity.setUrlPath(filePath);
-    }
-
-    protected String getFilePath(AssetEntity entity) {
-        return String.format("%s%s.%s", UrlParts.ensureEndsWithSlash(pathResolver.resolvePath(entity)), entity.getId(), entity.getType().getFileExtension())
-                .toLowerCase();
     }
 
     @SneakyThrows
     @Override
     @Transactional
     public InputStreamResource download(AssetEntity entity) {
-        return new InputStreamResource(new FileInputStream(new File(basePath + getFilePath(entity))));
+        return new InputStreamResource(new FileInputStream(new File(basePath + pathResolver.getAbsolutePath(entity))));
     }
 
     @Override
     @Transactional
     public void delete(AssetEntity entity) {
-        new File(basePath + getFilePath(entity)).delete();
+        new File(basePath + pathResolver.getAbsolutePath(entity)).delete();
     }
 }
