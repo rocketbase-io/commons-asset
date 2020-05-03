@@ -112,7 +112,7 @@ SOFTWARE.
         <commons-io.version>2.6</commons-io.version>
         <tika-core.version>1.24.1</tika-core.version>
         <thumbnailator.version>0.4.11</thumbnailator.version>
-        <okhttp.version>4.4.1</okhttp.version>
+        <okhttp.version>4.6.0</okhttp.version>
         <jacoco.version>0.8.5</jacoco.version>
         <colors.version>0.5.1</colors.version>
         <aws-sdk-java.version>1.11.771</aws-sdk-java.version>
