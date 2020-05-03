@@ -23,6 +23,7 @@ import java.time.Instant;
 public class DefaultImagMagickAssetHandler implements AssetHandler {
 
     private static final String BACKGROUND_WHITE = "\"#ffffff\"";
+    private static final String FIRST_FRAME = "[0]";
     private static final ConvertCmd convertCmd = new ConvertCmd();
 
     final AssetHandlerConfig config;
@@ -36,7 +37,7 @@ public class DefaultImagMagickAssetHandler implements AssetHandler {
     public File getPreview(AssetType assetType, File file, PreviewConfig previewConfig) {
         PreviewParameter previewSize = Nulls.notNull(previewConfig.getPreviewSize(), PreviewSize.S);
         IMOperation operation = new IMOperation();
-        operation.addImage(file.getAbsolutePath() + "[0]");
+        operation.addImage(file.getAbsolutePath() + FIRST_FRAME);
         operation.resize(previewSize.getMaxWidth(), previewSize.getMaxHeight());
 
         if (previewConfig.getRotation() != null) {
@@ -86,7 +87,7 @@ public class DefaultImagMagickAssetHandler implements AssetHandler {
     public Resolution getResolution(AssetType type, File file) {
         if (isPreviewSupported(type)) {
             try {
-                Info imageInfo = new Info(file.getAbsolutePath(), true);
+                Info imageInfo = new Info(file.getAbsolutePath() + FIRST_FRAME, true);
                 return new Resolution(imageInfo.getImageWidth(), imageInfo.getImageHeight());
             } catch (Exception e) {
                 log.error("could not read resolution from file {}", file.getPath());
@@ -99,7 +100,7 @@ public class DefaultImagMagickAssetHandler implements AssetHandler {
         if (isPreviewSupported(type)) {
             try {
                 IMOperation operation = new IMOperation();
-                operation.addImage(file.getAbsolutePath() + "[0]");
+                operation.addImage(file.getAbsolutePath() + FIRST_FRAME);
                 // a proper size
                 operation.resize(420, 420, ">");
                 if (type.couldHaveTransparency()) {
@@ -129,7 +130,7 @@ public class DefaultImagMagickAssetHandler implements AssetHandler {
 
 
         IMOperation operation = new IMOperation();
-        operation.addImage(file.getAbsolutePath() + "[0]");
+        operation.addImage(file.getAbsolutePath() + FIRST_FRAME);
         // a proper size
         operation.resize(previewSize.getMaxWidth(), previewSize.getMaxHeight());
         operation.quality((double) previewSize.getDefaultQuality());
