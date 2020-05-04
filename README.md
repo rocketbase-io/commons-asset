@@ -188,7 +188,6 @@ Containing a communication layer with s3 in order to use it as file storage. Use
 | asset.s3.secret-key                | **required** |                                                              |
 | asset.s3.region                    | **required** |                                                              |
 | asset.s3.endpoint                  | *optional*   | allow to connect to replacements of aws s3<br />by for example  [minio](https://www.minio.io/) you can specify the endpoint |
-| asset.s3.instance-profile          | *optional*   | property to configure aws-java-sdk                           |
 | asset.s3.path-style-access-enabled | *optional*   | property to configure aws-java-sdk                           |
 | asset.s3.signer-override           | *optional*   | property to configure aws-java-sdk                           |
 
@@ -203,7 +202,7 @@ asset:
 		region:	us-east-1
 		bucket: sample
 		instant-profile: true
-		path-style-acess-enabled: true
+		path-style-access-enabled: true
 		signer-override: AWSS3V4SignerType
 		endpoint: "https://minio.example.com"
 ## aws

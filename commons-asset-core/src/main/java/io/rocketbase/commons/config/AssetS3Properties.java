@@ -27,8 +27,6 @@ public class AssetS3Properties implements Serializable {
 
     private String endpoint;
 
-    private Boolean instanceProfile;
-
     private Boolean pathStyleAccessEnabled;
 
     private String signerOverride;
