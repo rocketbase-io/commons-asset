@@ -24,6 +24,9 @@ I've added a swagger api-documentation. You can find it within [src](./commons-a
 * intergrated [color-thief](https://github.com/SvenWoltmann/color-thief-java) in order to get primary and other colors from photo
 * optional LIQP (Low Quality Image Placeholder) option to have a placeholder for images in base64 encoded in ultra low resolution
 
+
+![project-structure](assets/module-tree.svg)
+
 ## commons-asset-api
 
 This module provides the DTOs and a client to communicate with the asset endpoints.
