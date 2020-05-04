@@ -77,6 +77,7 @@ Containing an implementation for storing asset references...
 | asset.api.path     | /api/asset        | base path of assetController                                 |
 | asset.api.types    | *All*             | you can shrink allowed Types (is a list property)            |
 | asset.api.download | true              | you can disable endpoint                                     |
+| asset.imagemagick.enabled | false      | you can active imagemagick command-line use otherwise java-processor will get used  |
 | asset.api.delete   | true              | when false no delete is possible                             |
 | asset.api.batch    | true              | you can disable batch endpoint                               |
 | asset.api.analyse | tru | you can disable analyse endpoint |
