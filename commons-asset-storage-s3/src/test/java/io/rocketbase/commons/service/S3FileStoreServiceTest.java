@@ -9,7 +9,6 @@ import io.rocketbase.commons.util.UrlParts;
 import lombok.*;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.IOUtils;
-import org.junit.Test;
 import org.springframework.core.io.InputStreamResource;
 
 import java.io.File;
@@ -92,7 +91,6 @@ public class S3FileStoreServiceTest {
         properties.setAccessKey("-");
         properties.setSecretKey("-");
         properties.setRegion("eu-central-1");
-        properties.setInstanceProfile(true);
         DefaultS3ClientProvider s3ClientProvider = new DefaultS3ClientProvider(properties);
         return new S3FileStoreService(new DefaultBucketResolver("example"), new DefaultPathResolver(), s3ClientProvider.getClient());
     }
