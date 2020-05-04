@@ -50,7 +50,7 @@ public enum PreviewSize implements PreviewParameter {
     public static PreviewSize getByName(String name, PreviewSize fallback) {
         if (name != null) {
             for (PreviewSize v : values()) {
-                if (name.equalsIgnoreCase(v.name())) {
+                if (name.trim().equalsIgnoreCase(v.name())) {
                     return v;
                 }
             }
