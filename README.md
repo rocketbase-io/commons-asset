@@ -25,6 +25,10 @@ I've added a swagger api-documentation. You can find it within [src](./commons-a
 * optional LIQP (Low Quality Image Placeholder) option to have a placeholder for images in base64 encoded in ultra low resolution
 
 
+
+***module-structure-tree:***
+
+
 ![project-structure](assets/module-tree.svg)
 
 ## commons-asset-api
@@ -76,8 +80,8 @@ Containing an implementation for storing asset references...
 | ------------------ | ----------------- | ------------------------------------------------------------ |
 | asset.api.path     | /api/asset        | base path of assetController                                 |
 | asset.api.types    | *All*             | you can shrink allowed Types (is a list property)            |
-| asset.api.download | true              | you can disable endpoint                                     |
 | asset.imagemagick.enabled | false      | you can active imagemagick command-line use otherwise java-processor will get used  |
+| asset.api.download | true              | you can disable endpoint                                     |
 | asset.api.delete   | true              | when false no delete is possible                             |
 | asset.api.batch    | true              | you can disable batch endpoint                               |
 | asset.api.analyse | tru | you can disable analyse endpoint |
@@ -197,6 +201,7 @@ asset:
 		access-key: XXX
 		secret-key:	XXX
 		region:	us-east-1
+		bucket: sample
 		instant-profile: true
 		path-style-acess-enabled: true
 		signer-override: AWSS3V4SignerType
@@ -207,6 +212,7 @@ asset:
 		access-key: XXX
 		secret-key:	XXX
 		region:	eu-central-1
+		bucket: sample
 		instant-profile: true
 ```
 
