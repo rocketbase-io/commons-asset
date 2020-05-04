@@ -16,13 +16,10 @@ public class AssetS3Properties implements Serializable {
     @NotEmpty
     private String bucket;
 
-    @NotEmpty
     private String accessKey;
 
-    @NotEmpty
     private String secretKey;
 
-    @NotEmpty
     private String region;
 
     private String endpoint;

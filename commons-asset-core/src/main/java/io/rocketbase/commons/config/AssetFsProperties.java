@@ -5,6 +5,7 @@ import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.validation.annotation.Validated;
 
+import javax.validation.constraints.NotEmpty;
 import java.io.Serializable;
 
 @Data
@@ -12,5 +13,6 @@ import java.io.Serializable;
 @ConfigurationProperties(prefix = "asset.fs")
 public class AssetFsProperties implements Serializable {
 
+    @NotEmpty
     private String basePath;
 }
