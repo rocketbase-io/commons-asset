@@ -86,18 +86,18 @@ Containing an implementation for storing asset references...
 | asset.api.batch    | true              | you can disable batch endpoint                               |
 | asset.api.analyse | tru | you can disable analyse endpoint |
 | asset.api.preview  | true              | should only been taken in case of mongo-storage<br />please consider also using outside caching |
-| asset.api.detectResolution    | true              | you can disable image resolution detection                              |
-| asset.api.detectColor    | true              | you can disable image colorThief                              |
-| asset.api.baseUrl  | ""                | used for previewUrls in case of mongo-storage, will get used as fallback |
-| asset.api.previewQuality | XS: 0.7<br />S: 0.75<br />M: 0.8<br />L: 0.85<br />XL: 0.85 | configure quality of image preview via java-code. Its a Map<String, Float> Configuration and the key needs to match the enum PreviewSize<br /><br />ValueRange is between 0 - 1.<br />1 means 100% |
+| asset.api.detect-resolution    | true              | you can disable image resolution detection                              |
+| asset.api.detect-color    | true              | you can disable image colorThief                              |
+| asset.api.base-url  | ""                | used for previewUrls in case of mongo-storage, will get used as fallback |
+| asset.api.preview-quality | XS: 0.7<br />S: 0.75<br />M: 0.8<br />L: 0.85<br />XL: 0.85 | configure quality of image preview via java-code. Its a Map<String, Float> Configuration and the key needs to match the enum PreviewSize<br /><br />ValueRange is between 0 - 1.<br />1 means 100% |
 
 **LQIP** (Low Quality Image Placeholder) since 3.1.x there is an option to allow adding base64 thumb as a placeholder to the assetReference. During upload process the system adds it to the entity and the small thumb get stored in db as well. It should be used as placeholder before loading the main preview. To lower http calls the "binary" is already containing within the rest response. 
 
 |                      | default | explanation                   |
 | -------------------- | ------- | ----------------------------- |
 | asset.lqip.enabled   | false   | by default disabled feature   |
-| asset.lqip.maxWidth  | 50      | max with of the image         |
-| asset.lqip.maxHeight | 50      | max height of the image       |
+| asset.lqip.max-width  | 50      | max with of the image         |
+| asset.lqip.max-height | 50      | max height of the image       |
 | asset.lqip.quality   | 0.05    | ultra low res of the image 5% |
 
 An usecase example could be found here [codepen - low quality image placeholder](https://codepen.io/alxdr/pen/oNgKNGY)
@@ -107,8 +107,8 @@ An usecase example could be found here [codepen - low quality image placeholder]
 |                      | default | explanation                   |
 | -------------------- | ------- | ----------------------------- |
 | asset.shrink.enabled   | false   | by default disabled feature   |
-| asset.shrink.maxWidth  | 2560      | max with of the image         |
-| asset.shrink.maxHeight | 2560      | max height of the image       |
+| asset.shrink.max-width  | 2560      | max with of the image         |
+| asset.shrink.max-height | 2560      | max height of the image       |
 | asset.shrink.quality   | 0.9    | quality of image - default mean 90% |
 
 
