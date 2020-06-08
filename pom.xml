@@ -53,6 +53,7 @@ SOFTWARE.
         <module>commons-asset-storage-s3</module>
         <module>commons-asset-imgproxy</module>
         <module>commons-asset-storage-fs</module>
+        <module>commons-asset-server-filepond</module>
     </modules>
 
     <licenses>
@@ -116,7 +117,7 @@ SOFTWARE.
         <okhttp.version>4.6.0</okhttp.version>
         <jacoco.version>0.8.5</jacoco.version>
         <colors.version>0.5.1</colors.version>
-        <aws-sdk-java.version>1.11.771</aws-sdk-java.version>
+        <aws-sdk-java.version>1.11.797</aws-sdk-java.version>
         <imgproxy.version>0.1.0</imgproxy.version>
         <im4java.version>1.4.2</im4java.version>
     </properties>
