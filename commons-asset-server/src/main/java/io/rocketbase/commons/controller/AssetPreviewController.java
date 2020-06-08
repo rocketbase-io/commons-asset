@@ -58,7 +58,7 @@ public class AssetPreviewController implements BaseAssetController {
             download = File.createTempFile("asset-download", entity.getType().getFileExtensionForSuffix());
             IOUtils.copy(streamResource.getInputStream(), new FileOutputStream(download));
 
-            File preview = assetHandler.getPreview(entity.getType(), streamResource.getFile(), PreviewConfig.builder()
+            File preview = assetHandler.getPreview(entity.getType(), download, PreviewConfig.builder()
                     .previewSize(previewSize)
                     .rotation(parseInteger(params, "rotation", null))
                     .bg(params.getFirst("bg"))
