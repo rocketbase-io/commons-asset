@@ -29,7 +29,7 @@ I've added a swagger api-documentation. You can find it within [src](./commons-a
 ***module-structure-tree:***
 
 
-![project-structure](assets/module-tree.svg)
+![project-structure](assets/module-tree.svg?v=2)
 
 ## commons-asset-api
 
@@ -191,7 +191,7 @@ Containing a communication layer with s3 in order to use it as file storage. Use
 | asset.s3.path-style-access-enabled | *optional*   | property to configure aws-java-sdk                           |
 | asset.s3.signer-override           | *optional*   | property to configure aws-java-sdk                           |
 
-### examaple configs
+### example configs
 
 ```yaml
 ## minio
@@ -249,7 +249,9 @@ Simple preconfiguration to use imgproxy for rendering thumbs via [imgproxy](http
 | asset.imgproxy.key      | optional     |                                         |
 | asset.imgproxy.salt     | optional     |                                         |
 
-## 
+## commons-asset-server-filepond
+
+Add **/api/asset/filepond** endpoint to handle uploads. It is similar to base upload but is more flexible with properties and also returns required assetId instead of AssetRead... 
 
 ### The MIT License (MIT)
 
