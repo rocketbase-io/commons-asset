@@ -201,7 +201,6 @@ asset:
 		secret-key:	XXX
 		region:	us-east-1
 		bucket: sample
-		instant-profile: true
 		path-style-access-enabled: true
 		signer-override: AWSS3V4SignerType
 		endpoint: "https://minio.example.com"
@@ -212,7 +211,6 @@ asset:
 		secret-key:	XXX
 		region:	eu-central-1
 		bucket: sample
-		instant-profile: true
 ```
 
 ### multiple buckets

@@ -1,8 +1,10 @@
 package io.rocketbase.commons.service;
 
+import io.rocketbase.commons.dto.asset.AssetReferenceType;
 import io.rocketbase.commons.model.AssetEntity;
 import org.springframework.core.io.InputStreamResource;
 
+import javax.annotation.Nullable;
 import java.io.File;
 
 public interface FileStorageService {
@@ -19,9 +21,21 @@ public interface FileStorageService {
      * download resource to tempfile
      *
      * @param entity of database
-     * @return tempfile that has content of storage
+     * @return temp-file that has content of storage
      */
     InputStreamResource download(AssetEntity entity);
+
+    /**
+     * fetch download url
+     *
+     * @param reference asset reference
+     * @return download url that may could expire after some days<br>
+     * could also return null when not implemented
+     */
+    @Nullable
+    default String getDownloadUrl(AssetReferenceType reference) {
+        return null;
+    }
 
     /**
      * delete given id from storage

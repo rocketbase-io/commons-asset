@@ -106,10 +106,10 @@ SOFTWARE.
         <maven.compiler.target>1.8</maven.compiler.target>
         <maven.javadoc.failOnError>false</maven.javadoc.failOnError>
 
-        <spring-boot.version>2.2.6.RELEASE</spring-boot.version>
+        <spring-boot.version>2.2.8.RELEASE</spring-boot.version>
 
-        <commons-rest.version>2.0.2</commons-rest.version>
-        <guava.version>28.2-jre</guava.version>
+        <commons-rest.version>2.0.5</commons-rest.version>
+        <guava.version>29.0-jre</guava.version>
         <commons-fileupload.version>1.4</commons-fileupload.version>
         <commons-io.version>2.6</commons-io.version>
         <tika-core.version>1.24.1</tika-core.version>
@@ -117,7 +117,7 @@ SOFTWARE.
         <okhttp.version>4.6.0</okhttp.version>
         <jacoco.version>0.8.5</jacoco.version>
         <colors.version>0.5.1</colors.version>
-        <aws-sdk-java.version>1.11.797</aws-sdk-java.version>
+        <aws-sdk-java.version>1.11.807</aws-sdk-java.version>
         <imgproxy.version>0.1.0</imgproxy.version>
         <im4java.version>1.4.2</im4java.version>
     </properties>

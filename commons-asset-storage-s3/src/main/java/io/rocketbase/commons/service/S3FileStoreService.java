@@ -8,22 +8,36 @@ import com.amazonaws.services.s3.transfer.Download;
 import com.amazonaws.services.s3.transfer.TransferManager;
 import com.amazonaws.services.s3.transfer.TransferManagerBuilder;
 import com.amazonaws.services.s3.transfer.Upload;
+import com.amazonaws.services.s3.transfer.model.UploadResult;
+import io.rocketbase.commons.config.AssetS3Properties;
+import io.rocketbase.commons.dto.asset.AssetReferenceType;
 import io.rocketbase.commons.model.AssetEntity;
 import io.rocketbase.commons.util.Nulls;
 import io.rocketbase.commons.util.UrlParts;
-import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import org.springframework.core.io.InputStreamResource;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.util.Date;
 
-@RequiredArgsConstructor
 public class S3FileStoreService implements FileStorageService {
 
+    private final AssetS3Properties assetS3Properties;
     private final BucketResolver bucketResolver;
     private final PathResolver pathResolver;
-    private final AmazonS3 amazonS3;
+    private final S3ClientProvider s3ClientProvider;
+
+    private AmazonS3 amazonS3;
+
+    public S3FileStoreService(AssetS3Properties assetS3Properties, BucketResolver bucketResolver, PathResolver pathResolver, S3ClientProvider s3ClientProvider) {
+        this.assetS3Properties = assetS3Properties;
+        this.bucketResolver = bucketResolver;
+        this.pathResolver = pathResolver;
+        this.s3ClientProvider = s3ClientProvider;
+
+        amazonS3 = s3ClientProvider.getClient();
+    }
 
     @SneakyThrows
     @Override
@@ -36,11 +50,11 @@ public class S3FileStoreService implements FileStorageService {
         ObjectMetadata objectMetadata = generateObjectMeta(entity);
         Upload upload = transferManager.upload(new PutObjectRequest(bucketResolver.resolveBucketName(entity),
                 entity.getUrlPath(), new FileInputStream(file), objectMetadata)
-                .withCannedAcl(CannedAccessControlList.BucketOwnerRead));
+                .withCannedAcl(assetS3Properties.isPublicReadObject() ? CannedAccessControlList.PublicRead : CannedAccessControlList.BucketOwnerRead));
 
-        upload.waitForUploadResult();
+        UploadResult uploadResult = upload.waitForUploadResult();
+
     }
-
 
     @SneakyThrows
     @Override
@@ -56,6 +70,20 @@ public class S3FileStoreService implements FileStorageService {
         download.waitForCompletion();
 
         return new InputStreamResource(new FileInputStream(tempFile));
+    }
+
+    @SneakyThrows
+    @Override
+    public String getDownloadUrl(AssetReferenceType reference) {
+        if (assetS3Properties.getDownloadExpire() > 0) {
+            Date expiration = new Date(new Date().getTime() + 1000 * 60 * assetS3Properties.getDownloadExpire());
+            return amazonS3.generatePresignedUrl(bucketResolver.resolveBucketName(reference), reference.getUrlPath(), expiration).toString();
+        }
+        return buildPublicUrl(reference);
+    }
+
+    protected String buildPublicUrl(AssetReferenceType reference) {
+        return UrlParts.ensureEndsWithSlash(s3ClientProvider.getPublicBaseUrl()) + bucketResolver.resolveBucketName(reference) + UrlParts.ensureStartsWithSlash(reference.getUrlPath());
     }
 
     @Override

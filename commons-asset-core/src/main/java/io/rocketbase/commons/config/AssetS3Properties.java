@@ -28,4 +28,17 @@ public class AssetS3Properties implements Serializable {
 
     private String signerOverride;
 
+    /**
+     * expire for pre-signed URL in minutes (AWS/Minio max 7 days)<br>
+     * 0 means object should be public accessable<br>
+     * 5 days by default
+     */
+    private int downloadExpire = 60 * 24 * 5;
+
+    /**
+     * when enabled for each uploaded object the acl will get set CannedAccessControlList.PublicRead<br>
+     * by default CannedAccessControlList.BucketOwnerRead
+     */
+    private boolean publicReadObject = false;
+
 }
