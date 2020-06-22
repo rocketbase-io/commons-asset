@@ -1,6 +1,7 @@
 package io.rocketbase.commons.service;
 
 import io.rocketbase.commons.config.AssetS3Properties;
+import io.rocketbase.commons.dto.asset.AssetReference;
 import io.rocketbase.commons.dto.asset.AssetType;
 import io.rocketbase.commons.dto.asset.ColorPalette;
 import io.rocketbase.commons.dto.asset.Resolution;
@@ -9,6 +10,8 @@ import io.rocketbase.commons.util.UrlParts;
 import lombok.*;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.IOUtils;
+import org.junit.Ignore;
+import org.junit.Test;
 import org.springframework.core.io.InputStreamResource;
 
 import java.io.File;
@@ -36,7 +39,8 @@ public class S3FileStoreServiceTest {
         return basePath;
     }
 
-    // @Test
+    @Test
+    @Ignore
     public void uploadTest() throws Exception {
         // given
         AssetEntity assetEntity = getSampleAssetEntity();
@@ -48,6 +52,19 @@ public class S3FileStoreServiceTest {
         // then
         File file = new File(UrlParts.ensureEndsWithSlash(getBasePath()) + "c/a/e/ac47975c-8fe0-40ad-b811-eb80c899fcae.gif");
         assertThat(file.exists(), equalTo(true));
+    }
+
+    @Test
+    @Ignore
+    public void getDownloadUrl() {
+        String url = getStorage().getDownloadUrl(AssetReference.builder()
+                .id("ac47975c-8fe0-40ad-b811-eb80c899fcae")
+                .type(AssetType.GIF)
+                .context("test")
+                .urlPath("c/a/e/ac47975c-8fe0-40ad-b811-eb80c899fcae.gif")
+                .build());
+
+        assertThat(url, notNullValue());
     }
 
     // @Test
@@ -77,11 +94,11 @@ public class S3FileStoreServiceTest {
 
     protected AssetEntity getSampleAssetEntity() {
         return SimpleAssetEntity.builder()
-                .id("ac47975c-8fe0-40ad-b811-eb80c899fcae")
+                .id("ac47975c-8fe0-40ad-b811-eb80c899fdev")
                 .type(AssetType.GIF)
                 .context("test")
                 .created(Instant.ofEpochMilli(1588529675916L))
-                .urlPath("c/a/e/ac47975c-8fe0-40ad-b811-eb80c899fcae.gif")
+                .urlPath("d/e/v/ac47975c-8fe0-40ad-b811-eb80c899fdev.gif")
                 .build();
     }
 
@@ -90,9 +107,14 @@ public class S3FileStoreServiceTest {
         AssetS3Properties properties = new AssetS3Properties();
         properties.setAccessKey("-");
         properties.setSecretKey("-");
+        properties.setEndpoint("-");
+        properties.setPathStyleAccessEnabled(true);
+        properties.setSignerOverride("AWSS3V4SignerType");
         properties.setRegion("eu-central-1");
+        properties.setDownloadExpire(0);
+        properties.setPublicReadObject(true);
         DefaultS3ClientProvider s3ClientProvider = new DefaultS3ClientProvider(properties);
-        return new S3FileStoreService(new DefaultBucketResolver("example"), new DefaultPathResolver(), s3ClientProvider.getClient());
+        return new S3FileStoreService(properties, new DefaultBucketResolver("test"), new DefaultPathResolver(), s3ClientProvider);
     }
 
     @Data
