@@ -21,8 +21,6 @@ public class AssetConverter {
     private final AssetApiProperties assetApiProperties;
     private final AssetPreviewService assetPreviewService;
 
-    private List<PreviewSize> defaultSizes = Arrays.asList(PreviewSize.S, PreviewSize.M, PreviewSize.L);
-
     public static Map<String, String> filterInvisibleKeys(Map<String, String> keyValues) {
         if (keyValues == null) {
             return null;
@@ -34,6 +32,13 @@ public class AssetConverter {
         return map;
     }
 
+    /**
+     * you can overwrite this default to change your way of asset-conversion
+     */
+    public List<PreviewSize> getDefaultPreviewSizes() {
+        return Arrays.asList(PreviewSize.S, PreviewSize.M, PreviewSize.L);
+    }
+
     protected void injectPreviewsAndDownload(AssetRead result, List<PreviewSize> sizes) {
         if (result != null) {
             if (result.getType() != null && assetPreviewService.isPreviewSupported(result.getType())) {
@@ -41,7 +46,7 @@ public class AssetConverter {
                         .previewMap(new HashMap<>())
                         .build());
 
-                ((sizes == null || sizes.isEmpty()) ? defaultSizes : sizes)
+                ((sizes == null || sizes.isEmpty()) ? getDefaultPreviewSizes() : sizes)
                         .forEach(s -> result.getPreviews().getPreviewMap()
                                 .put(s, assetPreviewService.getPreviewUrl(result, s)));
             }
