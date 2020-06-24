@@ -44,7 +44,7 @@ public class ImgproxyS3AssetPreviewService implements AssetPreviewService {
     public String getDownloadUrl(AssetReferenceType assetReference) {
         String downloadUrl = fileStorageService != null ? fileStorageService.getDownloadUrl(assetReference) : null;
         if (downloadUrl == null && s3Properties.getDownloadExpire() == 0) {
-            return UrlParts.ensureEndsWithSlash(s3Properties.getPublicBaseUrl()) + bucketResolver.resolveBucketName(assetReference) + UrlParts.ensureStartsWithSlash(assetReference.getUrlPath());
+            return UrlParts.ensureEndsWithSlash(s3Properties.getPublicBaseUrl()) + getBucket(assetReference) + UrlParts.ensureStartsWithSlash(assetReference.getUrlPath());
         } else if (downloadUrl == null) {
             return UrlParts.removeEndsWithSlash(assetApiProperties.getBaseUrl()) + assetApiProperties.getPath() + "/" + assetReference.getId() + "/b";
         }

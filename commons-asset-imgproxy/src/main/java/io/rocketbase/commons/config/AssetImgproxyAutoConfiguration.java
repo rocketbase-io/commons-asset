@@ -28,7 +28,8 @@ public class AssetImgproxyAutoConfiguration implements Serializable {
     @Bean
     @ConditionalOnMissingBean
     @ConditionalOnProperty(name = "asset.imgproxy.s3", matchIfMissing = true)
-    public AssetPreviewService s3ImgproxyAssetPreviewService(@Autowired(required = false) BucketResolver bucketResolver, @Autowired(required = false) FileStorageService fileStorageService) {
+    public AssetPreviewService s3ImgproxyAssetPreviewService(@Autowired(required = false) BucketResolver bucketResolver,
+                                                             @Autowired(required = false) FileStorageService fileStorageService) {
         return new ImgproxyS3AssetPreviewService(assetApiProperties, assetImgproxyProperties, assetS3Properties, bucketResolver, fileStorageService);
     }
 
