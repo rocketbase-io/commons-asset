@@ -26,17 +26,13 @@ public class S3FileStoreService implements FileStorageService {
     private final AssetS3Properties assetS3Properties;
     private final BucketResolver bucketResolver;
     private final PathResolver pathResolver;
-    private final S3ClientProvider s3ClientProvider;
+    private final AmazonS3 amazonS3;
 
-    private AmazonS3 amazonS3;
-
-    public S3FileStoreService(AssetS3Properties assetS3Properties, BucketResolver bucketResolver, PathResolver pathResolver, S3ClientProvider s3ClientProvider) {
+    public S3FileStoreService(AssetS3Properties assetS3Properties, BucketResolver bucketResolver, PathResolver pathResolver, AmazonS3 amazonS3) {
         this.assetS3Properties = assetS3Properties;
         this.bucketResolver = bucketResolver;
         this.pathResolver = pathResolver;
-        this.s3ClientProvider = s3ClientProvider;
-
-        amazonS3 = s3ClientProvider.getClient();
+        this.amazonS3 = amazonS3;
     }
 
     @SneakyThrows
@@ -83,7 +79,7 @@ public class S3FileStoreService implements FileStorageService {
     }
 
     protected String buildPublicUrl(AssetReferenceType reference) {
-        return UrlParts.ensureEndsWithSlash(s3ClientProvider.getPublicBaseUrl()) + bucketResolver.resolveBucketName(reference) + UrlParts.ensureStartsWithSlash(reference.getUrlPath());
+        return UrlParts.ensureEndsWithSlash(assetS3Properties.getPublicBaseUrl()) + bucketResolver.resolveBucketName(reference) + UrlParts.ensureStartsWithSlash(reference.getUrlPath());
     }
 
     @Override

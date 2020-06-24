@@ -114,7 +114,7 @@ public class S3FileStoreServiceTest {
         properties.setDownloadExpire(0);
         properties.setPublicReadObject(true);
         DefaultS3ClientProvider s3ClientProvider = new DefaultS3ClientProvider(properties);
-        return new S3FileStoreService(properties, new DefaultBucketResolver("test"), new DefaultPathResolver(), s3ClientProvider);
+        return new S3FileStoreService(properties, new DefaultBucketResolver("test"), new DefaultPathResolver(), s3ClientProvider.getClient());
     }
 
     @Data

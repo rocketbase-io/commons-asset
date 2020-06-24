@@ -38,13 +38,4 @@ public class DefaultS3ClientProvider implements S3ClientProvider {
         }
         return builder.build();
     }
-
-    @Override
-    public String getPublicBaseUrl() {
-        if (!StringUtils.isEmpty(assetS3Properties.getEndpoint())) {
-            return assetS3Properties.getEndpoint();
-        } else {
-            return "https://s3." + assetS3Properties.getRegion().toLowerCase() + ".amazonaws.com";
-        }
-    }
 }
