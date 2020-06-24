@@ -23,6 +23,13 @@ public final class PreviewSizeContextHolder {
     }
 
     /**
+     * true when ThreadLocal is not null
+     */
+    public static boolean hasValueSet() {
+        return currentPreviewSizes.get() != null;
+    }
+
+    /**
      * when key previewSize exists in params updates context
      */
     public static void update(MultiValueMap<String, String> params) {

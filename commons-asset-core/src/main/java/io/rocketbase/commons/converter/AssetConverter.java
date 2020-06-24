@@ -5,6 +5,7 @@ import io.rocketbase.commons.dto.asset.AssetPreviews;
 import io.rocketbase.commons.dto.asset.AssetRead;
 import io.rocketbase.commons.dto.asset.AssetReference;
 import io.rocketbase.commons.dto.asset.PreviewSize;
+import io.rocketbase.commons.holder.PreviewSizeContextHolder;
 import io.rocketbase.commons.model.AssetEntity;
 import lombok.RequiredArgsConstructor;
 
@@ -57,7 +58,13 @@ public class AssetConverter {
     }
 
     public AssetRead toRead(AssetReference reference) {
-        return toRead(reference, null);
+        List<PreviewSize> sizes = null;
+        try {
+            sizes = PreviewSizeContextHolder.hasValueSet() ? PreviewSizeContextHolder.getCurrent() : null;
+        } catch (Exception e) {
+            // could maybe throw error in case of reactive environment...
+        }
+        return toRead(reference, sizes);
     }
 
     public AssetRead toRead(AssetReference reference, List<PreviewSize> sizes) {
