@@ -2,7 +2,10 @@ package io.rocketbase.commons.config;
 
 
 import io.rocketbase.commons.dto.asset.AssetType;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
 import java.io.Serializable;
@@ -10,6 +13,9 @@ import java.util.*;
 
 @Data
 @ConfigurationProperties(prefix = "asset.api")
+@AllArgsConstructor
+@NoArgsConstructor
+@Builder
 public class AssetApiProperties implements Serializable {
 
     private String baseUrl = "";

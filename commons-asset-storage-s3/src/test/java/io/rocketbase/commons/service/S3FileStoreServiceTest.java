@@ -104,15 +104,16 @@ public class S3FileStoreServiceTest {
 
     @SneakyThrows
     protected S3FileStoreService getStorage() {
-        AssetS3Properties properties = new AssetS3Properties();
-        properties.setAccessKey("-");
-        properties.setSecretKey("-");
-        properties.setEndpoint("-");
-        properties.setPathStyleAccessEnabled(true);
-        properties.setSignerOverride("AWSS3V4SignerType");
-        properties.setRegion("eu-central-1");
-        properties.setDownloadExpire(0);
-        properties.setPublicReadObject(true);
+        AssetS3Properties properties = AssetS3Properties.builder()
+                .accessKey("-")
+                .secretKey("-")
+                .endpoint("-")
+                .pathStyleAccessEnabled(true)
+                .signerOverride("AWSS3V4SignerType")
+                .region("eu-central-1")
+                .downloadExpire(0)
+                .publicReadObject(true)
+                .build();
         DefaultS3ClientProvider s3ClientProvider = new DefaultS3ClientProvider(properties);
         return new S3FileStoreService(properties, new DefaultBucketResolver("test"), new DefaultPathResolver(), s3ClientProvider.getClient());
     }
