@@ -80,6 +80,26 @@ public class FsFileStorageServiceTest {
         assertThat(destFile.exists(), equalTo(false));
     }
 
+    @Test
+    public void copyTest() throws Exception {
+        // given
+        AssetEntity copySource = getSampleAssetEntity();
+        URL asset = ClassLoader.class.getResource("/assets/rocketbase.gif");
+        getStorage().upload(copySource, new File(asset.toURI()));
+
+        AssetEntity copyTarget = getSampleAssetEntity();
+        copyTarget.setId("ae38ecaa-e131-4132-b1a5-f2f92cf4750d");
+        
+        // when
+        getStorage().copy(copySource, copyTarget);
+
+        // then
+        File file = new File(UrlParts.ensureEndsWithSlash(getBasePath()) + "c/a/e/ac47975c-8fe0-40ad-b811-eb80c899fcae.gif");
+        assertThat(file.exists(), equalTo(true));
+        file = new File(UrlParts.ensureEndsWithSlash(getBasePath()) + "5/0/d/ae38ecaa-e131-4132-b1a5-f2f92cf4750d.gif");
+        assertThat(file.exists(), equalTo(true));
+    }
+
     protected AssetEntity getSampleAssetEntity() {
         return SimpleAssetEntity.builder()
                 .id("ac47975c-8fe0-40ad-b811-eb80c899fcae")

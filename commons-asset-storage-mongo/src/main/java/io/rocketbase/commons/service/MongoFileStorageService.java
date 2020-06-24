@@ -46,6 +46,16 @@ public class MongoFileStorageService implements FileStorageService {
         gridFsTemplate.delete(getIdQuery(entity.getId()));
     }
 
+    @SneakyThrows
+    @Override
+    public void copy(AssetEntity source, AssetEntity target) {
+        ObjectId objectId = gridFsTemplate.store(download(source).getInputStream(), target.getOriginalFilename(),
+                target.getType()
+                        .getContentType(), generateObjectMeta(target));
+        target.setId(objectId.toHexString());
+        target.setUrlPath(objectId.toHexString());
+    }
+
     @Nonnull
     private Query getIdQuery(String id) {
         return new Query(Criteria.where("_id")

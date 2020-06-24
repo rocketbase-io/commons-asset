@@ -123,10 +123,24 @@ public class AssetResource implements BaseRestResource {
      * @param id assetId
      */
     public void delete(String id) {
-        ResponseEntity<Void> response = getRestTemplate().exchange(getUriBuilder().path("/" + id)
+        getRestTemplate().exchange(getUriBuilder().path("/" + id)
                         .toUriString(),
                 HttpMethod.DELETE,
                 null, Void.class);
+    }
+
+    /**
+     * copy asset on filesystem and database
+     *
+     * @param id assetId
+     * @return AssetData of copied instance
+     */
+    public AssetRead copy(String id) {
+        ResponseEntity<AssetRead> response = getRestTemplate().exchange(getUriBuilder().path("/" + id + "/copy")
+                        .toUriString(),
+                HttpMethod.POST,
+                null, AssetRead.class);
+        return response.getBody();
     }
 
     /**

@@ -3,6 +3,7 @@ package io.rocketbase.commons.service;
 import com.google.common.base.Stopwatch;
 import io.rocketbase.commons.config.AssetApiProperties;
 import io.rocketbase.commons.dto.asset.*;
+import io.rocketbase.commons.event.AssetCopyEvent;
 import io.rocketbase.commons.event.AssetDeleteEvent;
 import io.rocketbase.commons.event.AssetUpdateMetaEvent;
 import io.rocketbase.commons.event.AssetUploadEvent;
@@ -15,6 +16,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.IOUtils;
 import org.apache.tika.Tika;
+import org.springframework.beans.BeanUtils;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.util.StringUtils;
 
@@ -203,6 +205,19 @@ public class AssetService {
     public AssetAnalyse analyse(File file, String originalFilename) throws IOException {
         AssetType assetType = detectAssetTypeWithChecks(file, originalFilename, file.length(), null, null);
         return assetHandler.getAnalyse(assetType, file, originalFilename);
+    }
+
+    public AssetEntity copyByIdOrSystemRefId(String sid) {
+        AssetEntity source = assetRepository.findByIdOrSystemRefId(sid)
+                .orElseThrow(NotFoundException::new);
+
+        AssetEntity target = assetRepository.initNewInstance();
+        BeanUtils.copyProperties(source, target, "id", "created");
+
+        applicationEventPublisher.publishEvent(new AssetCopyEvent(this, source, target));
+
+        fileStorageService.copy(source, target);
+        return assetRepository.save(target);
     }
 
 }

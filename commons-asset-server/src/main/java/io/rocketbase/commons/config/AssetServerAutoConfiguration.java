@@ -49,6 +49,12 @@ public class AssetServerAutoConfiguration implements Serializable {
         return new AssetPreviewController();
     }
 
+    @Bean
+    @ConditionalOnMissingBean
+    public AssetCopyController assetCopyController() {
+        return new AssetCopyController();
+    }
+
     // -------------------------------------------------------
     // ------------------ ExceptionHandlers ------------------
     // -------------------------------------------------------

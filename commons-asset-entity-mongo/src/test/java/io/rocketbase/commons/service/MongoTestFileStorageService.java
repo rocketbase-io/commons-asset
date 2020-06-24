@@ -21,4 +21,9 @@ public class MongoTestFileStorageService implements FileStorageService {
     @Override
     public void delete(AssetEntity entity) {
     }
+
+    @Override
+    public void copy(AssetEntity source, AssetEntity target) {
+
+    }
 }

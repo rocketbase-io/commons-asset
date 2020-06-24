@@ -44,6 +44,14 @@ public interface FileStorageService {
      */
     void delete(AssetEntity entity);
 
+    /**
+     * physically copy file
+     *
+     * @param source of database
+     * @param target new instance with it's new id
+     */
+    void copy(AssetEntity source, AssetEntity target);
+
     default boolean localEndpoint() {
         return true;
     }

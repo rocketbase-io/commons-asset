@@ -87,6 +87,12 @@ public class S3FileStoreService implements FileStorageService {
         amazonS3.deleteObject(bucketResolver.resolveBucketName(entity), entity.getUrlPath());
     }
 
+    @Override
+    public void copy(AssetEntity source, AssetEntity target) {
+        target.setUrlPath(pathResolver.getAbsolutePath(target));
+        amazonS3.copyObject(bucketResolver.resolveBucketName(source), source.getUrlPath(), bucketResolver.resolveBucketName(target), target.getUrlPath());
+    }
+
     private ObjectMetadata generateObjectMeta(AssetEntity entity) {
         ObjectMetadata objectMetadata = new ObjectMetadata();
         objectMetadata.setContentType(entity.getType().getContentType());

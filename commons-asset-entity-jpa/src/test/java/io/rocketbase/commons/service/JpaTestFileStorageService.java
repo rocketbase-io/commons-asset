@@ -23,4 +23,9 @@ public class JpaTestFileStorageService implements FileStorageService {
     public void delete(AssetEntity entity) {
 
     }
+
+    @Override
+    public void copy(AssetEntity source, AssetEntity target) {
+
+    }
 }

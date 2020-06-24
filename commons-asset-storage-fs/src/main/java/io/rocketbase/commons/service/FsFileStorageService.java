@@ -42,4 +42,13 @@ public class FsFileStorageService implements FileStorageService {
     public void delete(AssetEntity entity) {
         new File(basePath + pathResolver.getAbsolutePath(entity)).delete();
     }
+
+    @SneakyThrows
+    @Override
+    @Transactional
+    public void copy(AssetEntity source, AssetEntity target) {
+        String filePath = pathResolver.getAbsolutePath(target);
+        FileUtils.copyFile(new File(basePath + pathResolver.getAbsolutePath(source)), new File(basePath + filePath));
+        target.setUrlPath(filePath);
+    }
 }

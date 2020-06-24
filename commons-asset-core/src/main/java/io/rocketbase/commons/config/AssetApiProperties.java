@@ -28,6 +28,8 @@ public class AssetApiProperties implements Serializable {
 
     private boolean delete = true;
 
+    private boolean copy = true;
+
     private boolean batch = true;
 
     private boolean preview = true;
