@@ -1,4 +1,4 @@
-package io.rocketbase.commons.controller;
+package io.rocketbase.commons.converter;
 
 import io.rocketbase.commons.dto.asset.PreviewSize;
 import org.junit.Test;
@@ -12,7 +12,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.notNullValue;
 
-public class BaseAssetControllerTest {
+public class QueryPreviewSizeConverterTest {
 
     @Test
     public void getPreviewSizesSimple() {
@@ -20,7 +20,7 @@ public class BaseAssetControllerTest {
         MultiValueMap<String, String> map = new LinkedMultiValueMap<>();
         map.put("size", Arrays.asList("s", "M", "XL"));
         // when
-        List<PreviewSize> previewSizes = new SampleBaseAssetControllerTest().getPreviewSizes(map);
+        List<PreviewSize> previewSizes = QueryPreviewSizeConverter.getPreviewSizes(map);
         // then
         assertThat(previewSizes, notNullValue());
         assertThat(previewSizes, containsInAnyOrder(PreviewSize.S, PreviewSize.M, PreviewSize.XL));
@@ -32,13 +32,10 @@ public class BaseAssetControllerTest {
         MultiValueMap<String, String> map = new LinkedMultiValueMap<>();
         map.put("size", Arrays.asList("s,M", "XS"));
         // when
-        List<PreviewSize> previewSizes = new SampleBaseAssetControllerTest().getPreviewSizes(map);
+        List<PreviewSize> previewSizes = QueryPreviewSizeConverter.getPreviewSizes(map);
         // then
         assertThat(previewSizes, notNullValue());
         assertThat(previewSizes, containsInAnyOrder(PreviewSize.S, PreviewSize.M, PreviewSize.XS));
     }
 
-
-    private static class SampleBaseAssetControllerTest implements BaseAssetController {
-    }
 }

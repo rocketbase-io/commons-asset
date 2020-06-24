@@ -1,5 +1,6 @@
 package io.rocketbase.commons.controller;
 
+import io.rocketbase.commons.converter.QueryPreviewSizeConverter;
 import io.rocketbase.commons.dto.batch.AssetBatchResult;
 import io.rocketbase.commons.dto.batch.AssetBatchWrite;
 import io.rocketbase.commons.service.AssetBatchService;
@@ -17,7 +18,7 @@ import javax.validation.constraints.NotNull;
 @ConditionalOnExpression(value = "${asset.api.batch:true}")
 @RequestMapping("${asset.api:/api/asset}")
 @Slf4j
-public class AssetBatchController implements BaseAssetController {
+public class AssetBatchController implements BaseController {
 
     @Resource
     private AssetBatchService assetBatchService;
@@ -26,7 +27,7 @@ public class AssetBatchController implements BaseAssetController {
     @RequestMapping(value = "/batch", method = RequestMethod.POST)
     public AssetBatchResult processBatchFileUrls(@RequestBody @NotNull @Validated AssetBatchWrite assetBatch,
                                                  @RequestParam(required = false) MultiValueMap<String, String> params) {
-        return assetBatchService.batch(assetBatch, getPreviewSizes(params));
+        return assetBatchService.batch(assetBatch, QueryPreviewSizeConverter.getPreviewSizes(params));
     }
 
 

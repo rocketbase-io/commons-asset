@@ -19,7 +19,7 @@ import javax.annotation.Resource;
 @ConditionalOnExpression(value = "${asset.api.download:true}")
 @RequestMapping("${asset.api:/api/asset}")
 @Slf4j
-public class AssetDownloadController implements BaseAssetController {
+public class AssetDownloadController implements BaseController {
 
     @Resource
     private FileStorageService fileStorageService;

@@ -20,7 +20,7 @@ import java.util.List;
 @ConditionalOnExpression(value = "${asset.api.analyse:true}")
 @RequestMapping("${asset.api:/api/asset}")
 @Slf4j
-public class AssetAnalyseController implements BaseAssetController {
+public class AssetAnalyseController implements BaseController {
 
     @Resource
     private AssetService assetService;

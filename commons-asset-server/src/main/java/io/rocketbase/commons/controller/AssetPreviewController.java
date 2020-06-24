@@ -28,7 +28,7 @@ import java.util.concurrent.TimeUnit;
 @ConditionalOnExpression(value = "${asset.api.preview:true}")
 @RequestMapping("${asset.api:/api/asset}")
 @Slf4j
-public class AssetPreviewController implements BaseAssetController {
+public class AssetPreviewController implements BaseController {
 
     @Resource
     private FileStorageService fileStorageService;

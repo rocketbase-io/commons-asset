@@ -2,6 +2,7 @@ package io.rocketbase.commons.controller;
 
 import io.rocketbase.commons.converter.AssetConverter;
 import io.rocketbase.commons.converter.QueryAssetConverter;
+import io.rocketbase.commons.converter.QueryPreviewSizeConverter;
 import io.rocketbase.commons.dto.PageableResult;
 import io.rocketbase.commons.dto.asset.AssetRead;
 import io.rocketbase.commons.dto.asset.AssetUpdate;
@@ -30,7 +31,7 @@ import java.util.Map;
 @RestController
 @RequestMapping("${asset.api:/api/asset}")
 @Slf4j
-public class AssetBaseController implements BaseAssetController {
+public class AssetBaseController implements BaseController {
 
     @Resource
     private AssetRepository assetRepository;
@@ -50,7 +51,7 @@ public class AssetBaseController implements BaseAssetController {
         }
         @Cleanup InputStream inputStream = file.getInputStream();
         AssetEntity asset = assetService.store(inputStream, file.getOriginalFilename(), file.getSize(), null, convert(params));
-        return assetConverter.fromEntityByRequestContext(asset, getPreviewSizes(null));
+        return assetConverter.fromEntityByRequestContext(asset, QueryPreviewSizeConverter.getPreviewSizes( params));
     }
 
     protected AssetUploadMeta convert(MultiValueMap<String, String> params) {
@@ -73,14 +74,14 @@ public class AssetBaseController implements BaseAssetController {
 
         Page<AssetEntity> pageResult = assetRepository.findAll(QueryAssetConverter.fromParams(params), parsePageRequest(params));
 
-        return PageableResult.contentPage(assetConverter.fromEntities(pageResult.getContent(), getPreviewSizes(params)), pageResult);
+        return PageableResult.contentPage(assetConverter.fromEntities(pageResult.getContent(), QueryPreviewSizeConverter.getPreviewSizes(params)), pageResult);
     }
 
     @RequestMapping(value = "/{sid}", method = RequestMethod.GET)
     public AssetRead getAsset(@PathVariable("sid") String sid, @RequestParam(required = false) MultiValueMap<String, String> params) {
         AssetEntity entity = assetService.findByIdOrSystemRefId(sid)
                 .orElseThrow(() -> new NotFoundException());
-        return assetConverter.fromEntityByRequestContext(entity, getPreviewSizes(params));
+        return assetConverter.fromEntityByRequestContext(entity, QueryPreviewSizeConverter.getPreviewSizes(params));
     }
 
     @RequestMapping(value = "/{sid}", method = RequestMethod.PUT)
@@ -88,7 +89,7 @@ public class AssetBaseController implements BaseAssetController {
                                  @RequestParam(required = false) MultiValueMap<String, String> params) {
         AssetEntity entity = assetService.findByIdOrSystemRefId(sid)
                 .orElseThrow(() -> new NotFoundException());
-        return assetConverter.fromEntityByRequestContext(assetService.update(entity, update), getPreviewSizes(params));
+        return assetConverter.fromEntityByRequestContext(assetService.update(entity, update), QueryPreviewSizeConverter.getPreviewSizes(params));
     }
 
 

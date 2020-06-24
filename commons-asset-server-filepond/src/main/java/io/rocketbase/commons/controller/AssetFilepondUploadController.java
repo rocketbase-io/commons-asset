@@ -23,7 +23,7 @@ import java.io.InputStream;
 @RestController
 @RequestMapping("${asset.api:/api/asset}")
 @Slf4j
-public class AssetFilepondUploadController implements BaseAssetController {
+public class AssetFilepondUploadController implements BaseController {
 
     @Resource
     private AssetRepository assetRepository;

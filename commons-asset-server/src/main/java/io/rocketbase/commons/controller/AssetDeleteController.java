@@ -16,7 +16,7 @@ import javax.annotation.Resource;
 @ConditionalOnExpression(value = "${asset.api.delete:true}")
 @RequestMapping("${asset.api:/api/asset}")
 @Slf4j
-public class AssetDeleteController implements BaseAssetController {
+public class AssetDeleteController implements BaseController {
 
     @Resource
     private AssetService assetService;
