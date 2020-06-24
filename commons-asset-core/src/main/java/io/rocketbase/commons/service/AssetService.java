@@ -3,6 +3,9 @@ package io.rocketbase.commons.service;
 import com.google.common.base.Stopwatch;
 import io.rocketbase.commons.config.AssetApiProperties;
 import io.rocketbase.commons.dto.asset.*;
+import io.rocketbase.commons.event.AssetDeleteEvent;
+import io.rocketbase.commons.event.AssetUpdateMetaEvent;
+import io.rocketbase.commons.event.AssetUploadEvent;
 import io.rocketbase.commons.exception.*;
 import io.rocketbase.commons.model.AssetEntity;
 import io.rocketbase.commons.service.AssetTypeFilterService.AssetUploadDetail;
@@ -12,6 +15,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.IOUtils;
 import org.apache.tika.Tika;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.util.StringUtils;
 
 import javax.annotation.Resource;
@@ -44,6 +48,9 @@ public class AssetService {
 
     @Resource
     private OriginalUploadModifier originalUploadModifier;
+
+    @Resource
+    private ApplicationEventPublisher applicationEventPublisher;
 
     public AssetEntity store(InputStream inputStream, String originalFilename, long size, String systemRefId, String context) {
         return store(inputStream, originalFilename, size, null, DefaultAssetUploadMeta.builder()
@@ -94,6 +101,8 @@ public class AssetService {
         }
         asset.setSystemRefId(update.getSystemRefId());
         asset.setEol(update.getEol());
+
+        applicationEventPublisher.publishEvent(new AssetUpdateMetaEvent(this, asset));
         return assetRepository.save(asset);
     }
 
@@ -144,6 +153,8 @@ public class AssetService {
         AssetEntity asset = assetRepository.findByIdOrSystemRefId(sid)
                 .orElseThrow(NotFoundException::new);
 
+        applicationEventPublisher.publishEvent(new AssetDeleteEvent(this, asset));
+
         fileStorageService.delete(asset);
         assetRepository.delete(asset.getId());
     }
@@ -172,6 +183,8 @@ public class AssetService {
         entity.setLqip(modification.getAnalyse().getLqip());
 
         handleKeyValues(entity, Nulls.notNull(uploadMeta, AssetUploadMeta::getKeyValues, null));
+
+        applicationEventPublisher.publishEvent(new AssetUploadEvent(this, entity));
 
         try {
             fileStorageService.upload(entity, modification.getFile());
