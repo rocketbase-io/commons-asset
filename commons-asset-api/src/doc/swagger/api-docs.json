@@ -2,7 +2,7 @@
   "swagger": "2.0",
   "info": {
     "description": "Provides services + rest-controller to handle asset with different storage engines.",
-    "version": "4.0.0",
+    "version": "4.1.0",
     "title": "commons-asset api",
     "contact": {
       "name": "rocketbase.io",
@@ -21,11 +21,15 @@
     },
     {
       "name": "delete",
-      "description": "Delete asset from datastore + db"
+      "description": "Delete asset from filestorage + db"
     },
     {
       "name": "download",
       "description": "Download original binary."
+    },
+    {
+      "name": "copy",
+      "description": "Copy source asset on filestorage + db."
     },
     {
       "name": "preview",
@@ -411,6 +415,46 @@
         "responses": {
           "200": {
             "description": "OK"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        },
+        "deprecated": false
+      }
+    },
+    "/api/asset/{sid}/copy": {
+      "post": {
+        "tags": [
+          "copy"
+        ],
+        "summary": "copy source asset",
+        "description": "response with the copied assetRead of source",
+        "operationId": "copyAssetPOST",
+        "produces": [
+          "*/*"
+        ],
+        "parameters": [
+          {
+            "name": "sid",
+            "in": "path",
+            "description": "id or systemRefId (you've given optionally within upload process)",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/AssetRead"
+            }
           },
           "401": {
             "description": "Unauthorized"

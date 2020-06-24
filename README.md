@@ -83,6 +83,7 @@ Containing an implementation for storing asset references...
 | asset.imagemagick.enabled | false      | you can active imagemagick command-line use otherwise java-processor will get used  |
 | asset.api.download | true              | you can disable endpoint                                     |
 | asset.api.delete   | true              | when false no delete is possible                             |
+| asset.api.copy   | true              | when false no copy is possible                             |
 | asset.api.batch    | true              | you can disable batch endpoint                               |
 | asset.api.analyse | tru | you can disable analyse endpoint |
 | asset.api.preview  | true              | should only been taken in case of mongo-storage<br />please consider also using outside caching |
