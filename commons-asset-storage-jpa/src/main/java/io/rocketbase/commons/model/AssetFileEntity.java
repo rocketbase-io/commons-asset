@@ -11,7 +11,7 @@ import java.sql.Blob;
 
 
 @Entity
-@Table(name = "asset_file")
+@Table(name = "co_asset_file")
 @Data
 @Builder
 @AllArgsConstructor

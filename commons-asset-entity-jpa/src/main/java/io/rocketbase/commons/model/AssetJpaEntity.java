@@ -19,7 +19,7 @@ import java.util.Map;
 
 
 @Entity
-@Table(name = "asset",
+@Table(name = "co_asset",
         uniqueConstraints = {
                 @UniqueConstraint(name = "uk_asset_system_ref_if", columnNames = {"systemRefId"})
         },
@@ -101,7 +101,7 @@ public class AssetJpaEntity implements AssetEntity {
 
     @ElementCollection(fetch = FetchType.EAGER)
     @CollectionTable(
-            name = "asset_keyvalue_pair",
+            name = "co_asset_keyvalue_pair",
             joinColumns = @JoinColumn(name = "asset_id"),
             uniqueConstraints = @UniqueConstraint(name = "uk_asset_keyvalue_pair", columnNames = {"asset_id", "field_key"}),
             indexes = @Index(name = "idx_asset_keyvalue_pair", columnList = "asset_id")
