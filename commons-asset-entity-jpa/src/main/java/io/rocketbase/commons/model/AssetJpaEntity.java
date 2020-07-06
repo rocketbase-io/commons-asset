@@ -99,7 +99,7 @@ public class AssetJpaEntity implements AssetEntity {
     @Lob
     private String lqip;
 
-    @ElementCollection(fetch = FetchType.EAGER)
+    @ElementCollection
     @CollectionTable(
             name = "co_asset_keyvalue_pair",
             joinColumns = @JoinColumn(name = "asset_id"),
