@@ -2,6 +2,9 @@ sudo: true
 language: java
 jdk:
   - openjdk8
+cache:
+  directories:
+    - $HOME/.m2
 services:
   - mongodb
 ## gpg stuff
@@ -18,10 +21,12 @@ script: mvn --settings .travis/settings.xml -U clean install
 # code climate upload coverage
 after_script:
   - JACOCO_SOURCE_PATH=commons-asset-api/src/main/java ./cc-test-reporter format-coverage -t jacoco -o coverage/codeclimate.api.json commons-asset-api/target/site/jacoco/jacoco.xml
-  - JACOCO_SOURCE_PATH=commons-asset-core/src/main/java ./cc-test-reporter format-coverage -t jacoco -o coverage/codeclimate.core.json commons-asset-core/target/site/jacoco/jacoco.xml
-  - JACOCO_SOURCE_PATH=commons-asset-jpa/src/main/java ./cc-test-reporter format-coverage -t jacoco -o coverage/codeclimate.jpa.json commons-asset-jpa/target/site/jacoco/jacoco.xml
+  - JACOCO_SOURCE_PATH=commons-asset-entity-jpa/src/main/java ./cc-test-reporter format-coverage -t jacoco -o coverage/codeclimate.jpa.json commons-asset-entity-jpa/target/site/jacoco/jacoco.xml
+  - JACOCO_SOURCE_PATH=commons-asset-entity-mongo/src/main/java ./cc-test-reporter format-coverage -t jacoco -o coverage/codeclimate.mongo.json commons-asset-entity-mongo/target/site/jacoco/jacoco.xml
   - JACOCO_SOURCE_PATH=commons-asset-server/src/main/java ./cc-test-reporter format-coverage -t jacoco -o coverage/codeclimate.server.json commons-asset-server/target/site/jacoco/jacoco.xml
-  - ./cc-test-reporter sum-coverage coverage/codeclimate.*.json -p 4
+  - JACOCO_SOURCE_PATH=commons-asset-tooling/src/main/java ./cc-test-reporter format-coverage -t jacoco -o coverage/codeclimate.tooling.json commons-asset-tooling/target/site/jacoco/jacoco.xml
+  - JACOCO_SOURCE_PATH=commons-asset-storage-fs/src/main/java ./cc-test-reporter format-coverage -t jacoco -o coverage/codeclimate.fs.json commons-asset-storage-fs/target/site/jacoco/jacoco.xml
+  - ./cc-test-reporter sum-coverage coverage/codeclimate.*.json -p 6
   - if [[ "$TRAVIS_TEST_RESULT" == 0 ]]; then ./cc-test-reporter upload-coverage; fi  # Upload coverage/codeclimate.json
 
 ## release on tag
