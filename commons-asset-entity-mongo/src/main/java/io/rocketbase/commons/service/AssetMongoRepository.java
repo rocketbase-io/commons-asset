@@ -22,7 +22,9 @@ import org.springframework.util.StringUtils;
 
 import java.time.Instant;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.regex.Pattern;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -127,6 +129,12 @@ public class AssetMongoRepository implements AssetRepository<AssetMongoEntity> {
                 } else {
                     result.addCriteria(Criteria.where("eol").exists(false)
                             .orOperator(Criteria.where("eol").gte(Instant.now())));
+                }
+            }
+            if (query.getKeyValues() != null && !query.getKeyValues().isEmpty()) {
+                for (Map.Entry<String, String> kv : query.getKeyValues().entrySet()) {
+                    Pattern valuePattern = Pattern.compile(kv.getValue(), Pattern.CASE_INSENSITIVE);
+                    result.addCriteria(Criteria.where("keyValueMap." + kv.getKey().toLowerCase()).is(valuePattern));
                 }
             }
         }

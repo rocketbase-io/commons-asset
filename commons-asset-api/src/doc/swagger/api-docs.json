@@ -114,6 +114,13 @@
             "type": "boolean"
           },
           {
+            "name": "keyValue",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "description": "user needs to have key with value match (case-insensitive). format: keyValue=KEY;VALUE"
+          },
+          {
             "name": "isEol",
             "in": "query",
             "description": "true: queries all assets that has an eol value that is expired, false: all without or newer then now, null: ignore",

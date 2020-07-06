@@ -6,6 +6,7 @@ import javax.annotation.Nullable;
 import java.io.Serializable;
 import java.time.Instant;
 import java.util.List;
+import java.util.Map;
 
 @Data
 @AllArgsConstructor
@@ -51,4 +52,11 @@ public class QueryAsset implements Serializable {
      */
     @Nullable
     private Boolean isEol;
+
+    /**
+     * search for given key and value with exact match ignore cases
+     */
+    @Singular
+    @Nullable
+    private Map<String, String> keyValues;
 }

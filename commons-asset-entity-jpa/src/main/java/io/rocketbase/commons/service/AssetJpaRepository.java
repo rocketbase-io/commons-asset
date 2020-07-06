@@ -10,14 +10,12 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.util.StringUtils;
 
+import javax.persistence.criteria.MapJoin;
 import javax.persistence.criteria.Predicate;
 import javax.transaction.Transactional;
 import java.nio.charset.Charset;
 import java.time.Instant;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 
 @RequiredArgsConstructor
 public class AssetJpaRepository implements AssetRepository<AssetJpaEntity>, PredicateHelper {
@@ -62,10 +60,11 @@ public class AssetJpaRepository implements AssetRepository<AssetJpaEntity>, Pred
         if (!StringUtils.isEmpty(entity.getReferenceUrl())) {
             entity.setReferenceHash(Hashing.sha256().hashString(entity.getReferenceUrl(), Charset.forName("UTF8")).toString());
         }
-        return assetEntityRepository.save(entity);
+        return initLazyObjects(assetEntityRepository.save(entity));
     }
 
     @Override
+    @Transactional
     public Page<AssetJpaEntity> findAll(QueryAsset query, Pageable pageable) {
         if (query == null) {
             return assetEntityRepository.findAll(pageable);
@@ -106,10 +105,22 @@ public class AssetJpaRepository implements AssetRepository<AssetJpaEntity>, Pred
                     predicates.add(cb.or(cb.isNull(root.get("eol")), cb.greaterThanOrEqualTo(root.get("eol"), Instant.now())));
                 }
             }
+
+            if (query.getKeyValues() != null && !query.getKeyValues().isEmpty()) {
+                criteriaQuery.distinct(true);
+                MapJoin<AssetJpaEntity, String, String> mapJoin = root.joinMap("keyValueMap");
+                for (Map.Entry<String, String> keyEntry : query.getKeyValues().entrySet()) {
+                    predicates.add(cb.and(cb.equal(mapJoin.key(), keyEntry.getKey().toLowerCase()), cb.equal(cb.lower(mapJoin.value()), keyEntry.getValue().toLowerCase())));
+                }
+            }
             return cb.and(predicates.toArray(new Predicate[]{}));
         };
 
-        return assetEntityRepository.findAll(specification, pageable);
+        Page<AssetJpaEntity> result = assetEntityRepository.findAll(specification, pageable);
+        // in order to initialize lazy map
+        result.stream()
+                .forEach(v -> initLazyObjects(v));
+        return result;
     }
 
     @Override
@@ -118,6 +129,14 @@ public class AssetJpaRepository implements AssetRepository<AssetJpaEntity>, Pred
                 .id(UUID.randomUUID().toString())
                 .created(Instant.now())
                 .build();
+    }
+
+    protected AssetJpaEntity initLazyObjects(AssetJpaEntity entity) {
+        if (entity != null && entity.getKeyValueMap() != null) {
+            // in order to initialize lazy map
+            entity.getKeyValueMap().size();
+        }
+        return entity;
     }
 
 }

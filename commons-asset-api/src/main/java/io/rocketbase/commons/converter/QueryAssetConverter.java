@@ -5,7 +5,11 @@ import io.rocketbase.commons.dto.asset.QueryAsset;
 import io.rocketbase.commons.util.QueryParamBuilder;
 import io.rocketbase.commons.util.QueryParamParser;
 import org.springframework.util.MultiValueMap;
+import org.springframework.util.StringUtils;
 import org.springframework.web.util.UriComponentsBuilder;
+
+import java.util.HashMap;
+import java.util.Map;
 
 public class QueryAssetConverter {
 
@@ -28,6 +32,9 @@ public class QueryAssetConverter {
             if (query.getHasEolValue() != null) {
                 uriBuilder.queryParam("hasEolValue", query.getHasEolValue());
             }
+            if (query.getKeyValues() != null) {
+                addKeyValues(uriBuilder, "keyValue", query.getKeyValues());
+            }
         }
         return uriBuilder;
     }
@@ -43,7 +50,9 @@ public class QueryAssetConverter {
                 .context(params.containsKey("context") ? params.getFirst("context") : null)
                 .referenceUrl(params.containsKey("referenceUrl") ? params.getFirst("referenceUrl") : null)
                 .hasEolValue(QueryParamParser.parseBoolean(params, "hasEolValue", null))
-                .isEol(QueryParamParser.parseBoolean(params, "isEol", null));
+                .isEol(QueryParamParser.parseBoolean(params, "isEol", null))
+                .keyValues(parseKeyValue("keyValue", params))
+        ;
 
         if (params.containsKey("type")) {
             params.get("type").forEach(t -> {
@@ -55,5 +64,27 @@ public class QueryAssetConverter {
             });
         }
         return builder.build();
+    }
+
+
+    protected static void addKeyValues(UriComponentsBuilder uriBuilder, String key, Map<String, String> keyValues) {
+        if (uriBuilder != null && key != null && keyValues != null && !keyValues.isEmpty()) {
+            for (Map.Entry<String, String> entry : keyValues.entrySet()) {
+                uriBuilder.queryParam(key, String.format("%s;%s", entry.getKey(), entry.getValue()));
+            }
+        }
+    }
+
+    protected static Map<String, String> parseKeyValue(String key, MultiValueMap<String, String> params) {
+        Map<String, String> result = new HashMap<>();
+        if (params != null && params.containsKey(key)) {
+            for (String kv : params.get(key)) {
+                String[] split = StringUtils.split(kv, ";");
+                if (split != null) {
+                    result.put(split[0], split[1]);
+                }
+            }
+        }
+        return result;
     }
 }
