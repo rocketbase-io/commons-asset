@@ -253,7 +253,7 @@ public class AssetBaseControllerIntegrationTest extends BaseIntegrationTest {
         String _hiddenValue = "secret";
         keyValues.put(_hidden, _hiddenValue);
 
-        result = assetResource.updateKeyValues(result.getId(), new AssetUpdate(keyValues));
+        result = assetResource.update(result.getId(), new AssetUpdate(keyValues));
 
         // then
         assertThat(result, notNullValue());

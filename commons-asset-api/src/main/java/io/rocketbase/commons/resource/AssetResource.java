@@ -190,8 +190,15 @@ public class AssetResource implements BaseRestResource {
         return response.getBody();
     }
 
+    /**
+     * allow to update key-values, eol and systemRefId with care after upload for internal organisation
+     *
+     * @param id          assetId
+     * @param assetUpdate update instructions
+     * @return stored asset references
+     */
     @SneakyThrows
-    public AssetRead updateKeyValues(String id, AssetUpdate assetUpdate) {
+    public AssetRead update(String id, AssetUpdate assetUpdate) {
         ResponseEntity<AssetRead> response = getRestTemplate().exchange(getUriBuilder().path("/" + id).toUriString(),
                 HttpMethod.PUT,
                 new HttpEntity<>(assetUpdate),
@@ -249,6 +256,12 @@ public class AssetResource implements BaseRestResource {
         return response.getBody();
     }
 
+    /**
+     * lookup asset and download file
+     *
+     * @param sid assetId or systemRefId
+     * @return tmp-file with content of asset
+     */
     public File downloadAsset(String sid) {
         File file = getRestTemplate().execute(getUriBuilder().path("/" + sid).path("/b")
                 .toUriString(), HttpMethod.GET, null, clientHttpResponse -> {
