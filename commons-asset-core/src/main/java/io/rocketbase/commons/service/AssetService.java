@@ -186,7 +186,7 @@ public class AssetService {
 
         handleKeyValues(entity, Nulls.notNull(uploadMeta, AssetUploadMeta::getKeyValues, null));
 
-        applicationEventPublisher.publishEvent(new AssetUploadEvent(this, entity));
+        applicationEventPublisher.publishEvent(new AssetUploadEvent(this, entity, modification));
 
         try {
             fileStorageService.upload(entity, modification.getFile());

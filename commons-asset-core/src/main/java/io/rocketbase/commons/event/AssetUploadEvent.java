@@ -1,6 +1,7 @@
 package io.rocketbase.commons.event;
 
 import io.rocketbase.commons.model.AssetEntity;
+import io.rocketbase.commons.service.OriginalUploadModifier;
 import lombok.Getter;
 import org.springframework.context.ApplicationEvent;
 
@@ -12,9 +13,11 @@ import org.springframework.context.ApplicationEvent;
 public class AssetUploadEvent extends ApplicationEvent {
 
     private AssetEntity assetEntity;
+    private OriginalUploadModifier.Modification modification;
 
-    public AssetUploadEvent(Object source, AssetEntity assetEntity) {
+    public AssetUploadEvent(Object source, AssetEntity assetEntity, OriginalUploadModifier.Modification modification) {
         super(source);
         this.assetEntity = assetEntity;
+        this.modification = modification;
     }
 }
