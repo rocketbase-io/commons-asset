@@ -1,14 +1,14 @@
 package io.rocketbase.commons.service.download;
 
-import com.google.common.io.BaseEncoding;
 import io.rocketbase.commons.dto.asset.AssetType;
-import io.rocketbase.commons.service.download.DefaultDownloadService;
-import io.rocketbase.commons.service.download.DownloadService;
-import okhttp3.*;
 import org.junit.Test;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.client.ClientHttpResponse;
+import org.springframework.mock.http.client.MockClientHttpResponse;
 
 import java.io.IOException;
+import java.net.URL;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
@@ -20,7 +20,7 @@ public class DefaultDownloadServiceTest {
         // given
         DefaultDownloadService defaultDownloadService = new DefaultDownloadService();
         String filename = "12312321321.jpg";
-        Response response = buildResponse(filename);
+        ClientHttpResponse response = buildResponse(filename);
         // when
         String result = defaultDownloadService.extractFilename(response);
         // then
@@ -33,7 +33,7 @@ public class DefaultDownloadServiceTest {
         // given
         DefaultDownloadService defaultDownloadService = new DefaultDownloadService();
         String filename = "12312321321.jpg";
-        Response response = buildResponse(filename);
+        ClientHttpResponse response = buildResponse(filename);
         // when
         DownloadService.TempDownload result = defaultDownloadService.processResponse(response, filename);
         // then
@@ -47,7 +47,7 @@ public class DefaultDownloadServiceTest {
     public void processDownloadWithoutFilename() throws IOException {
         // given
         DefaultDownloadService defaultDownloadService = new DefaultDownloadService();
-        Response response = buildResponse(null);
+        ClientHttpResponse response = buildResponse(null);
         // when
         DownloadService.TempDownload result = defaultDownloadService.processResponse(response, null);
         // then
@@ -57,16 +57,13 @@ public class DefaultDownloadServiceTest {
         assertThat(result.getFile(), notNullValue());
     }
 
-    private Response buildResponse(String filename) {
-        Response.Builder builder = new Response.Builder()
-                .request(new Request.Builder().url("http://localhost").build())
-                .protocol(Protocol.HTTP_2)
-                .code(200)
-                .message("")
-                .body(ResponseBody.create(MediaType.get("image/gif"), BaseEncoding.base64().decode("R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==")));
+    private ClientHttpResponse buildResponse(String filename) throws IOException {
+        URL asset = ClassLoader.class.getResource("/assets/rocketbase.gif");
+
+        ClientHttpResponse response = new MockClientHttpResponse(asset.openStream(), HttpStatus.OK);
         if (filename != null) {
-            builder.header(HttpHeaders.CONTENT_DISPOSITION, "attachment;filename=" + filename);
+            response.getHeaders().add(HttpHeaders.CONTENT_DISPOSITION, "attachment;filename=" + filename);
         }
-        return builder.build();
+        return response;
     }
 }

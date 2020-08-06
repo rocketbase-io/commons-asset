@@ -5,29 +5,35 @@ import io.rocketbase.commons.exception.AssetErrorCodes;
 import lombok.Cleanup;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
-import okhttp3.Headers;
-import okhttp3.OkHttpClient;
-import okhttp3.Request;
-import okhttp3.Response;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
+import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
+import org.apache.http.conn.ssl.TrustStrategy;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClients;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.client.ClientHttpResponse;
+import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
+import org.springframework.web.client.ResponseExtractor;
+import org.springframework.web.client.RestTemplate;
 
-import javax.net.ssl.*;
+import javax.net.ssl.SSLContext;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.security.cert.CertificateException;
+import java.security.cert.X509Certificate;
 import java.util.Map;
 
 @Slf4j
 public class DefaultDownloadService implements DownloadService {
 
-    private final Headers headers;
+    private final HttpHeaders headers;
 
-    protected OkHttpClient httpClient;
+    protected RestTemplate restTemplate;
 
     public DefaultDownloadService() {
-        this.headers = new Headers.Builder().build();
+        this.headers = new HttpHeaders();
     }
 
     public DefaultDownloadService(Map<String, String> config) {
@@ -35,75 +41,63 @@ public class DefaultDownloadService implements DownloadService {
     }
 
     @SneakyThrows
-    protected OkHttpClient getHttpClient() {
-        if (httpClient == null) {
-            // Create a trust manager that does not validate certificate chains
-            final TrustManager[] trustAllCerts = new TrustManager[]{
-                    new X509TrustManager() {
-                        @Override
-                        public void checkClientTrusted(java.security.cert.X509Certificate[] chain, String authType) throws CertificateException {
-                        }
+    protected RestTemplate getRestTemplate() {
+        if (restTemplate == null) {
+            TrustStrategy acceptingTrustStrategy = (X509Certificate[] chain, String authType) -> true;
 
-                        @Override
-                        public void checkServerTrusted(java.security.cert.X509Certificate[] chain, String authType) throws CertificateException {
-                        }
+            SSLContext sslContext = org.apache.http.ssl.SSLContexts.custom()
+                    .loadTrustMaterial(null, acceptingTrustStrategy)
+                    .build();
 
-                        @Override
-                        public java.security.cert.X509Certificate[] getAcceptedIssuers() {
-                            return new java.security.cert.X509Certificate[]{};
-                        }
-                    }
-            };
+            SSLConnectionSocketFactory csf = new SSLConnectionSocketFactory(sslContext);
 
-            // Install the all-trusting trust manager
-            final SSLContext sslContext = SSLContext.getInstance("SSL");
-            sslContext.init(null, trustAllCerts, new java.security.SecureRandom());
-            // Create an ssl socket factory with our all-trusting manager
-            final SSLSocketFactory sslSocketFactory = sslContext.getSocketFactory();
+            CloseableHttpClient httpClient = HttpClients.custom()
+                    .setSSLSocketFactory(csf)
+                    .build();
 
-            OkHttpClient.Builder builder = new OkHttpClient.Builder();
-            builder.sslSocketFactory(sslSocketFactory, (X509TrustManager) trustAllCerts[0]);
-            builder.hostnameVerifier(new HostnameVerifier() {
-                @Override
-                public boolean verify(String hostname, SSLSession session) {
-                    return true;
-                }
+            HttpComponentsClientHttpRequestFactory requestFactory =
+                    new HttpComponentsClientHttpRequestFactory();
+
+            requestFactory.setHttpClient(httpClient);
+
+            restTemplate = new RestTemplate(requestFactory);
+            // add header interceptor
+            restTemplate.getInterceptors().add((request, body, execution) -> {
+                request.getHeaders().addAll(headers);
+                return execution.execute(request, body);
             });
 
-            // builder.callTimeout(Duration.ofSeconds(30));
-
-            httpClient = builder.build();
         }
-        return httpClient;
+        return restTemplate;
     }
 
     public TempDownload downloadUrl(String url) {
         String filename = FilenameUtils.getName(url);
-
         try {
-            Request request = new Request.Builder()
-                    .headers(headers)
-                    .url(url)
-                    .get()
-                    .build();
-            Response response = getHttpClient().newCall(request).execute();
-            return processResponse(response, filename);
-        } catch (IOException | IllegalStateException e) {
+            TempDownload tempDownload = getRestTemplate().execute(url, HttpMethod.GET, null,
+                    new ResponseExtractor<TempDownload>() {
+                        @Override
+                        public TempDownload extractData(ClientHttpResponse response) throws IOException {
+                            return processResponse(response, filename);
+                        }
+                    });
+            return tempDownload;
+        } catch (Exception e) {
             throw new DownloadError(AssetErrorCodes.NOT_DOWNLOADABLE);
         }
     }
 
-    protected Headers convertHeaders(Map<String, String> config) {
-        Headers.Builder builder = new Headers.Builder();
+    protected HttpHeaders convertHeaders(Map<String, String> config) {
+        HttpHeaders headers = new HttpHeaders();
         if (config != null && !config.isEmpty()) {
             for (Map.Entry<String, String> header : config.entrySet()) {
-                builder.add(header.getKey(), header.getValue());
+                headers.add(header.getKey(), header.getValue());
             }
         }
-        return builder.build();
+        return headers;
     }
 
-    protected TempDownload processResponse(Response response, String filename) throws IOException {
+    protected TempDownload processResponse(ClientHttpResponse response, String filename) throws IOException {
         if (response != null) {
             String extractedFilename = extractFilename(response);
             if (extractedFilename != null && extractedFilename.contains(".")) {
@@ -112,7 +106,7 @@ public class DefaultDownloadService implements DownloadService {
             AssetType type = AssetType.findByFileExtension(FilenameUtils.getExtension(filename));
             File tempFile = File.createTempFile("asset-", type != null ? type.getFileExtensionForSuffix() : ".tmp");
             @Cleanup FileOutputStream outputStream = new FileOutputStream(tempFile);
-            IOUtils.copy(response.body().byteStream(), outputStream);
+            IOUtils.copy(response.getBody(), outputStream);
             return new TempDownload(tempFile, filename, type);
         } else {
             throw new DownloadError(AssetErrorCodes.NOT_DOWNLOADABLE);

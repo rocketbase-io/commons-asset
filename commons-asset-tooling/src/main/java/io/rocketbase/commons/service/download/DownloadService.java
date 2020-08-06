@@ -3,8 +3,8 @@ package io.rocketbase.commons.service.download;
 import io.rocketbase.commons.dto.asset.AssetType;
 import io.rocketbase.commons.exception.AssetErrorCodes;
 import lombok.*;
-import okhttp3.Response;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.client.ClientHttpResponse;
 
 import java.io.File;
 
@@ -16,8 +16,8 @@ public interface DownloadService {
      */
     TempDownload downloadUrl(String url);
 
-    default String extractFilename(Response response) {
-        String contentDisposition = response.headers().get(HttpHeaders.CONTENT_DISPOSITION);
+    default String extractFilename(ClientHttpResponse response) {
+        String contentDisposition = response.getHeaders().getFirst(HttpHeaders.CONTENT_DISPOSITION);
         if (contentDisposition != null) {
             return contentDisposition.replaceFirst("(?i)^.*filename=\"?([^\"]+)\"?.*$", "$1");
         }

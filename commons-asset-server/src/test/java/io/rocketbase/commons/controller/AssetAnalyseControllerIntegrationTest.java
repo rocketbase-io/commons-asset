@@ -63,7 +63,7 @@ public class AssetAnalyseControllerIntegrationTest extends BaseIntegrationTest {
         assertThat(result.getSucceeded().get(success).getColorPalette(), notNullValue());
         assertThat(result.getFailed().size(), equalTo(1));
         // gitlab response with 404 html page that is text/plain detected
-        assertThat(result.getFailed().get(failure), equalTo(AssetErrorCodes.INVALID_CONTENT_TYPE));
+        assertThat(result.getFailed().get(failure), equalTo(AssetErrorCodes.NOT_DOWNLOADABLE));
 
     }
 
