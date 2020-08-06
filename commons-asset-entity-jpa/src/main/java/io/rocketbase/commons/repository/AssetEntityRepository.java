@@ -21,4 +21,7 @@ public interface AssetEntityRepository extends PagingAndSortingRepository<AssetJ
     @Query("select a from AssetJpaEntity a where a.referenceHash is null and a.referenceUrl is not null")
     Page<AssetJpaEntity> findAssetsWithMissingReferenceHash(Pageable pageable);
 
+    @Query(value = "select a from AssetJpaEntity a left join fetch a.keyValueMap")
+    Page<AssetJpaEntity> findAll(Pageable pageable);
+
 }
