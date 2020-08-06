@@ -1,11 +1,9 @@
 package io.rocketbase.commons.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import io.rocketbase.commons.converter.AssetConverter;
 import io.rocketbase.commons.dto.asset.DefaultAssetUploadMeta;
 import io.rocketbase.commons.exception.EmptyFileException;
 import io.rocketbase.commons.model.AssetEntity;
-import io.rocketbase.commons.service.AssetRepository;
 import io.rocketbase.commons.service.AssetService;
 import lombok.Cleanup;
 import lombok.SneakyThrows;
@@ -24,12 +22,6 @@ import java.io.InputStream;
 @RequestMapping("${asset.api:/api/asset}")
 @Slf4j
 public class AssetFilepondUploadController implements BaseController {
-
-    @Resource
-    private AssetRepository assetRepository;
-
-    @Resource
-    private AssetConverter assetConverter;
 
     @Resource
     private AssetService assetService;
