@@ -19,6 +19,7 @@ import org.springframework.core.io.InputStreamResource;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.text.Normalizer;
 import java.util.Date;
 
 public class S3FileStoreService implements FileStorageService {
@@ -45,7 +46,8 @@ public class S3FileStoreService implements FileStorageService {
                 .build();
         ObjectMetadata objectMetadata = generateObjectMeta(entity);
         Upload upload = transferManager.upload(new PutObjectRequest(bucketResolver.resolveBucketName(entity),
-                entity.getUrlPath(), new FileInputStream(file), objectMetadata)
+                entity.getUrlPath(), file)
+                .withMetadata(objectMetadata)
                 .withCannedAcl(assetS3Properties.isPublicReadObject() ? CannedAccessControlList.PublicRead : CannedAccessControlList.BucketOwnerRead));
 
         UploadResult uploadResult = upload.waitForUploadResult();
@@ -98,15 +100,21 @@ public class S3FileStoreService implements FileStorageService {
         objectMetadata.setContentType(entity.getType().getContentType());
         objectMetadata.setHeader("type", entity.getType().name());
         objectMetadata.setHeader("context", Nulls.notNull(entity.getContext()));
-        objectMetadata.setHeader("originalFilename", Nulls.notNull(entity.getOriginalFilename()));
+        objectMetadata.setHeader("originalFilename", cleanString(Nulls.notNull(entity.getOriginalFilename())));
         objectMetadata.setHeader("created", entity.getCreated().toString());
         if (entity.getSystemRefId() != null) {
             objectMetadata.setHeader("systemRefId", entity.getSystemRefId());
         }
         if (entity.getReferenceUrl() != null) {
-            objectMetadata.setHeader("referenceUrl", entity.getReferenceUrl());
+            objectMetadata.setHeader("referenceUrl", cleanString(entity.getReferenceUrl()));
         }
 
         return objectMetadata;
+    }
+
+    String cleanString(String input) {
+        String result = Normalizer.normalize(input, Normalizer.Form.NFD);
+        result = result.replaceAll("[^\\x00-\\x7F]", "");
+        return result;
     }
 }

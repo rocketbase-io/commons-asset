@@ -56,6 +56,32 @@ public class S3FileStoreServiceTest {
 
     @Test
     @Ignore
+    public void uploadTestUmlaute() throws Exception {
+        // given
+        AssetEntity assetEntity = getSampleAssetEntity();
+        assetEntity.setReferenceUrl("https://images.unsplash.com/photo-1593642531955-b62e17bdaa9c?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=3750&q=80");
+        assetEntity.setOriginalFilename("äö¿ßtest.png");
+        URL asset = ClassLoader.class.getResource("/assets/äö¿ßtest.png");
+
+        // when
+        getStorage().upload(assetEntity, new File(asset.toURI()));
+
+        // then
+    }
+
+    @Test
+    public void normalizeOriginalFilename() {
+        // given
+        String input = "äö¿ßtest.png";
+        // when
+        String result = getStorage().cleanString(input);
+
+        // then
+        assertThat(result, equalTo("aotest.png"));
+    }
+
+    @Test
+    @Ignore
     public void getDownloadUrl() {
         String url = getStorage().getDownloadUrl(AssetReference.builder()
                 .id("ac47975c-8fe0-40ad-b811-eb80c899fcae")
@@ -67,7 +93,8 @@ public class S3FileStoreServiceTest {
         assertThat(url, notNullValue());
     }
 
-    // @Test
+    @Test
+    @Ignore
     public void downloadTest() throws Exception {
         // given
         AssetEntity assetEntity = getSampleAssetEntity();
