@@ -134,7 +134,7 @@ public class S3FileStoreServiceTest {
         AssetS3Properties properties = AssetS3Properties.builder()
                 .accessKey("-")
                 .secretKey("-")
-                .endpoint("-")
+                .endpoint("https://test.rocketbase.io")
                 .pathStyleAccessEnabled(true)
                 .signerOverride("AWSS3V4SignerType")
                 .region("eu-central-1")
