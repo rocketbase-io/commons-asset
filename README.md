@@ -23,8 +23,8 @@ I've added a swagger api-documentation. You can find it within [src](./commons-a
 * batch downloading urls and storing them / analyzing
 * intergrated [color-thief](https://github.com/SvenWoltmann/color-thief-java) in order to get primary and other colors from photo
 * optional LIQP (Low Quality Image Placeholder) option to have a placeholder for images in base64 encoded in ultra low resolution
-
-
+* optional preview calculation after upload 
+* configure available preview-sizes
 
 ***module-structure-tree:***
 
@@ -91,6 +91,8 @@ Containing an implementation for storing asset references...
 | asset.api.detect-color    | true              | you can disable image colorThief                              |
 | asset.api.base-url  | ""                | used for previewUrls in case of mongo-storage, will get used as fallback |
 | asset.api.preview-quality | XS: 0.7<br />S: 0.75<br />M: 0.8<br />L: 0.85<br />XL: 0.85 | configure quality of image preview via java-code. Its a Map<String, Float> Configuration and the key needs to match the enum PreviewSize<br /><br />ValueRange is between 0 - 1.<br />1 means 100% |
+| asset.api.preview-sizes | XS, S, M, L, XL | configure possible preview-sizes (will limit precalcuation + assetRead previewSizes) |
+| asset.api.precalculate | false | when enabled the configured previews of configured sizes will get generated directly after store of original file  |
 
 **LQIP** (Low Quality Image Placeholder) since 3.1.x there is an option to allow adding base64 thumb as a placeholder to the assetReference. During upload process the system adds it to the entity and the small thumb get stored in db as well. It should be used as placeholder before loading the main preview. To lower http calls the "binary" is already containing within the rest response. 
 
