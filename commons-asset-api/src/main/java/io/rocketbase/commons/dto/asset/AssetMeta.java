@@ -39,4 +39,13 @@ public class AssetMeta implements Serializable {
      */
     @Nullable
     private String referenceUrl;
+
+    public AssetMeta(AssetMeta other) {
+            this.created = other.created;
+            this.originalFilename = other.originalFilename;
+            this.fileSize = other.fileSize;
+            this.resolution = other.resolution != null ? new Resolution(other.resolution) : null;
+            this.colorPalette = other.colorPalette != null ? new ColorPalette(other.colorPalette) : null;
+            this.referenceUrl = other.referenceUrl;
+    }
 }

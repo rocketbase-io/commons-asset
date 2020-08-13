@@ -6,6 +6,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
 
 @Data
@@ -24,4 +25,8 @@ public class ColorPalette implements Serializable {
      */
     private List<String> colors;
 
+    public ColorPalette(ColorPalette other) {
+        this.primary = other.primary;
+        this.colors = other.colors != null ? new ArrayList<>(other.colors) : null;
+    }
 }

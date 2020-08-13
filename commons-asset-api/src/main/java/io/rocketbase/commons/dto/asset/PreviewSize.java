@@ -16,9 +16,6 @@ public enum PreviewSize implements PreviewParameter {
     L(1200, 1200, 0.85f),
     XL(1900, 1900, 0.85f);
 
-    /*
-
-     */
     @Getter
     private final int maxWidth;
 
@@ -56,6 +53,15 @@ public enum PreviewSize implements PreviewParameter {
             }
         }
         return fallback;
+    }
+
+    /**
+     * used as prefix for stores previews in storage-engine
+     *
+     * @return
+     */
+    public String getPreviewStoragePath() {
+        return "prev_" + name().toLowerCase();
     }
 
 }

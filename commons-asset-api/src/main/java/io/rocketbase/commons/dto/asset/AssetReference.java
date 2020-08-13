@@ -49,4 +49,12 @@ public class AssetReference implements Serializable, AssetReferenceType {
     @Nullable
     private String lqip;
 
+    public AssetReference(AssetReferenceType other) {
+        this.id = other.getId();
+        this.systemRefId = other.getSystemRefId();
+        this.urlPath = other.getUrlPath();
+        this.type = other.getType();
+        this.context = other.getContext();
+        this.meta = other.getMeta() != null ? new AssetMeta(other.getMeta()) : null;
+    }
 }

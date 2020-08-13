@@ -18,6 +18,11 @@ public class Resolution implements Serializable {
 
     private Integer height;
 
+    public Resolution(Resolution other) {
+        this.width = other.width;
+        this.height = other.height;
+    }
+
     /**
      * calculates aspect ratio
      *
