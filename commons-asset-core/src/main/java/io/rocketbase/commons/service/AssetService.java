@@ -3,10 +3,7 @@ package io.rocketbase.commons.service;
 import com.google.common.base.Stopwatch;
 import io.rocketbase.commons.config.AssetApiProperties;
 import io.rocketbase.commons.dto.asset.*;
-import io.rocketbase.commons.event.AssetCopyEvent;
-import io.rocketbase.commons.event.AssetDeleteEvent;
-import io.rocketbase.commons.event.AssetUpdateMetaEvent;
-import io.rocketbase.commons.event.AssetUploadEvent;
+import io.rocketbase.commons.event.*;
 import io.rocketbase.commons.exception.*;
 import io.rocketbase.commons.model.AssetEntity;
 import io.rocketbase.commons.service.AssetTypeFilterService.AssetUploadDetail;
@@ -186,12 +183,13 @@ public class AssetService {
 
         handleKeyValues(entity, Nulls.notNull(uploadMeta, AssetUploadMeta::getKeyValues, null));
 
+        applicationEventPublisher.publishEvent(new AssetUploadEvent(this, entity, modification));
 
         try {
             fileStorageService.upload(entity, modification.getFile());
             assetRepository.save(entity);
 
-            applicationEventPublisher.publishEvent(new AssetUploadEvent(this, entity, modification));
+            applicationEventPublisher.publishEvent(new AssetAfterUploadEvent(this, entity, modification));
             if (!modification.getFile().equals(file)) {
                 modification.getFile().delete();
             }

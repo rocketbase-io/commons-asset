@@ -127,8 +127,8 @@ public class AssetCoreAutoConfiguration implements Serializable {
 
     @Bean
     @ConditionalOnProperty(name = "asset.api.precalculate", havingValue = "true")
-    public PrecalculateOnAssetUploadEventListener precalculateOnAssetUploadEventListener(@Autowired AssetHandler assetHandler, @Autowired FileStorageService fileStorageService) {
-        return new PrecalculateOnAssetUploadEventListener(assetApiProperties, assetHandler, fileStorageService);
+    public PrecalculateOnAfterUploadEventListener precalculateOnAfterUploadEventListener(@Autowired AssetHandler assetHandler, @Autowired FileStorageService fileStorageService) {
+        return new PrecalculateOnAfterUploadEventListener(assetApiProperties, assetHandler, fileStorageService);
     }
 
     @Bean

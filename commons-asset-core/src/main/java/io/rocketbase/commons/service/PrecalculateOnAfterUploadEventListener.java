@@ -2,7 +2,7 @@ package io.rocketbase.commons.service;
 
 import com.google.common.base.Stopwatch;
 import io.rocketbase.commons.config.AssetApiProperties;
-import io.rocketbase.commons.event.AssetUploadEvent;
+import io.rocketbase.commons.event.AssetAfterUploadEvent;
 import io.rocketbase.commons.model.AssetEntity;
 import io.rocketbase.commons.service.handler.AssetHandler;
 import io.rocketbase.commons.service.handler.PreviewConfig;
@@ -15,22 +15,22 @@ import java.util.concurrent.TimeUnit;
 
 @Slf4j
 @RequiredArgsConstructor
-public class PrecalculateOnAssetUploadEventListener implements ApplicationListener<AssetUploadEvent> {
+public class PrecalculateOnAfterUploadEventListener implements ApplicationListener<AssetAfterUploadEvent> {
 
     private final AssetApiProperties assetApiProperties;
     private final AssetHandler assetHandler;
     private final FileStorageService fileStorageService;
 
     @Override
-    public void onApplicationEvent(AssetUploadEvent assetUploadEvent) {
+    public void onApplicationEvent(AssetAfterUploadEvent assetAfterUploadEvent) {
         if (assetApiProperties.isPrecalculate()) {
-            AssetEntity entity = assetUploadEvent.getAssetEntity();
+            AssetEntity entity = assetAfterUploadEvent.getAssetEntity();
             if (assetHandler.isPreviewSupported(entity.getType())) {
                 Stopwatch stopwatch = Stopwatch.createStarted();
                 assetApiProperties.getPreviewSizes()
                         .forEach(s -> {
                             File previewFile = assetHandler.getPreview(entity.getType(),
-                                    assetUploadEvent.getModification().getFile(),
+                                    assetAfterUploadEvent.getModification().getFile(),
                                     PreviewConfig.builder()
                                             .previewSize(s)
                                             .build());
