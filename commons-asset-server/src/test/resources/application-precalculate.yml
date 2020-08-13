@@ -1,0 +1,20 @@
+spring:
+  # database connection
+  data:
+    mongodb:
+      database: commons-asset-sample-test
+
+  servlet:
+    multipart:
+      max-file-size: 10MB
+
+logging:
+  level:
+    io.rocketbase: TRACE
+
+asset:
+  api:
+    preview-sizes:
+      - S
+      - M
+    precalculate: true
