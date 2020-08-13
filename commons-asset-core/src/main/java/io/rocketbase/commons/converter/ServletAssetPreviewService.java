@@ -1,6 +1,7 @@
 package io.rocketbase.commons.converter;
 
 import io.rocketbase.commons.config.AssetApiProperties;
+import io.rocketbase.commons.service.FileStorageService;
 import io.rocketbase.commons.util.Nulls;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
@@ -10,8 +11,8 @@ import javax.servlet.http.HttpServletRequest;
 
 public class ServletAssetPreviewService extends AbstractAssetPreviewService {
 
-    public ServletAssetPreviewService(AssetApiProperties assetApiProperties) {
-        super(assetApiProperties);
+    public ServletAssetPreviewService(AssetApiProperties assetApiProperties, FileStorageService fileStorageService, boolean imageMagickEnabled) {
+        super(assetApiProperties, fileStorageService, imageMagickEnabled);
     }
 
     @Override

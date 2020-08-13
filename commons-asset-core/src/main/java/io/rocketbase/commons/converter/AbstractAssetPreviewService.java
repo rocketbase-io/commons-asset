@@ -4,7 +4,9 @@ import io.rocketbase.commons.config.AssetApiProperties;
 import io.rocketbase.commons.dto.asset.AssetReferenceType;
 import io.rocketbase.commons.dto.asset.AssetType;
 import io.rocketbase.commons.dto.asset.PreviewSize;
+import io.rocketbase.commons.service.FileStorageService;
 import io.rocketbase.commons.util.Nulls;
+import io.rocketbase.commons.util.UrlParts;
 import lombok.RequiredArgsConstructor;
 
 import java.util.Arrays;
@@ -16,27 +18,26 @@ public abstract class AbstractAssetPreviewService implements AssetPreviewService
     public static final Collection<AssetType> SUPPORTED_ASSET_TYPES = Arrays.asList(AssetType.JPEG, AssetType.PNG, AssetType.GIF, AssetType.TIFF);
 
     protected final AssetApiProperties assetApiProperties;
+    protected final FileStorageService fileStorageService;
+    protected final boolean imageMagickEnabled;
 
     protected abstract String getBaseUrl();
 
     public String getPreviewUrl(AssetReferenceType assetReference, PreviewSize size) {
-        return removeEndsWithSlash(Nulls.notNull(getBaseUrl())) + assetApiProperties.getPath() + "/" + assetReference.getId() + "/" + size.name().toLowerCase();
-    }
-
-    protected String removeEndsWithSlash(String value) {
-        if (value.endsWith("/")) {
-            value = value.substring(0, value.length() - 1);
-        }
-        return value;
+        return UrlParts.removeEndsWithSlash(Nulls.notNull(getBaseUrl())) + assetApiProperties.getPath() + "/" + assetReference.getId() + "/" + size.name().toLowerCase();
     }
 
     @Override
     public String getDownloadUrl(AssetReferenceType assetReference) {
-        return removeEndsWithSlash(Nulls.notNull(getBaseUrl())) + assetApiProperties.getPath() + "/" + assetReference.getId() + "/b";
+        String downloadUrl = fileStorageService != null ? fileStorageService.getDownloadUrl(assetReference) : null;
+        if (downloadUrl == null) {
+            return UrlParts.removeEndsWithSlash(getBaseUrl()) + assetApiProperties.getPath() + "/" + assetReference.getId() + "/b";
+        }
+        return downloadUrl;
     }
 
     @Override
     public boolean isPreviewSupported(AssetType assetType) {
-        return SUPPORTED_ASSET_TYPES.contains(assetType);
+        return imageMagickEnabled ? assetType.isImage() : SUPPORTED_ASSET_TYPES.contains(assetType);
     }
 }

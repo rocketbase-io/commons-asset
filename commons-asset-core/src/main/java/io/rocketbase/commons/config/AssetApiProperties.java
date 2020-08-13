@@ -2,6 +2,7 @@ package io.rocketbase.commons.config;
 
 
 import io.rocketbase.commons.dto.asset.AssetType;
+import io.rocketbase.commons.dto.asset.PreviewSize;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -23,6 +24,13 @@ public class AssetApiProperties implements Serializable {
     private String path = "/api/asset";
 
     private List<AssetType> types = new ArrayList<>(EnumSet.allOf(AssetType.class));
+
+    /**
+     * you can limit the allowed previewSizes
+     */
+    private List<PreviewSize> previewSizes = new ArrayList<>(EnumSet.allOf(PreviewSize.class));
+
+    private boolean precalculate = false;
 
     private boolean download = true;
 
@@ -48,5 +56,11 @@ public class AssetApiProperties implements Serializable {
     private Map<String, String> downloadHeaders = new HashMap<>();
 
     private Map<String, Float> previewQuality = new HashMap<>();
+
+    public List<PreviewSize> filterAllowedPreviewSizes(List<PreviewSize> sizes) {
+        List<PreviewSize> result = new ArrayList<>(previewSizes);
+        result.retainAll(sizes);
+        return result;
+    }
 
 }

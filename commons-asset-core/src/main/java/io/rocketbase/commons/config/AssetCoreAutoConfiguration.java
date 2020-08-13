@@ -13,6 +13,7 @@ import io.rocketbase.commons.service.handler.DefaultJavaAssetHandler;
 import io.rocketbase.commons.util.Nulls;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.*;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
@@ -31,6 +32,9 @@ public class AssetCoreAutoConfiguration implements Serializable {
     private final AssetLqipProperties assetLqipProperties;
     private final AssetShrinkProperties assetShrinkProperties;
 
+    @Value("${asset.imagemagick.enabled:false}")
+    private Boolean imageMagickEnabled;
+
     @Bean
     @ConditionalOnMissingBean
     public AssetTypeFilterService assetTypeFilterService() {
@@ -40,15 +44,17 @@ public class AssetCoreAutoConfiguration implements Serializable {
     @Bean
     @ConditionalOnMissingBean(value = AssetPreviewService.class)
     @ConditionalOnNotWebApplication
-    public AssetPreviewService assetPreviewService() {
-        return new DefaultAssetPreviewService(assetApiProperties);
+    @ConditionalOnProperty(name = "asset.api.precalculate", havingValue = "false", matchIfMissing = true)
+    public AssetPreviewService assetPreviewService(@Autowired(required = false) FileStorageService fileStorageService) {
+        return new DefaultAssetPreviewService(assetApiProperties, fileStorageService, imageMagickEnabled);
     }
 
     @Bean
     @ConditionalOnMissingBean(value = AssetPreviewService.class)
     @ConditionalOnWebApplication
-    public AssetPreviewService webAssetPreviewService() {
-        return new ServletAssetPreviewService(assetApiProperties);
+    @ConditionalOnProperty(name = "asset.api.precalculate", havingValue = "false", matchIfMissing = true)
+    public AssetPreviewService webAssetPreviewService(@Autowired(required = false) FileStorageService fileStorageService) {
+        return new ServletAssetPreviewService(assetApiProperties, fileStorageService, imageMagickEnabled);
     }
 
     @Bean
@@ -110,6 +116,19 @@ public class AssetCoreAutoConfiguration implements Serializable {
     @ConditionalOnProperty(name = "asset.imagemagick.enabled", havingValue = "true")
     public AssetHandler imageMagickAssetHandler() {
         return new DefaultImagMagickAssetHandler(getAssetHandlerConfig());
+    }
+
+
+    @Bean
+    @ConditionalOnProperty(name = "asset.api.precalculate", havingValue = "true")
+    public AssetPreviewService assetPreviewServicePrecalculated(@Autowired(required = false) FileStorageService fileStorageService) {
+        return new PrecalculatedAssetPreviewService(assetApiProperties, imageMagickEnabled, fileStorageService);
+    }
+
+    @Bean
+    @ConditionalOnProperty(name = "asset.api.precalculate", havingValue = "true")
+    public PrecalculateOnAssetUploadEventListener precalculateOnAssetUploadEventListener(@Autowired AssetHandler assetHandler, @Autowired FileStorageService fileStorageService) {
+        return new PrecalculateOnAssetUploadEventListener(assetApiProperties, assetHandler, fileStorageService);
     }
 
     @Bean
