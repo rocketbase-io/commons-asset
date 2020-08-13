@@ -10,10 +10,7 @@ import io.rocketbase.commons.model.AssetEntity;
 import lombok.RequiredArgsConstructor;
 
 import java.time.Instant;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
@@ -47,7 +44,7 @@ public class AssetConverter {
                         .previewMap(new HashMap<>())
                         .build());
 
-                ((sizes == null || sizes.isEmpty()) ? getDefaultPreviewSizes() : sizes)
+                assetApiProperties.filterAllowedPreviewSizes(((sizes == null || sizes.isEmpty()) ? getDefaultPreviewSizes() : sizes))
                         .forEach(s -> result.getPreviews().getPreviewMap()
                                 .put(s, assetPreviewService.getPreviewUrl(result, s)));
             }

@@ -2,15 +2,16 @@ package io.rocketbase.commons.service;
 
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.model.CannedAccessControlList;
+import com.amazonaws.services.s3.model.DeleteObjectsRequest;
 import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.amazonaws.services.s3.model.PutObjectRequest;
 import com.amazonaws.services.s3.transfer.Download;
 import com.amazonaws.services.s3.transfer.TransferManager;
 import com.amazonaws.services.s3.transfer.TransferManagerBuilder;
-import com.amazonaws.services.s3.transfer.Upload;
-import com.amazonaws.services.s3.transfer.model.UploadResult;
 import io.rocketbase.commons.config.AssetS3Properties;
+import io.rocketbase.commons.dto.asset.AssetReference;
 import io.rocketbase.commons.dto.asset.AssetReferenceType;
+import io.rocketbase.commons.dto.asset.PreviewSize;
 import io.rocketbase.commons.model.AssetEntity;
 import io.rocketbase.commons.util.Nulls;
 import io.rocketbase.commons.util.UrlParts;
@@ -20,7 +21,9 @@ import org.springframework.core.io.InputStreamResource;
 import java.io.File;
 import java.io.FileInputStream;
 import java.text.Normalizer;
+import java.util.Arrays;
 import java.util.Date;
+import java.util.stream.Collectors;
 
 public class S3FileStoreService implements FileStorageService {
 
@@ -41,30 +44,54 @@ public class S3FileStoreService implements FileStorageService {
     public void upload(AssetEntity entity, File file) {
         entity.setUrlPath(pathResolver.getAbsolutePath(entity));
 
-        TransferManager transferManager = TransferManagerBuilder.standard()
-                .withS3Client(amazonS3)
-                .build();
+        TransferManager transferManager = getTransferManager();
+
         ObjectMetadata objectMetadata = generateObjectMeta(entity);
-        Upload upload = transferManager.upload(new PutObjectRequest(bucketResolver.resolveBucketName(entity),
+        transferManager.upload(new PutObjectRequest(bucketResolver.resolveBucketName(entity),
                 entity.getUrlPath(), file)
                 .withMetadata(objectMetadata)
-                .withCannedAcl(assetS3Properties.isPublicReadObject() ? CannedAccessControlList.PublicRead : CannedAccessControlList.BucketOwnerRead));
+                .withCannedAcl(assetS3Properties.isPublicReadObject() ? CannedAccessControlList.PublicRead : CannedAccessControlList.BucketOwnerRead))
+                .waitForUploadResult();
+    }
 
-        UploadResult uploadResult = upload.waitForUploadResult();
+    @SneakyThrows
+    @Override
+    public void storePreview(AssetReferenceType reference, File file, PreviewSize previewSize) {
+        TransferManager transferManager = getTransferManager();
 
+        ObjectMetadata objectMetadata = generateObjectMeta((AssetReference) reference);
+        transferManager.upload(new PutObjectRequest(bucketResolver.resolveBucketName(reference),
+                buildPreviewPart(reference, previewSize), file)
+                .withMetadata(objectMetadata)
+                .withCannedAcl(assetS3Properties.isPublicReadObject() ? CannedAccessControlList.PublicRead : CannedAccessControlList.BucketOwnerRead))
+                .waitForUploadResult();
+    }
+
+    protected TransferManager getTransferManager() {
+        return TransferManagerBuilder.standard()
+                .withS3Client(amazonS3)
+                .build();
     }
 
     @SneakyThrows
     @Override
     public InputStreamResource download(AssetEntity entity) {
-        File tempFile = File.createTempFile("asset", entity.getType().getFileExtensionForSuffix());
+        return download(entity, entity.getUrlPath());
+    }
+
+    @Override
+    public InputStreamResource downloadPreview(AssetReferenceType reference, PreviewSize previewSize) {
+        return download(reference, buildPreviewPart(reference, previewSize));
+    }
+
+    @SneakyThrows
+    protected InputStreamResource download(AssetReferenceType reference, String url) {
+        File tempFile = File.createTempFile("asset", reference.getType().getFileExtensionForSuffix());
         // not the best cleanup...
         tempFile.deleteOnExit();
 
-        TransferManager transferManager = TransferManagerBuilder.standard()
-                .withS3Client(amazonS3)
-                .build();
-        Download download = transferManager.download(bucketResolver.resolveBucketName(entity), entity.getUrlPath(), tempFile);
+        TransferManager transferManager = getTransferManager();
+        Download download = transferManager.download(bucketResolver.resolveBucketName(reference), url, tempFile);
         download.waitForCompletion();
 
         return new InputStreamResource(new FileInputStream(tempFile));
@@ -73,20 +100,40 @@ public class S3FileStoreService implements FileStorageService {
     @SneakyThrows
     @Override
     public String getDownloadUrl(AssetReferenceType reference) {
-        if (assetS3Properties.getDownloadExpire() > 0) {
-            Date expiration = new Date(new Date().getTime() + 1000 * 60 * assetS3Properties.getDownloadExpire());
-            return amazonS3.generatePresignedUrl(bucketResolver.resolveBucketName(reference), reference.getUrlPath(), expiration).toString();
-        }
-        return buildPublicUrl(reference);
+        return getDownloadUrl(reference, reference.getUrlPath());
     }
 
-    protected String buildPublicUrl(AssetReferenceType reference) {
-        return UrlParts.ensureEndsWithSlash(assetS3Properties.getPublicBaseUrl()) + bucketResolver.resolveBucketName(reference) + UrlParts.ensureStartsWithSlash(reference.getUrlPath());
+    @Override
+    public String getDownloadPreviewUrl(AssetReferenceType reference, PreviewSize previewSize) {
+        return getDownloadUrl(reference, buildPreviewPart(reference, previewSize));
+    }
+
+    protected String buildPreviewPart(AssetReferenceType reference, PreviewSize previewSize) {
+        return previewSize.getPreviewStoragePath() + "/" + reference.getUrlPath();
+    }
+
+    protected String getDownloadUrl(AssetReferenceType reference, String url) {
+        if (assetS3Properties.getDownloadExpire() > 0) {
+            Date expiration = new Date(new Date().getTime() + 1000 * 60 * assetS3Properties.getDownloadExpire());
+            return amazonS3.generatePresignedUrl(bucketResolver.resolveBucketName(reference), url, expiration).toString();
+        }
+        return buildPublicUrl(reference, url);
+    }
+
+    protected String buildPublicUrl(AssetReferenceType reference, String url) {
+        return UrlParts.ensureEndsWithSlash(assetS3Properties.getPublicBaseUrl()) + bucketResolver.resolveBucketName(reference) + UrlParts.ensureStartsWithSlash(url);
     }
 
     @Override
     public void delete(AssetEntity entity) {
         amazonS3.deleteObject(bucketResolver.resolveBucketName(entity), entity.getUrlPath());
+
+        DeleteObjectsRequest objectsRequest = new DeleteObjectsRequest(bucketResolver.resolveBucketName(entity));
+        objectsRequest.setKeys(Arrays.stream(PreviewSize.values())
+                .map(size -> new DeleteObjectsRequest.KeyVersion(buildPreviewPart(entity, size)))
+                .collect(Collectors.toList()));
+        objectsRequest.setQuiet(true);
+        amazonS3.deleteObjects(objectsRequest);
     }
 
     @Override
@@ -95,20 +142,24 @@ public class S3FileStoreService implements FileStorageService {
         amazonS3.copyObject(bucketResolver.resolveBucketName(source), source.getUrlPath(), bucketResolver.resolveBucketName(target), target.getUrlPath());
     }
 
-    private ObjectMetadata generateObjectMeta(AssetEntity entity) {
+    private ObjectMetadata generateObjectMeta(AssetReference reference) {
         ObjectMetadata objectMetadata = new ObjectMetadata();
-        objectMetadata.setContentType(entity.getType().getContentType());
-        objectMetadata.setHeader("type", entity.getType().name());
-        objectMetadata.setHeader("context", Nulls.notNull(entity.getContext()));
-        objectMetadata.setHeader("originalFilename", cleanString(Nulls.notNull(entity.getOriginalFilename())));
-        objectMetadata.setHeader("created", entity.getCreated().toString());
+        objectMetadata.setContentType(reference.getType().getContentType());
+        objectMetadata.setHeader("type", reference.getType().name());
+        objectMetadata.setHeader("context", Nulls.notNull(reference.getContext()));
+        objectMetadata.setHeader("originalFilename", cleanString(Nulls.notNull(reference.getMeta().getOriginalFilename())));
+        objectMetadata.setHeader("created", reference.getMeta().getCreated().toString());
+        return objectMetadata;
+    }
+
+    private ObjectMetadata generateObjectMeta(AssetEntity entity) {
+        ObjectMetadata objectMetadata = generateObjectMeta((AssetReference) entity);
         if (entity.getSystemRefId() != null) {
             objectMetadata.setHeader("systemRefId", entity.getSystemRefId());
         }
         if (entity.getReferenceUrl() != null) {
             objectMetadata.setHeader("referenceUrl", cleanString(entity.getReferenceUrl()));
         }
-
         return objectMetadata;
     }
 

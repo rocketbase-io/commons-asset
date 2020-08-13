@@ -17,7 +17,6 @@ import javax.annotation.Resource;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-@ActiveProfiles(profiles = "test")
 public abstract class BaseIntegrationTest {
 
     @Getter

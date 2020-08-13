@@ -35,7 +35,7 @@ public class AssetConverterTest {
         AssetApiProperties assetApiProperties = new AssetApiProperties();
         assetApiProperties.setBaseUrl("http://localhost:8080");
 
-        AssetConverter converter = new AssetConverter(assetApiProperties, new DefaultAssetPreviewService(assetApiProperties));
+        AssetConverter converter = new AssetConverter(assetApiProperties, new DefaultAssetPreviewService(assetApiProperties, null, false));
         // when
         AssetRead assetRead = converter.fromEntity(createSample(), Arrays.asList(PreviewSize.S, PreviewSize.M, PreviewSize.L));
 
@@ -55,7 +55,7 @@ public class AssetConverterTest {
         AssetEntity entity = createSample();
 
         AssetApiProperties assetApiProperties = new AssetApiProperties();
-        AssetConverter converter = new AssetConverter(assetApiProperties, new DefaultAssetPreviewService(assetApiProperties));
+        AssetConverter converter = new AssetConverter(assetApiProperties, new DefaultAssetPreviewService(assetApiProperties, null, false));
         // when
         AssetRead assetRead = converter.fromEntity(entity);
 
@@ -79,7 +79,7 @@ public class AssetConverterTest {
         entity.setLqip("data:image/jpeg;base64,/9j/4AAQSkZJRgABAgAAAQABAAD/2wBDAHJPVmRWR3JkXWSBeXKIq/+6q52dq//6/8//////////////////////////////////////////////////////2wBDAXmBgauWq/+6uv//////////////////////////////////////////////////////////////////////////wAARCAAyAEsDASIAAhEBAxEB/8QAHwAAAQUBAQEBAQEAAAAAAAAAAAECAwQFBgcICQoL/8QAtRAAAgEDAwIEAwUFBAQAAAF9AQIDAAQRBRIhMUEGE1FhByJxFDKBkaEII0KxwRVS0fAkM2JyggkKFhcYGRolJicoKSo0NTY3ODk6Q0RFRkdISUpTVFVWV1hZWmNkZWZnaGlqc3R1dnd4eXqDhIWGh4iJipKTlJWWl5iZmqKjpKWmp6ipqrKztLW2t7i5usLDxMXGx8jJytLT1NXW19jZ2uHi4+Tl5ufo6erx8vP09fb3+Pn6/8QAHwEAAwEBAQEBAQEBAQAAAAAAAAECAwQFBgcICQoL/8QAtREAAgECBAQDBAcFBAQAAQJ3AAECAxEEBSExBhJBUQdhcRMiMoEIFEKRobHBCSMzUvAVYnLRChYkNOEl8RcYGRomJygpKjU2Nzg5OkNERUZHSElKU1RVVldYWVpjZGVmZ2hpanN0dXZ3eHl6goOEhYaHiImKkpOUlZaXmJmaoqOkpaanqKmqsrO0tba3uLm6wsPExcbHyMnK0tPU1dbX2Nna4uPk5ebn6Onq8vP09fb3+Pn6/9oADAMBAAIRAxEAPwCtRTkRnOFGaspAiDc5B/lQBXSJn6Dj1NTrbIwBy1JJcdox+NQZJ5JNAFn7Knq1H2Vf7xqtn3P50ZPYmgB8kJAJTJUVFViGfaNr9Oxp0sAb5k6+nrQBVooIwcGigB6SOn3T+FDOzn5jTKUe9ABUgHHTimjb3qQkKQDxSGN8rjqaNgUdafvXHf8AKkDK2celAERGKkimMZweV/lTdwIpppiJJ3jfoDn1qKiigBKKKKACpC25QTyQKjpRjvQAoPNKXwpVeh60mRnpSUAJRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQB//Z\n");
 
         AssetApiProperties assetApiProperties = new AssetApiProperties();
-        AssetConverter converter = new AssetConverter(assetApiProperties, new DefaultAssetPreviewService(assetApiProperties));
+        AssetConverter converter = new AssetConverter(assetApiProperties, new DefaultAssetPreviewService(assetApiProperties, null, false));
         // when
         AssetRead assetRead = converter.fromEntity(entity);
 
@@ -94,7 +94,7 @@ public class AssetConverterTest {
         AssetEntity entity = createSample();
 
         AssetApiProperties assetApiProperties = new AssetApiProperties();
-        AssetConverter converter = new AssetConverter(assetApiProperties, new DefaultAssetPreviewService(assetApiProperties));
+        AssetConverter converter = new AssetConverter(assetApiProperties, new DefaultAssetPreviewService(assetApiProperties, null, false));
         // when
         AssetReference assetReference = converter.fromEntity(entity).toReference();
 
@@ -118,7 +118,7 @@ public class AssetConverterTest {
         entity.setLqip("data:image/jpeg;base64,/9j/4AAQSkZJRgABAgAAAQABAAD/2wBDAHJPVmRWR3JkXWSBeXKIq/+6q52dq//6/8//////////////////////////////////////////////////////2wBDAXmBgauWq/+6uv//////////////////////////////////////////////////////////////////////////wAARCAAyAEsDASIAAhEBAxEB/8QAHwAAAQUBAQEBAQEAAAAAAAAAAAECAwQFBgcICQoL/8QAtRAAAgEDAwIEAwUFBAQAAAF9AQIDAAQRBRIhMUEGE1FhByJxFDKBkaEII0KxwRVS0fAkM2JyggkKFhcYGRolJicoKSo0NTY3ODk6Q0RFRkdISUpTVFVWV1hZWmNkZWZnaGlqc3R1dnd4eXqDhIWGh4iJipKTlJWWl5iZmqKjpKWmp6ipqrKztLW2t7i5usLDxMXGx8jJytLT1NXW19jZ2uHi4+Tl5ufo6erx8vP09fb3+Pn6/8QAHwEAAwEBAQEBAQEBAQAAAAAAAAECAwQFBgcICQoL/8QAtREAAgECBAQDBAcFBAQAAQJ3AAECAxEEBSExBhJBUQdhcRMiMoEIFEKRobHBCSMzUvAVYnLRChYkNOEl8RcYGRomJygpKjU2Nzg5OkNERUZHSElKU1RVVldYWVpjZGVmZ2hpanN0dXZ3eHl6goOEhYaHiImKkpOUlZaXmJmaoqOkpaanqKmqsrO0tba3uLm6wsPExcbHyMnK0tPU1dbX2Nna4uPk5ebn6Onq8vP09fb3+Pn6/9oADAMBAAIRAxEAPwCtRTkRnOFGaspAiDc5B/lQBXSJn6Dj1NTrbIwBy1JJcdox+NQZJ5JNAFn7Knq1H2Vf7xqtn3P50ZPYmgB8kJAJTJUVFViGfaNr9Oxp0sAb5k6+nrQBVooIwcGigB6SOn3T+FDOzn5jTKUe9ABUgHHTimjb3qQkKQDxSGN8rjqaNgUdafvXHf8AKkDK2celAERGKkimMZweV/lTdwIpppiJJ3jfoDn1qKiigBKKKKACpC25QTyQKjpRjvQAoPNKXwpVeh60mRnpSUAJRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQB//Z\n");
 
         AssetApiProperties assetApiProperties = new AssetApiProperties();
-        AssetConverter converter = new AssetConverter(assetApiProperties, new DefaultAssetPreviewService(assetApiProperties));
+        AssetConverter converter = new AssetConverter(assetApiProperties, new DefaultAssetPreviewService(assetApiProperties, null, false));
         // when
         AssetReference assetReference = converter.fromEntity(entity).toReference();
 

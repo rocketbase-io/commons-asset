@@ -11,6 +11,7 @@ import lombok.SneakyThrows;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ResourceLoader;
+import org.springframework.test.context.ActiveProfiles;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -20,6 +21,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.notNullValue;
 
+@ActiveProfiles(profiles = "test")
 public class AssetAnalyseControllerIntegrationTest extends BaseIntegrationTest {
 
     @Autowired

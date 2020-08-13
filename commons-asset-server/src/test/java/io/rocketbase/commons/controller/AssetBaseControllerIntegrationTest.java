@@ -15,6 +15,7 @@ import org.assertj.core.api.Fail;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ResourceLoader;
+import org.springframework.test.context.ActiveProfiles;
 
 import javax.annotation.Resource;
 import java.io.File;
@@ -25,6 +26,7 @@ import java.util.Map;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 
+@ActiveProfiles(profiles = "test")
 public class AssetBaseControllerIntegrationTest extends BaseIntegrationTest {
 
     @Autowired

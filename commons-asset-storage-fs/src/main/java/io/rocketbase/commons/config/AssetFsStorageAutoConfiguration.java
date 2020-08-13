@@ -14,17 +14,18 @@ import org.springframework.context.annotation.Configuration;
 import java.io.Serializable;
 
 @Configuration
-@EnableConfigurationProperties({AssetFsProperties.class})
 @AutoConfigureBefore(AssetCoreAutoConfiguration.class)
+@EnableConfigurationProperties({AssetFsProperties.class, AssetApiProperties.class})
 @RequiredArgsConstructor
 public class AssetFsStorageAutoConfiguration implements Serializable {
 
     private final AssetFsProperties assetFsProperties;
+    private final AssetApiProperties assetApiProperties;
 
     @Bean
     @ConditionalOnMissingBean
     public FileStorageService fileStorageService(@Autowired PathResolver pathResolver) {
-        return new FsFileStorageService(assetFsProperties.getBasePath(), pathResolver);
+        return new FsFileStorageService(assetFsProperties.getBasePath(), pathResolver, assetApiProperties);
     }
 
 }

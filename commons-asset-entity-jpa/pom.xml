@@ -50,6 +50,18 @@
             <artifactId>h2</artifactId>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>io.rocketbase.commons</groupId>
+            <artifactId>commons-asset-storage-jpa</artifactId>
+            <version>${project.version}</version>
+            <scope>test</scope>
+            <exclusions>
+                <exclusion>
+                    <groupId>io.rocketbase.commons</groupId>
+                    <artifactId>commons-asset-core</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
     </dependencies>
 
 

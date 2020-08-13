@@ -1,5 +1,6 @@
 package io.rocketbase.commons.service;
 
+import io.rocketbase.commons.config.AssetApiProperties;
 import io.rocketbase.commons.dto.asset.AssetType;
 import io.rocketbase.commons.dto.asset.ColorPalette;
 import io.rocketbase.commons.dto.asset.Resolution;
@@ -81,6 +82,23 @@ public class FsFileStorageServiceTest {
     }
 
     @Test
+    public void deleteWithPreviewsTest() throws Exception {
+        // given
+        AssetEntity assetEntity = getSampleAssetEntity();
+        URL asset = ClassLoader.class.getResource("/assets/rocketbase.gif");
+        File destFile = new File(UrlParts.ensureEndsWithSlash(getBasePath()) + "c/a/e/ac47975c-8fe0-40ad-b811-eb80c899fcae.gif");
+        File previewFile = new File(UrlParts.ensureEndsWithSlash(getBasePath()) + "prev_s/c/a/e/ac47975c-8fe0-40ad-b811-eb80c899fcae.gif");
+        FileUtils.copyFile(new File(asset.toURI()), destFile);
+        FileUtils.copyFile(new File(asset.toURI()), previewFile);
+
+        // when
+        getStorage(true).delete(assetEntity);
+        // then
+        assertThat(destFile.exists(), equalTo(false));
+        assertThat(previewFile.exists(), equalTo(false));
+    }
+
+    @Test
     public void copyTest() throws Exception {
         // given
         AssetEntity copySource = getSampleAssetEntity();
@@ -89,7 +107,7 @@ public class FsFileStorageServiceTest {
 
         AssetEntity copyTarget = getSampleAssetEntity();
         copyTarget.setId("ae38ecaa-e131-4132-b1a5-f2f92cf4750d");
-        
+
         // when
         getStorage().copy(copySource, copyTarget);
 
@@ -110,7 +128,14 @@ public class FsFileStorageServiceTest {
 
     @SneakyThrows
     protected FsFileStorageService getStorage() {
-        return new FsFileStorageService(getBasePath(), new DefaultPathResolver());
+        return getStorage(false);
+    }
+
+    @SneakyThrows
+    protected FsFileStorageService getStorage(boolean precalulate) {
+        AssetApiProperties assetApiProperties = new AssetApiProperties();
+        assetApiProperties.setPrecalculate(precalulate);
+        return new FsFileStorageService(getBasePath(), new DefaultPathResolver(), assetApiProperties);
     }
 
     @Data

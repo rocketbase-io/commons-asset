@@ -1,6 +1,9 @@
 package io.rocketbase.commons.service;
 
 import com.mongodb.client.gridfs.model.GridFSFile;
+import io.rocketbase.commons.config.AssetApiProperties;
+import io.rocketbase.commons.dto.asset.AssetReferenceType;
+import io.rocketbase.commons.dto.asset.PreviewSize;
 import io.rocketbase.commons.exception.NotFoundException;
 import io.rocketbase.commons.model.AssetEntity;
 import lombok.RequiredArgsConstructor;
@@ -11,16 +14,18 @@ import org.springframework.core.io.InputStreamResource;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.gridfs.GridFsTemplate;
+import org.springframework.data.mongodb.gridfs.GridFsUpload;
 
 import javax.annotation.Nonnull;
 import java.io.File;
 import java.io.FileInputStream;
+import java.util.regex.Pattern;
 
 @RequiredArgsConstructor
 public class MongoFileStorageService implements FileStorageService {
 
-
     private final GridFsTemplate gridFsTemplate;
+    private final AssetApiProperties assetApiProperties;
 
     @SneakyThrows
     @Override
@@ -32,6 +37,19 @@ public class MongoFileStorageService implements FileStorageService {
         entity.setUrlPath(objectId.toHexString());
     }
 
+    @SneakyThrows
+    @Override
+    public void storePreview(AssetReferenceType reference, File file, PreviewSize previewSize) {
+        gridFsTemplate.store(GridFsUpload.fromStream(new FileInputStream(file))
+                .id(buildPreviewSizeId(reference, previewSize))
+                .filename(buildPreviewFilename(reference, previewSize))
+                .metadata(new Document()
+                        .append("preview", previewSize.name())
+                        .append("assetId", reference.getId()))
+                .contentType(reference.getType().getContentType())
+                .build());
+    }
+
     @Override
     public InputStreamResource download(AssetEntity entity) {
         GridFSFile gridFsFile = gridFsTemplate.findOne(getIdQuery(entity.getId()));
@@ -41,9 +59,31 @@ public class MongoFileStorageService implements FileStorageService {
         return gridFsTemplate.getResource(gridFsFile);
     }
 
+    protected String buildPreviewSizeId(AssetReferenceType reference, PreviewSize previewSize) {
+        return reference.getId() + "-" + previewSize.name().toLowerCase();
+    }
+
+    protected String buildPreviewFilename(AssetReferenceType reference, PreviewSize previewSize) {
+        return reference.getId() + "_" + previewSize.name().toLowerCase() + reference.getType().getFileExtensionForSuffix();
+    }
+
+    @Override
+    public InputStreamResource downloadPreview(AssetReferenceType reference, PreviewSize previewSize) {
+        GridFSFile gridFsFile = gridFsTemplate.findOne(getIdQuery(buildPreviewSizeId(reference, previewSize)));
+        if (gridFsFile == null) {
+            throw new NotFoundException("assetPreview of id " + reference.getId() + " and size " + previewSize + " was not found in system");
+        }
+        return gridFsTemplate.getResource(gridFsFile);
+    }
+
     @Override
     public void delete(AssetEntity entity) {
         gridFsTemplate.delete(getIdQuery(entity.getId()));
+
+        if (assetApiProperties.isPrecalculate()) {
+            Pattern previewIdPattern = Pattern.compile(entity.getId() + "\\-(xs|s|m|l|xl)", Pattern.CASE_INSENSITIVE);
+            gridFsTemplate.delete(new Query(Criteria.where("_id").is(previewIdPattern)));
+        }
     }
 
     @SneakyThrows
@@ -64,13 +104,9 @@ public class MongoFileStorageService implements FileStorageService {
 
     private Document generateObjectMeta(AssetEntity entity) {
         Document meta = new Document()
-                .append("type",
-                        entity.getType()
-                                .name())
+                .append("type", entity.getType().name())
                 .append("originalFilename", entity.getOriginalFilename())
-                .append("created",
-                        entity.getCreated()
-                                .toString());
+                .append("created", entity.getCreated().toString());
         if (entity.getSystemRefId() != null) {
             meta.append("systemRefId", entity.getSystemRefId());
         }

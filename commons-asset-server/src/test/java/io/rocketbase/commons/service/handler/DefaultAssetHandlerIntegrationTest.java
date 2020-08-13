@@ -4,6 +4,7 @@ import io.rocketbase.commons.BaseIntegrationTest;
 import io.rocketbase.commons.dto.asset.PreviewSize;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.Test;
+import org.springframework.test.context.ActiveProfiles;
 
 import javax.annotation.Resource;
 import java.util.Map;
@@ -13,6 +14,7 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.notNullValue;
 
 @Slf4j
+@ActiveProfiles(profiles = "test")
 public class DefaultAssetHandlerIntegrationTest extends BaseIntegrationTest {
 
     @Resource
