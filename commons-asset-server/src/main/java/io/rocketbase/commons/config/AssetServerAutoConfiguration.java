@@ -11,9 +11,11 @@ import org.springframework.context.annotation.Configuration;
 import java.io.Serializable;
 
 @Configuration
-@EnableConfigurationProperties({AssetApiProperties.class, AssetLqipProperties.class})
+@EnableConfigurationProperties({AssetApiProperties.class})
 @RequiredArgsConstructor
 public class AssetServerAutoConfiguration implements Serializable {
+
+    private final AssetApiProperties assetApiProperties;
 
     // -------------------------------------------------------
     // --------------------- Controller ----------------------
@@ -46,7 +48,7 @@ public class AssetServerAutoConfiguration implements Serializable {
     @Bean
     @ConditionalOnMissingBean
     public AssetPreviewController assetPreviewController() {
-        return new AssetPreviewController();
+        return new AssetPreviewController(assetApiProperties);
     }
 
     @Bean

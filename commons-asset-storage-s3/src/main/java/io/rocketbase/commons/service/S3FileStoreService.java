@@ -163,6 +163,11 @@ public class S3FileStoreService implements FileStorageService {
         return objectMetadata;
     }
 
+    @Override
+    public boolean useDownloadPreviewUrl() {
+        return true;
+    }
+
     String cleanString(String input) {
         String result = Normalizer.normalize(input, Normalizer.Form.NFD);
         result = result.replaceAll("[^\\x00-\\x7F]", "");

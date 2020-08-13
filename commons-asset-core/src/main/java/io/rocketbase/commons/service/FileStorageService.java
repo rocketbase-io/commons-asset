@@ -89,4 +89,8 @@ public interface FileStorageService {
         return true;
     }
 
+    default boolean useDownloadPreviewUrl() {
+        return false;
+    }
+
 }
