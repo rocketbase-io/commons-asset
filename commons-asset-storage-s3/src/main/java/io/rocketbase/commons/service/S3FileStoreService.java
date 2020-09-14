@@ -142,7 +142,7 @@ public class S3FileStoreService implements FileStorageService {
         amazonS3.copyObject(bucketResolver.resolveBucketName(source), source.getUrlPath(), bucketResolver.resolveBucketName(target), target.getUrlPath());
     }
 
-    private ObjectMetadata generateObjectMeta(AssetReference reference) {
+    private ObjectMetadata generateObjectMeta(AssetReferenceType reference) {
         ObjectMetadata objectMetadata = new ObjectMetadata();
         objectMetadata.setContentType(reference.getType().getContentType());
         objectMetadata.setHeader("type", reference.getType().name());
@@ -153,7 +153,7 @@ public class S3FileStoreService implements FileStorageService {
     }
 
     private ObjectMetadata generateObjectMeta(AssetEntity entity) {
-        ObjectMetadata objectMetadata = generateObjectMeta((AssetReference) entity);
+        ObjectMetadata objectMetadata = generateObjectMeta((AssetReferenceType) entity);
         if (entity.getSystemRefId() != null) {
             objectMetadata.setHeader("systemRefId", entity.getSystemRefId());
         }
