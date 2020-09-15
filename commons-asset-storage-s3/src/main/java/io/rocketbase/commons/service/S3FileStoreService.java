@@ -9,7 +9,6 @@ import com.amazonaws.services.s3.transfer.Download;
 import com.amazonaws.services.s3.transfer.TransferManager;
 import com.amazonaws.services.s3.transfer.TransferManagerBuilder;
 import io.rocketbase.commons.config.AssetS3Properties;
-import io.rocketbase.commons.dto.asset.AssetReference;
 import io.rocketbase.commons.dto.asset.AssetReferenceType;
 import io.rocketbase.commons.dto.asset.PreviewSize;
 import io.rocketbase.commons.model.AssetEntity;
@@ -59,7 +58,7 @@ public class S3FileStoreService implements FileStorageService {
     public void storePreview(AssetReferenceType reference, File file, PreviewSize previewSize) {
         TransferManager transferManager = getTransferManager();
 
-        ObjectMetadata objectMetadata = generateObjectMeta((AssetReference) reference);
+        ObjectMetadata objectMetadata = generateObjectMeta(reference);
         transferManager.upload(new PutObjectRequest(bucketResolver.resolveBucketName(reference),
                 buildPreviewPart(reference, previewSize), file)
                 .withMetadata(objectMetadata)
@@ -153,7 +152,7 @@ public class S3FileStoreService implements FileStorageService {
     }
 
     private ObjectMetadata generateObjectMeta(AssetEntity entity) {
-        ObjectMetadata objectMetadata = generateObjectMeta((AssetReferenceType) entity);
+        ObjectMetadata objectMetadata = generateObjectMeta(entity);
         if (entity.getSystemRefId() != null) {
             objectMetadata.setHeader("systemRefId", entity.getSystemRefId());
         }
