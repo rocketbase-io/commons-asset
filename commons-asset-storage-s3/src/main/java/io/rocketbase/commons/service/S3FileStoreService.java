@@ -152,7 +152,7 @@ public class S3FileStoreService implements FileStorageService {
     }
 
     private ObjectMetadata generateObjectMeta(AssetEntity entity) {
-        ObjectMetadata objectMetadata = generateObjectMeta(entity);
+        ObjectMetadata objectMetadata = generateObjectMeta((AssetReferenceType) entity);
         if (entity.getSystemRefId() != null) {
             objectMetadata.setHeader("systemRefId", entity.getSystemRefId());
         }
