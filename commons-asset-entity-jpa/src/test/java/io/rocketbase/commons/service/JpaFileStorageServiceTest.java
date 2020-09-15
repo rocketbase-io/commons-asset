@@ -45,7 +45,7 @@ public class JpaFileStorageServiceTest {
     public void uploadTest() throws Exception {
         // given
         AssetEntity assetEntity = getSampleAssetEntity();
-        URL asset = ClassLoader.class.getResource("/assets/rocketbase.gif");
+        URL asset = ClassLoader.getSystemResource("assets/rocketbase.gif");
         File file = new File(asset.toURI());
 
         // when
@@ -63,7 +63,7 @@ public class JpaFileStorageServiceTest {
     public void deleteTest() throws Exception {
         // given
         AssetEntity assetEntity = getSampleAssetEntity();
-        URL asset = ClassLoader.class.getResource("/assets/rocketbase.gif");
+        URL asset = ClassLoader.getSystemResource("assets/rocketbase.gif");
         File file = new File(asset.toURI());
         getStorage().upload(assetEntity, file);
 
@@ -77,7 +77,7 @@ public class JpaFileStorageServiceTest {
     public void deleteWithPreviewsTest() throws Exception {
         // given
         AssetEntity assetEntity = getSampleAssetEntity();
-        URL asset = ClassLoader.class.getResource("/assets/rocketbase.gif");
+        URL asset = ClassLoader.getSystemResource("assets/rocketbase.gif");
         File file = new File(asset.toURI());
         getStorage().upload(assetEntity, file);
         getStorage().storePreview(assetEntity, file, PreviewSize.S);
@@ -93,7 +93,7 @@ public class JpaFileStorageServiceTest {
     public void copyTest() throws Exception {
         // given
         AssetEntity copySource = getSampleAssetEntity();
-        URL asset = ClassLoader.class.getResource("/assets/rocketbase.gif");
+        URL asset = ClassLoader.getSystemResource("assets/rocketbase.gif");
         getStorage().upload(copySource, new File(asset.toURI()));
 
         AssetEntity copyTarget = getSampleAssetEntity();

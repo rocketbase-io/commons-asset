@@ -58,7 +58,7 @@ public class DefaultDownloadServiceTest {
     }
 
     private ClientHttpResponse buildResponse(String filename) throws IOException {
-        URL asset = ClassLoader.class.getResource("/assets/rocketbase.gif");
+        URL asset = ClassLoader.getSystemResource("assets/rocketbase.gif");
 
         ClientHttpResponse response = new MockClientHttpResponse(asset.openStream(), HttpStatus.OK);
         if (filename != null) {

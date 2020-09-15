@@ -41,7 +41,7 @@ public class FsFileStorageServiceTest {
     public void uploadTest() throws Exception {
         // given
         AssetEntity assetEntity = getSampleAssetEntity();
-        URL asset = ClassLoader.class.getResource("/assets/rocketbase.gif");
+        URL asset = ClassLoader.getSystemResource("assets/rocketbase.gif");
 
         // when
         getStorage().upload(assetEntity, new File(asset.toURI()));
@@ -55,7 +55,7 @@ public class FsFileStorageServiceTest {
     public void downloadTest() throws Exception {
         // given
         AssetEntity assetEntity = getSampleAssetEntity();
-        URL asset = ClassLoader.class.getResource("/assets/rocketbase.gif");
+        URL asset = ClassLoader.getSystemResource("assets/rocketbase.gif");
         FileUtils.copyFile(new File(asset.toURI()), new File(UrlParts.ensureEndsWithSlash(getBasePath()) + "c/a/e/ac47975c-8fe0-40ad-b811-eb80c899fcae.gif"));
 
         // when
@@ -71,7 +71,7 @@ public class FsFileStorageServiceTest {
     public void deleteTest() throws Exception {
         // given
         AssetEntity assetEntity = getSampleAssetEntity();
-        URL asset = ClassLoader.class.getResource("/assets/rocketbase.gif");
+        URL asset = ClassLoader.getSystemResource("assets/rocketbase.gif");
         File destFile = new File(UrlParts.ensureEndsWithSlash(getBasePath()) + "c/a/e/ac47975c-8fe0-40ad-b811-eb80c899fcae.gif");
         FileUtils.copyFile(new File(asset.toURI()), destFile);
 
@@ -85,7 +85,7 @@ public class FsFileStorageServiceTest {
     public void deleteWithPreviewsTest() throws Exception {
         // given
         AssetEntity assetEntity = getSampleAssetEntity();
-        URL asset = ClassLoader.class.getResource("/assets/rocketbase.gif");
+        URL asset = ClassLoader.getSystemResource("assets/rocketbase.gif");
         File destFile = new File(UrlParts.ensureEndsWithSlash(getBasePath()) + "c/a/e/ac47975c-8fe0-40ad-b811-eb80c899fcae.gif");
         File previewFile = new File(UrlParts.ensureEndsWithSlash(getBasePath()) + "prev_s/c/a/e/ac47975c-8fe0-40ad-b811-eb80c899fcae.gif");
         FileUtils.copyFile(new File(asset.toURI()), destFile);
@@ -102,7 +102,7 @@ public class FsFileStorageServiceTest {
     public void copyTest() throws Exception {
         // given
         AssetEntity copySource = getSampleAssetEntity();
-        URL asset = ClassLoader.class.getResource("/assets/rocketbase.gif");
+        URL asset = ClassLoader.getSystemResource("assets/rocketbase.gif");
         getStorage().upload(copySource, new File(asset.toURI()));
 
         AssetEntity copyTarget = getSampleAssetEntity();

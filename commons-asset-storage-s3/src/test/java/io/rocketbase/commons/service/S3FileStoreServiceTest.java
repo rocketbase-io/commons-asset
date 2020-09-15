@@ -44,7 +44,7 @@ public class S3FileStoreServiceTest {
     public void uploadTest() throws Exception {
         // given
         AssetEntity assetEntity = getSampleAssetEntity();
-        URL asset = ClassLoader.class.getResource("/assets/rocketbase.gif");
+        URL asset = ClassLoader.getSystemResource("assets/rocketbase.gif");
 
         // when
         getStorage().upload(assetEntity, new File(asset.toURI()));
@@ -61,7 +61,7 @@ public class S3FileStoreServiceTest {
         AssetEntity assetEntity = getSampleAssetEntity();
         assetEntity.setReferenceUrl("https://images.unsplash.com/photo-1593642531955-b62e17bdaa9c?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=3750&q=80");
         assetEntity.setOriginalFilename("äö¿ßtest.png");
-        URL asset = ClassLoader.class.getResource("/assets/äö¿ßtest.png");
+        URL asset = ClassLoader.getSystemResource("assets/äö¿ßtest.png");
 
         // when
         getStorage().upload(assetEntity, new File(asset.toURI()));

@@ -28,7 +28,7 @@ public class DefaultJavaAssetHandlerTest {
                 .previewQuality(getPreviewQualityMap())
                 .build());
 
-        URL asset = ClassLoader.class.getResource("/assets/max-duzij-qAjJk-un3BI-unsplash.jpg");
+        URL asset = ClassLoader.getSystemResource("assets/max-duzij-qAjJk-un3BI-unsplash.jpg");
         PreviewSize size = PreviewSize.S;
 
         // when
@@ -50,7 +50,7 @@ public class DefaultJavaAssetHandlerTest {
         AssetHandler previewService = new DefaultJavaAssetHandler(AssetHandlerConfig.builder()
                 .lqipPreview(new SimplePreviewParameter(50, 50, 0.07f))
                 .build());
-        URL asset = ClassLoader.class.getResource("/assets/icon-tomate.png");
+        URL asset = ClassLoader.getSystemResource("assets/icon-tomate.png");
         PreviewSize size = PreviewSize.S;
 
         // when
@@ -70,7 +70,7 @@ public class DefaultJavaAssetHandlerTest {
         AssetHandler previewService = new DefaultJavaAssetHandler(AssetHandlerConfig.builder()
                 .lqipPreview(new SimplePreviewParameter(50, 50, 0.07f))
                 .build());
-        URL asset = ClassLoader.class.getResource("/assets/icon-tomate.png");
+        URL asset = ClassLoader.getSystemResource("assets/icon-tomate.png");
         PreviewSize size = PreviewSize.S;
 
         // when
@@ -91,7 +91,7 @@ public class DefaultJavaAssetHandlerTest {
         AssetHandler previewService = new DefaultJavaAssetHandler(AssetHandlerConfig.builder()
                 .lqipPreview(new SimplePreviewParameter(75, 75, 0.07f))
                 .build());
-        URL asset = ClassLoader.class.getResource("/assets/max-duzij-qAjJk-un3BI-unsplash.jpg");
+        URL asset = ClassLoader.getSystemResource("assets/max-duzij-qAjJk-un3BI-unsplash.jpg");
 
         // when
         ImageHandlingResult result = previewService.getLqip(AssetType.JPEG, new File(asset.toURI()));
@@ -105,7 +105,7 @@ public class DefaultJavaAssetHandlerTest {
     public void getLqipPng() throws Exception {
         // given
         AssetHandler previewService = new DefaultJavaAssetHandler(new AssetHandlerConfig());
-        URL asset = ClassLoader.class.getResource("/assets/pnggrad8rgb.png");
+        URL asset = ClassLoader.getSystemResource("assets/pnggrad8rgb.png");
 
         // when
         ImageHandlingResult result = previewService.getLqip(AssetType.PNG, new File(asset.toURI()));
@@ -121,7 +121,7 @@ public class DefaultJavaAssetHandlerTest {
         AssetHandler previewService = new DefaultJavaAssetHandler(AssetHandlerConfig.builder()
                 .lqipPreview(new SimplePreviewParameter(50, 50, 0.07f))
                 .build());
-        URL asset = ClassLoader.class.getResource("/assets/rocketbase.gif");
+        URL asset = ClassLoader.getSystemResource("assets/rocketbase.gif");
 
         // when
         ImageHandlingResult result = previewService.getLqip(AssetType.GIF, new File(asset.toURI()));
