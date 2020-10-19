@@ -110,7 +110,7 @@ public class AssetJpaRepository implements AssetRepository<AssetJpaEntity>, Pred
                 criteriaQuery.distinct(true);
                 MapJoin<AssetJpaEntity, String, String> mapJoin = root.joinMap("keyValueMap");
                 for (Map.Entry<String, String> keyEntry : query.getKeyValues().entrySet()) {
-                    predicates.add(cb.and(cb.equal(mapJoin.key(), keyEntry.getKey().toLowerCase()), cb.equal(cb.lower(mapJoin.value()), keyEntry.getValue().toLowerCase())));
+                    predicates.add(cb.and(cb.equal(mapJoin.key(), keyEntry.getKey()), cb.equal(cb.lower(mapJoin.value()), keyEntry.getValue().toLowerCase())));
                 }
             }
             return cb.and(predicates.toArray(new Predicate[]{}));

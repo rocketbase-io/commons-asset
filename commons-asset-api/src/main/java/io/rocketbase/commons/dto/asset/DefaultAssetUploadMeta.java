@@ -1,9 +1,6 @@
 package io.rocketbase.commons.dto.asset;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import javax.annotation.Nullable;
 import java.time.Instant;
@@ -22,6 +19,7 @@ public class DefaultAssetUploadMeta implements AssetUploadMeta {
     private String context;
 
     @Nullable
+    @Singular
     private Map<String, String> keyValues;
 
     @Nullable

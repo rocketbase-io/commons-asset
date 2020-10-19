@@ -101,13 +101,14 @@ public class AssetJpaEntity implements AssetEntity {
 
     @ElementCollection
     @CollectionTable(
-            name = "co_asset_keyvalue_pair",
+            name = "co_asset_keyvalue",
             joinColumns = @JoinColumn(name = "asset_id"),
-            uniqueConstraints = @UniqueConstraint(name = "uk_asset_keyvalue_pair", columnNames = {"asset_id", "field_key"}),
-            indexes = @Index(name = "idx_asset_keyvalue_pair", columnList = "asset_id")
+            uniqueConstraints = @UniqueConstraint(name = "uk_asset_keyvalue", columnNames = {"asset_id", "field_key"}),
+            indexes = @Index(name = "idx_asset_keyvalue", columnList = "asset_id")
     )
     @MapKeyColumn(name = "field_key", length = 50)
-    @Column(name = "field_value", length = 4000, nullable = false)
+    @Lob
+    @Column(name = "field_value", nullable = false)
     @Builder.Default
     private Map<String, String> keyValueMap = new HashMap<>();
 
@@ -126,7 +127,6 @@ public class AssetJpaEntity implements AssetEntity {
         } else {
             this.resolutionEntity = new ResolutionEntity(resolution.getWidth(), resolution.getHeight());
         }
-
     }
 
     @Override
@@ -148,4 +148,7 @@ public class AssetJpaEntity implements AssetEntity {
         return keyValueMap;
     }
 
+    public AssetJpaEntity(String id) {
+        this.id = id;
+    }
 }
