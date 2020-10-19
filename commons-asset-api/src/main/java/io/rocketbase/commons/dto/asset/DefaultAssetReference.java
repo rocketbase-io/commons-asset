@@ -2,8 +2,6 @@ package io.rocketbase.commons.dto.asset;
 
 import lombok.*;
 
-import javax.annotation.Nullable;
-
 
 /**
  * used to store reference in db
@@ -15,37 +13,18 @@ import javax.annotation.Nullable;
 @ToString(exclude = "lqip")
 public class DefaultAssetReference implements AssetReference {
 
-    /**
-     * reference to asset in asset collection
-     */
     private String id;
 
-    /**
-     * optional foreign id of other system
-     */
-    @Nullable
     private String systemRefId;
 
-    /**
-     * relative path of storage
-     */
     private String urlPath;
 
     private AssetType type;
 
-    /**
-     * allows to store individual grouping for assets to find all picture of a flexible type<br>
-     * for example all avatar images or backgrounds...
-     */
-    @Nullable
     private String context;
 
     private AssetMeta meta;
 
-    /**
-     * Low Quality Image Placeholder (LQIP) that is a base64 preview in ultra low-res + quality
-     */
-    @Nullable
     private String lqip;
 
     public DefaultAssetReference(AssetReference other) {
@@ -55,5 +34,6 @@ public class DefaultAssetReference implements AssetReference {
         this.type = other.getType();
         this.context = other.getContext();
         this.meta = other.getMeta() != null ? new AssetMeta(other.getMeta()) : null;
+        this.lqip = other.getLqip();
     }
 }

@@ -11,7 +11,7 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-import javax.annotation.Nullable;
+import org.springframework.lang.Nullable;
 import java.time.Instant;
 import java.util.HashMap;
 import java.util.Map;

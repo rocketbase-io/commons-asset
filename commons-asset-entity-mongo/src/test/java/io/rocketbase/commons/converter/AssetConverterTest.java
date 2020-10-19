@@ -96,7 +96,7 @@ public class AssetConverterTest {
         AssetApiProperties assetApiProperties = new AssetApiProperties();
         AssetConverter converter = new AssetConverter(assetApiProperties, new DefaultAssetPreviewService(assetApiProperties, null, false));
         // when
-        DefaultAssetReference assetReference = converter.fromEntity(entity).toReference();
+        AssetReference assetReference = converter.fromEntity(entity).toReference();
 
         // then
         assertThat(assetReference, notNullValue());
@@ -120,7 +120,7 @@ public class AssetConverterTest {
         AssetApiProperties assetApiProperties = new AssetApiProperties();
         AssetConverter converter = new AssetConverter(assetApiProperties, new DefaultAssetPreviewService(assetApiProperties, null, false));
         // when
-        DefaultAssetReference assetReference = converter.fromEntity(entity).toReference();
+        AssetReference assetReference = converter.fromEntity(entity).toReference();
 
         // then
         assertThat(assetReference.getLqip(), notNullValue());

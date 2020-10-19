@@ -5,7 +5,7 @@ import io.rocketbase.commons.dto.asset.PreviewSize;
 import io.rocketbase.commons.model.AssetEntity;
 import org.springframework.core.io.InputStreamResource;
 
-import javax.annotation.Nullable;
+import org.springframework.lang.Nullable;
 import java.io.File;
 
 public interface FileStorageService {

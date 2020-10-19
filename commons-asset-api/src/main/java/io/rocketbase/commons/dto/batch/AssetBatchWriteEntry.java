@@ -5,7 +5,7 @@ import io.rocketbase.commons.dto.asset.AssetUploadMeta;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
-import javax.annotation.Nullable;
+import org.springframework.lang.Nullable;
 import javax.validation.constraints.NotNull;
 import java.time.Instant;
 import java.util.Map;
