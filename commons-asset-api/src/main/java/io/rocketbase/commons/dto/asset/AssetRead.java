@@ -2,6 +2,7 @@ package io.rocketbase.commons.dto.asset;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import io.rocketbase.commons.model.HasKeyValue;
 import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -14,7 +15,7 @@ import java.util.Map;
 
 @Data
 @EqualsAndHashCode(callSuper = true)
-public class AssetRead extends DefaultAssetReference {
+public class AssetRead extends DefaultAssetReference implements HasKeyValue {
 
     private AssetPreviews previews;
 
