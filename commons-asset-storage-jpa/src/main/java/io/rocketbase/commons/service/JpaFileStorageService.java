@@ -1,7 +1,7 @@
 package io.rocketbase.commons.service;
 
 import io.rocketbase.commons.config.AssetApiProperties;
-import io.rocketbase.commons.dto.asset.AssetReferenceType;
+import io.rocketbase.commons.dto.asset.AssetReference;
 import io.rocketbase.commons.dto.asset.PreviewSize;
 import io.rocketbase.commons.exception.NotFoundException;
 import io.rocketbase.commons.model.AssetEntity;
@@ -41,7 +41,7 @@ public class JpaFileStorageService implements FileStorageService {
 
     @SneakyThrows
     @Override
-    public void storePreview(AssetReferenceType reference, File file, PreviewSize previewSize) {
+    public void storePreview(AssetReference reference, File file, PreviewSize previewSize) {
         AssetFileEntity assetFileEntity = AssetFileEntity.builder()
                 .id(buildPreviewSizeId(reference, previewSize))
                 .binary(BlobProxy.generateProxy(new FileInputStream(file), file.length()))
@@ -49,7 +49,7 @@ public class JpaFileStorageService implements FileStorageService {
         entityManager.persist(assetFileEntity);
     }
 
-    protected String buildPreviewSizeId(AssetReferenceType reference, PreviewSize previewSize) {
+    protected String buildPreviewSizeId(AssetReference reference, PreviewSize previewSize) {
         return reference.getId() + "-" + previewSize.name().toLowerCase();
     }
 
@@ -65,7 +65,7 @@ public class JpaFileStorageService implements FileStorageService {
 
     @SneakyThrows
     @Override
-    public InputStreamResource downloadPreview(AssetReferenceType reference, PreviewSize previewSize) {
+    public InputStreamResource downloadPreview(AssetReference reference, PreviewSize previewSize) {
         AssetFileEntity assetFileEntity = entityManager.find(AssetFileEntity.class, buildPreviewSizeId(reference, previewSize));
         if (assetFileEntity == null) {
             throw new NotFoundException("asset with id: " + reference.getId() + " not found");

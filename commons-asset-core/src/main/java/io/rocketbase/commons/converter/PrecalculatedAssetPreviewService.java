@@ -2,7 +2,7 @@ package io.rocketbase.commons.converter;
 
 import io.rocketbase.commons.config.AssetApiProperties;
 import io.rocketbase.commons.converter.AbstractAssetPreviewService;
-import io.rocketbase.commons.dto.asset.AssetReferenceType;
+import io.rocketbase.commons.dto.asset.AssetReference;
 import io.rocketbase.commons.dto.asset.PreviewSize;
 import io.rocketbase.commons.service.FileStorageService;
 import io.rocketbase.commons.util.UrlParts;
@@ -20,7 +20,7 @@ public class PrecalculatedAssetPreviewService extends AbstractAssetPreviewServic
     }
 
     @Override
-    public String getPreviewUrl(AssetReferenceType assetReference, PreviewSize size) {
+    public String getPreviewUrl(AssetReference assetReference, PreviewSize size) {
         String downloadUrl = fileStorageService != null ? fileStorageService.getDownloadPreviewUrl(assetReference, size) : null;
         if (downloadUrl == null) {
             return UrlParts.removeEndsWithSlash(assetApiProperties.getBaseUrl()) + assetApiProperties.getPath() + "/" + assetReference.getId() + "/" + size.name().toLowerCase();

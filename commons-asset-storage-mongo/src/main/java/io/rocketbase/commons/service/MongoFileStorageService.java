@@ -2,7 +2,7 @@ package io.rocketbase.commons.service;
 
 import com.mongodb.client.gridfs.model.GridFSFile;
 import io.rocketbase.commons.config.AssetApiProperties;
-import io.rocketbase.commons.dto.asset.AssetReferenceType;
+import io.rocketbase.commons.dto.asset.AssetReference;
 import io.rocketbase.commons.dto.asset.PreviewSize;
 import io.rocketbase.commons.exception.NotFoundException;
 import io.rocketbase.commons.model.AssetEntity;
@@ -39,7 +39,7 @@ public class MongoFileStorageService implements FileStorageService {
 
     @SneakyThrows
     @Override
-    public void storePreview(AssetReferenceType reference, File file, PreviewSize previewSize) {
+    public void storePreview(AssetReference reference, File file, PreviewSize previewSize) {
         gridFsTemplate.store(GridFsUpload.fromStream(new FileInputStream(file))
                 .id(buildPreviewSizeId(reference, previewSize))
                 .filename(buildPreviewFilename(reference, previewSize))
@@ -59,16 +59,16 @@ public class MongoFileStorageService implements FileStorageService {
         return gridFsTemplate.getResource(gridFsFile);
     }
 
-    protected String buildPreviewSizeId(AssetReferenceType reference, PreviewSize previewSize) {
+    protected String buildPreviewSizeId(AssetReference reference, PreviewSize previewSize) {
         return reference.getId() + "-" + previewSize.name().toLowerCase();
     }
 
-    protected String buildPreviewFilename(AssetReferenceType reference, PreviewSize previewSize) {
+    protected String buildPreviewFilename(AssetReference reference, PreviewSize previewSize) {
         return reference.getId() + "_" + previewSize.name().toLowerCase() + reference.getType().getFileExtensionForSuffix();
     }
 
     @Override
-    public InputStreamResource downloadPreview(AssetReferenceType reference, PreviewSize previewSize) {
+    public InputStreamResource downloadPreview(AssetReference reference, PreviewSize previewSize) {
         GridFSFile gridFsFile = gridFsTemplate.findOne(getIdQuery(buildPreviewSizeId(reference, previewSize)));
         if (gridFsFile == null) {
             throw new NotFoundException("assetPreview of id " + reference.getId() + " and size " + previewSize + " was not found in system");

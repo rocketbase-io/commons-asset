@@ -133,7 +133,7 @@ public abstract class ThumborPreviewService implements AssetPreviewService {
 
     protected final ThumborProperties thumborProperties;
 
-    public String getPreviewUrl(AssetReferenceType assetReference, PreviewSize size) {
+    public String getPreviewUrl(AssetReference assetReference, PreviewSize size) {
         return getThumbor().buildImage(assetReference.getUrlPath())
                 .resize(size.getMaxWidth(), size.getMaxHeight())
                 .fitIn()
@@ -225,7 +225,7 @@ You can provide your custom BucketResolver bean to allow support for multiple bu
 public class CustomBucketResolver implements BucketResolver {
     
     @Override
-    public String resolveBucketName(AssetReferenceType assetReference) {
+    public String resolveBucketName(AssetReference assetReference) {
         if ("profile".equalsIgnoreCase(assetReference.getContext())) {
             return "profile_bucket";
         }

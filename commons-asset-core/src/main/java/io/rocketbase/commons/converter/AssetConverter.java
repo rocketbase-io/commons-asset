@@ -1,10 +1,7 @@
 package io.rocketbase.commons.converter;
 
 import io.rocketbase.commons.config.AssetApiProperties;
-import io.rocketbase.commons.dto.asset.AssetPreviews;
-import io.rocketbase.commons.dto.asset.AssetRead;
-import io.rocketbase.commons.dto.asset.AssetReference;
-import io.rocketbase.commons.dto.asset.PreviewSize;
+import io.rocketbase.commons.dto.asset.*;
 import io.rocketbase.commons.holder.PreviewSizeContextHolder;
 import io.rocketbase.commons.model.AssetEntity;
 import lombok.RequiredArgsConstructor;
@@ -54,7 +51,7 @@ public class AssetConverter {
         }
     }
 
-    public AssetRead toRead(AssetReference reference) {
+    public AssetRead toRead(DefaultAssetReference reference) {
         List<PreviewSize> sizes = null;
         try {
             sizes = PreviewSizeContextHolder.hasValueSet() ? PreviewSizeContextHolder.getCurrent() : null;
@@ -64,11 +61,11 @@ public class AssetConverter {
         return toRead(reference, sizes);
     }
 
-    public AssetRead toRead(AssetReference reference, List<PreviewSize> sizes) {
+    public AssetRead toRead(DefaultAssetReference reference, List<PreviewSize> sizes) {
         return toRead(reference, sizes, null, null);
     }
 
-    public AssetRead toRead(AssetReference reference, List<PreviewSize> sizes, Map<String, String> keyValues, Instant eol) {
+    public AssetRead toRead(DefaultAssetReference reference, List<PreviewSize> sizes, Map<String, String> keyValues, Instant eol) {
         if (reference == null) {
             return null;
         }
@@ -120,12 +117,12 @@ public class AssetConverter {
                 .build();
     }
 
-    public AssetReference fromEntityWithoutPreviews(AssetEntity entity) {
+    public DefaultAssetReference fromEntityWithoutPreviews(AssetEntity entity) {
         if (entity == null) {
             return null;
         }
 
-        return AssetReference.builder()
+        return DefaultAssetReference.builder()
                 .id(entity.getId())
                 .systemRefId(entity.getSystemRefId())
                 .context(entity.getContext())

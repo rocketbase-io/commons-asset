@@ -1,6 +1,6 @@
 package io.rocketbase.commons.service;
 
-import io.rocketbase.commons.dto.asset.AssetReferenceType;
+import io.rocketbase.commons.dto.asset.AssetReference;
 import io.rocketbase.commons.dto.asset.PreviewSize;
 import io.rocketbase.commons.model.AssetEntity;
 import org.springframework.core.io.InputStreamResource;
@@ -25,7 +25,7 @@ public interface FileStorageService {
      * @param file        preview source
      * @param previewSize size of file
      */
-    void storePreview(AssetReferenceType reference, File file, PreviewSize previewSize);
+    void storePreview(AssetReference reference, File file, PreviewSize previewSize);
 
     /**
      * download resource to tempfile
@@ -42,7 +42,7 @@ public interface FileStorageService {
      * @param previewSize size of preview
      * @return temp-file that has content of storage
      */
-    InputStreamResource downloadPreview(AssetReferenceType reference, PreviewSize previewSize);
+    InputStreamResource downloadPreview(AssetReference reference, PreviewSize previewSize);
 
     /**
      * fetch download url
@@ -52,7 +52,7 @@ public interface FileStorageService {
      * could also return null when not implemented
      */
     @Nullable
-    default String getDownloadUrl(AssetReferenceType reference) {
+    default String getDownloadUrl(AssetReference reference) {
         return null;
     }
 
@@ -66,7 +66,7 @@ public interface FileStorageService {
      * could also return null when not implemented
      */
     @Nullable
-    default String getDownloadPreviewUrl(AssetReferenceType reference, PreviewSize previewSize) {
+    default String getDownloadPreviewUrl(AssetReference reference, PreviewSize previewSize) {
         return null;
     }
 

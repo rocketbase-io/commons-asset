@@ -1,10 +1,7 @@
 package io.rocketbase.commons.service;
 
 import io.rocketbase.commons.config.AssetS3Properties;
-import io.rocketbase.commons.dto.asset.AssetReference;
-import io.rocketbase.commons.dto.asset.AssetType;
-import io.rocketbase.commons.dto.asset.ColorPalette;
-import io.rocketbase.commons.dto.asset.Resolution;
+import io.rocketbase.commons.dto.asset.*;
 import io.rocketbase.commons.model.AssetEntity;
 import io.rocketbase.commons.util.UrlParts;
 import lombok.*;
@@ -83,7 +80,7 @@ public class S3FileStoreServiceTest {
     @Test
     @Ignore
     public void getDownloadUrl() {
-        String url = getStorage().getDownloadUrl(AssetReference.builder()
+        String url = getStorage().getDownloadUrl(DefaultAssetReference.builder()
                 .id("ac47975c-8fe0-40ad-b811-eb80c899fcae")
                 .type(AssetType.GIF)
                 .context("test")

@@ -9,7 +9,7 @@ import lombok.RequiredArgsConstructor;
 
 
 /**
- * used to trick with mapstruct in order to autoconvert id -> {@link AssetReference} or {@link AssetRead}
+ * used to trick with mapstruct in order to autoconvert id -> {@link DefaultAssetReference} or {@link AssetRead}
  */
 @Data
 @RequiredArgsConstructor

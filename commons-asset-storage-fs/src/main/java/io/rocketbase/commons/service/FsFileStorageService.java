@@ -1,7 +1,7 @@
 package io.rocketbase.commons.service;
 
 import io.rocketbase.commons.config.AssetApiProperties;
-import io.rocketbase.commons.dto.asset.AssetReferenceType;
+import io.rocketbase.commons.dto.asset.AssetReference;
 import io.rocketbase.commons.dto.asset.PreviewSize;
 import io.rocketbase.commons.model.AssetEntity;
 import io.rocketbase.commons.util.UrlParts;
@@ -35,7 +35,7 @@ public class FsFileStorageService implements FileStorageService {
 
     @SneakyThrows
     @Override
-    public void storePreview(AssetReferenceType reference, File file, PreviewSize previewSize) {
+    public void storePreview(AssetReference reference, File file, PreviewSize previewSize) {
         String filePath = pathResolver.getAbsolutePath(reference);
         FileUtils.copyFile(file, getPreviewFile(previewSize, reference));
     }
@@ -48,11 +48,11 @@ public class FsFileStorageService implements FileStorageService {
 
     @SneakyThrows
     @Override
-    public InputStreamResource downloadPreview(AssetReferenceType reference, PreviewSize previewSize) {
+    public InputStreamResource downloadPreview(AssetReference reference, PreviewSize previewSize) {
         return new InputStreamResource(new FileInputStream(getPreviewFile(previewSize, reference)));
     }
 
-    protected File getPreviewFile(PreviewSize previewSize, AssetReferenceType reference) {
+    protected File getPreviewFile(PreviewSize previewSize, AssetReference reference) {
         return new File(basePath + previewSize.getPreviewStoragePath() + "/" + pathResolver.getAbsolutePath(reference));
     }
 

@@ -28,11 +28,11 @@ export interface AssetRead extends AssetReference {
 /**
  * used to store reference in db
  */
-export interface AssetReference extends AssetReferenceType {
+export interface AssetReference extends AssetReference {
     lqip?: string;
 }
 
-export interface AssetReferenceType {
+export interface AssetReference {
     context: string;
     id: string;
     type: AssetType;

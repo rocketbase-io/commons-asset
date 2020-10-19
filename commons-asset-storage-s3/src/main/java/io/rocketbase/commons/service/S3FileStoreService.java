@@ -9,7 +9,7 @@ import com.amazonaws.services.s3.transfer.Download;
 import com.amazonaws.services.s3.transfer.TransferManager;
 import com.amazonaws.services.s3.transfer.TransferManagerBuilder;
 import io.rocketbase.commons.config.AssetS3Properties;
-import io.rocketbase.commons.dto.asset.AssetReferenceType;
+import io.rocketbase.commons.dto.asset.AssetReference;
 import io.rocketbase.commons.dto.asset.PreviewSize;
 import io.rocketbase.commons.model.AssetEntity;
 import io.rocketbase.commons.util.Nulls;
@@ -55,7 +55,7 @@ public class S3FileStoreService implements FileStorageService {
 
     @SneakyThrows
     @Override
-    public void storePreview(AssetReferenceType reference, File file, PreviewSize previewSize) {
+    public void storePreview(AssetReference reference, File file, PreviewSize previewSize) {
         TransferManager transferManager = getTransferManager();
 
         ObjectMetadata objectMetadata = generateObjectMeta(reference);
@@ -79,12 +79,12 @@ public class S3FileStoreService implements FileStorageService {
     }
 
     @Override
-    public InputStreamResource downloadPreview(AssetReferenceType reference, PreviewSize previewSize) {
+    public InputStreamResource downloadPreview(AssetReference reference, PreviewSize previewSize) {
         return download(reference, buildPreviewPart(reference, previewSize));
     }
 
     @SneakyThrows
-    protected InputStreamResource download(AssetReferenceType reference, String url) {
+    protected InputStreamResource download(AssetReference reference, String url) {
         File tempFile = File.createTempFile("asset", reference.getType().getFileExtensionForSuffix());
         // not the best cleanup...
         tempFile.deleteOnExit();
@@ -98,20 +98,20 @@ public class S3FileStoreService implements FileStorageService {
 
     @SneakyThrows
     @Override
-    public String getDownloadUrl(AssetReferenceType reference) {
+    public String getDownloadUrl(AssetReference reference) {
         return getDownloadUrl(reference, reference.getUrlPath());
     }
 
     @Override
-    public String getDownloadPreviewUrl(AssetReferenceType reference, PreviewSize previewSize) {
+    public String getDownloadPreviewUrl(AssetReference reference, PreviewSize previewSize) {
         return getDownloadUrl(reference, buildPreviewPart(reference, previewSize));
     }
 
-    protected String buildPreviewPart(AssetReferenceType reference, PreviewSize previewSize) {
+    protected String buildPreviewPart(AssetReference reference, PreviewSize previewSize) {
         return previewSize.getPreviewStoragePath() + "/" + reference.getUrlPath();
     }
 
-    protected String getDownloadUrl(AssetReferenceType reference, String url) {
+    protected String getDownloadUrl(AssetReference reference, String url) {
         if (assetS3Properties.getDownloadExpire() > 0) {
             Date expiration = new Date(new Date().getTime() + 1000 * 60 * assetS3Properties.getDownloadExpire());
             return amazonS3.generatePresignedUrl(bucketResolver.resolveBucketName(reference), url, expiration).toString();
@@ -119,7 +119,7 @@ public class S3FileStoreService implements FileStorageService {
         return buildPublicUrl(reference, url);
     }
 
-    protected String buildPublicUrl(AssetReferenceType reference, String url) {
+    protected String buildPublicUrl(AssetReference reference, String url) {
         return UrlParts.ensureEndsWithSlash(assetS3Properties.getPublicBaseUrl()) + bucketResolver.resolveBucketName(reference) + UrlParts.ensureStartsWithSlash(url);
     }
 
@@ -141,7 +141,7 @@ public class S3FileStoreService implements FileStorageService {
         amazonS3.copyObject(bucketResolver.resolveBucketName(source), source.getUrlPath(), bucketResolver.resolveBucketName(target), target.getUrlPath());
     }
 
-    private ObjectMetadata generateObjectMeta(AssetReferenceType reference) {
+    private ObjectMetadata generateObjectMeta(AssetReference reference) {
         ObjectMetadata objectMetadata = new ObjectMetadata();
         objectMetadata.setContentType(reference.getType().getContentType());
         objectMetadata.setHeader("type", reference.getType().name());
@@ -152,7 +152,7 @@ public class S3FileStoreService implements FileStorageService {
     }
 
     private ObjectMetadata generateObjectMeta(AssetEntity entity) {
-        ObjectMetadata objectMetadata = generateObjectMeta((AssetReferenceType) entity);
+        ObjectMetadata objectMetadata = generateObjectMeta((AssetReference) entity);
         if (entity.getSystemRefId() != null) {
             objectMetadata.setHeader("systemRefId", entity.getSystemRefId());
         }

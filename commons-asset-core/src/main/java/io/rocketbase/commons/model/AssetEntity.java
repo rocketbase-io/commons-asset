@@ -7,7 +7,7 @@ import org.springframework.util.Assert;
 import java.time.Instant;
 import java.util.Map;
 
-public interface AssetEntity extends AssetReferenceType {
+public interface AssetEntity extends AssetReference {
 
     void setId(String id);
 
@@ -87,7 +87,7 @@ public interface AssetEntity extends AssetReferenceType {
 
     @Transient
     default AssetReference toReference() {
-        return AssetReference.builder()
+        return DefaultAssetReference.builder()
                 .id(getId())
                 .systemRefId(getSystemRefId())
                 .context(getContext())

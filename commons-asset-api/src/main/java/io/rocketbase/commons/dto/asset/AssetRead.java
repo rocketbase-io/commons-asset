@@ -14,7 +14,7 @@ import java.util.Map;
 
 @Data
 @EqualsAndHashCode(callSuper = true)
-public class AssetRead extends AssetReference {
+public class AssetRead extends DefaultAssetReference {
 
     private AssetPreviews previews;
 
@@ -50,7 +50,7 @@ public class AssetRead extends AssetReference {
 
 
     @JsonIgnore
-    public AssetReference toReference() {
-        return (AssetReference) this;
+    public DefaultAssetReference toReference() {
+        return (DefaultAssetReference) this;
     }
 }

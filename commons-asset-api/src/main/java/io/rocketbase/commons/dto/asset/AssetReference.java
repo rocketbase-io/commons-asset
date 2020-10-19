@@ -1,60 +1,44 @@
 package io.rocketbase.commons.dto.asset;
 
-import lombok.*;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 
 import javax.annotation.Nullable;
 import java.io.Serializable;
 
-
 /**
- * used to store reference in db
+ * used to store reference in db or elsewhere<br>
+ * could be converted to AssetRead without database access
  */
-@Data
-@Builder
-@AllArgsConstructor
-@NoArgsConstructor
-@ToString(exclude = "lqip")
-public class AssetReference implements Serializable, AssetReferenceType {
+@JsonDeserialize(as = DefaultAssetReference.class)
+public interface AssetReference extends Serializable {
 
     /**
      * reference to asset in asset collection
      */
-    private String id;
+    String getId();
 
     /**
      * optional foreign id of other system
      */
     @Nullable
-    private String systemRefId;
+    String getSystemRefId();
 
     /**
      * relative path of storage
      */
-    private String urlPath;
+    String getUrlPath();
 
-    private AssetType type;
+    AssetType getType();
 
     /**
      * allows to store individual grouping for assets to find all picture of a flexible type<br>
      * for example all avatar images or backgrounds...
      */
     @Nullable
-    private String context;
-
-    private AssetMeta meta;
+    String getContext();
 
     /**
      * Low Quality Image Placeholder (LQIP) that is a base64 preview in ultra low-res + quality
      */
-    @Nullable
-    private String lqip;
-
-    public AssetReference(AssetReferenceType other) {
-        this.id = other.getId();
-        this.systemRefId = other.getSystemRefId();
-        this.urlPath = other.getUrlPath();
-        this.type = other.getType();
-        this.context = other.getContext();
-        this.meta = other.getMeta() != null ? new AssetMeta(other.getMeta()) : null;
-    }
+    AssetMeta getMeta();
 }
