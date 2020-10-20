@@ -7,7 +7,10 @@ import io.rocketbase.commons.model.AssetEntity;
 import lombok.RequiredArgsConstructor;
 
 import java.time.Instant;
-import java.util.*;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
@@ -51,7 +54,7 @@ public class AssetConverter {
         }
     }
 
-    public AssetRead toRead(DefaultAssetReference reference) {
+    public AssetRead toRead(AssetReference reference) {
         List<PreviewSize> sizes = null;
         try {
             sizes = PreviewSizeContextHolder.hasValueSet() ? PreviewSizeContextHolder.getCurrent() : null;
@@ -61,11 +64,11 @@ public class AssetConverter {
         return toRead(reference, sizes);
     }
 
-    public AssetRead toRead(DefaultAssetReference reference, List<PreviewSize> sizes) {
+    public AssetRead toRead(AssetReference reference, List<PreviewSize> sizes) {
         return toRead(reference, sizes, null, null);
     }
 
-    public AssetRead toRead(DefaultAssetReference reference, List<PreviewSize> sizes, Map<String, String> keyValues, Instant eol) {
+    public AssetRead toRead(AssetReference reference, List<PreviewSize> sizes, Map<String, String> keyValues, Instant eol) {
         if (reference == null) {
             return null;
         }
@@ -117,20 +120,11 @@ public class AssetConverter {
                 .build();
     }
 
-    public DefaultAssetReference fromEntityWithoutPreviews(AssetEntity entity) {
+    public AssetReference fromEntityWithoutPreviews(AssetEntity entity) {
         if (entity == null) {
             return null;
         }
-
-        return DefaultAssetReference.builder()
-                .id(entity.getId())
-                .systemRefId(entity.getSystemRefId())
-                .context(entity.getContext())
-                .urlPath(entity.getUrlPath())
-                .type(entity.getType())
-                .meta(entity.getMeta())
-                .lqip(entity.getLqip())
-                .build();
+        return entity.toReference();
     }
 
     public List<AssetRead> fromEntities(List<AssetEntity> entities, List<PreviewSize> sizes) {
