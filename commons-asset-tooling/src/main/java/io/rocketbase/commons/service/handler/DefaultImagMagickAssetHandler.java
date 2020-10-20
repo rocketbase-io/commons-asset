@@ -90,7 +90,7 @@ public class DefaultImagMagickAssetHandler implements AssetHandler {
                 Info imageInfo = new Info(file.getAbsolutePath() + FIRST_FRAME, true);
                 return new Resolution(imageInfo.getImageWidth(), imageInfo.getImageHeight());
             } catch (Exception e) {
-                log.error("could not read resolution from file {}", file.getPath());
+                log.error("could not read resolution from file {}, error: {}", file.getPath(), e.getMessage());
             }
         }
         return null;
@@ -98,6 +98,7 @@ public class DefaultImagMagickAssetHandler implements AssetHandler {
 
     public ColorPalette getColorPalette(AssetType type, File file) {
         if (isPreviewSupported(type)) {
+            File tempFile = null;
             try {
                 IMOperation operation = new IMOperation();
                 operation.addImage(file.getAbsolutePath() + FIRST_FRAME);
@@ -106,16 +107,22 @@ public class DefaultImagMagickAssetHandler implements AssetHandler {
                 if (type.couldHaveTransparency()) {
                     operation.background(BACKGROUND_WHITE);
                 }
-                File tempFile = File.createTempFile("asset-analyse-colordetect", ".jpg");
+                tempFile = File.createTempFile("asset-analyse-colordetect", ".jpg");
                 operation.addImage(tempFile.getAbsolutePath());
                 convertCmd.run(operation);
 
                 BufferedImage bufferedImage = ImageIO.read(tempFile);
                 ColorPalette result = ColorDetection.detect(bufferedImage);
-                tempFile.delete();
                 return result;
             } catch (Exception e) {
-                log.error("could not read colors from file {}", file.getPath());
+                log.error("could not read colors from file {}, error: {}", file.getPath(), e.getMessage());
+            } finally {
+                if (tempFile != null) {
+                    try {
+                        tempFile.delete();
+                    } catch (Exception ee) {
+                    }
+                }
             }
         }
         return null;
@@ -128,7 +135,6 @@ public class DefaultImagMagickAssetHandler implements AssetHandler {
         }
         PreviewParameter previewSize = Nulls.notNull(config.getLqipPreview(), PreviewSize.XS);
 
-
         IMOperation operation = new IMOperation();
         operation.addImage(file.getAbsolutePath() + FIRST_FRAME);
         // a proper size
@@ -139,12 +145,23 @@ public class DefaultImagMagickAssetHandler implements AssetHandler {
             operation.background(BACKGROUND_WHITE);
         }
 
-        File tempFile = File.createTempFile("asset-lqip", ".jpg");
-        operation.addImage(tempFile.getAbsolutePath());
+        File tempFile = null;
+        try {
+            tempFile = File.createTempFile("asset-lqip", ".jpg");
+            operation.addImage(tempFile.getAbsolutePath());
 
-        convertCmd.run(operation);
-        ImageHandlingResult result = new ImageHandlingResult(IOUtils.toByteArray(tempFile.toURI()), AssetType.JPEG);
-        tempFile.delete();
-        return result;
+            convertCmd.run(operation);
+            return new ImageHandlingResult(IOUtils.toByteArray(tempFile.toURI()), AssetType.JPEG);
+        } catch (Exception e) {
+            log.error("couldn't process lqip for file: {}, error: {}", file.getPath(), e.getMessage());
+            throw new UnsupportedOperationException("file is not processable");
+        } finally {
+            if (tempFile != null) {
+                try {
+                    tempFile.delete();
+                } catch (Exception ee) {
+                }
+            }
+        }
     }
 }
