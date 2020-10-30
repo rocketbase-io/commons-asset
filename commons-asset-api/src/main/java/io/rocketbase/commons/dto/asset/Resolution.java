@@ -5,8 +5,8 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-
 import org.springframework.lang.Nullable;
+
 import java.io.Serializable;
 
 @Data
@@ -48,7 +48,7 @@ public class Resolution implements Serializable {
     }
 
     /**
-     * check's if resolution if bigger than given size
+     * check's if resolution is bigger than given size
      *
      * @return true = bigger then given parameter, false = smaller or null
      */
@@ -58,6 +58,19 @@ public class Resolution implements Serializable {
             return false;
         }
         return width > maxWidth || height > maxHeight;
+    }
+
+    /**
+     * check's if resolution is bigger than given size
+     *
+     * @return true = bigger then given parameter, false = smaller or null
+     */
+    @JsonIgnore
+    public boolean isBiggerThan(PreviewSize previewSize) {
+        if (previewSize == null) {
+            return false;
+        }
+        return isBiggerThan(previewSize.getMaxWidth(), previewSize.getMaxHeight());
     }
 
     /**

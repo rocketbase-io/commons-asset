@@ -28,13 +28,17 @@ public class PrecalculateOnAfterUploadEventListener implements ApplicationListen
             if (assetHandler.isPreviewSupported(entity.getType())) {
                 Stopwatch stopwatch = Stopwatch.createStarted();
                 assetApiProperties.getPreviewSizes()
-                        .forEach(s -> {
-                            File previewFile = assetHandler.getPreview(entity.getType(),
-                                    assetAfterUploadEvent.getModification().getFile(),
-                                    PreviewConfig.builder()
-                                            .previewSize(s)
-                                            .build());
-                            fileStorageService.storePreview(entity, previewFile, s);
+                        .forEach(previewSize -> {
+                            if (entity.getResolution() == null || entity.getResolution().isBiggerThan(previewSize)) {
+                                File previewFile = assetHandler.getPreview(entity.getType(),
+                                        assetAfterUploadEvent.getModification().getFile(),
+                                        PreviewConfig.builder()
+                                                .previewSize(previewSize)
+                                                .build());
+                                fileStorageService.storePreview(entity, previewFile, previewSize);
+                            } else {
+                                fileStorageService.storePreview(entity, assetAfterUploadEvent.getModification().getFile(), previewSize);
+                            }
                         });
                 if (log.isDebugEnabled()) {
                     log.debug("precalculated asset previews took: {} ms for sizes: {}", stopwatch.elapsed(TimeUnit.MILLISECONDS), assetApiProperties.getPreviewSizes());

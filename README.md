@@ -88,7 +88,7 @@ Containing an implementation for storing asset references...
 | asset.api.analyse | tru | you can disable analyse endpoint |
 | asset.api.preview  | true              | should only been taken in case of mongo-storage<br />please consider also using outside caching |
 | asset.api.detect-resolution    | true              | you can disable image resolution detection                              |
-| asset.api.detect-color    | true              | you can disable image colorThief                              |
+| asset.api.detect-colors    | true              | you can disable image colorThief                              |
 | asset.api.base-url  | ""                | used for previewUrls in case of mongo-storage, will get used as fallback |
 | asset.api.preview-quality | XS: 0.7<br />S: 0.75<br />M: 0.8<br />L: 0.85<br />XL: 0.85 | configure quality of image preview via java-code. Its a Map<String, Float> Configuration and the key needs to match the enum PreviewSize<br /><br />ValueRange is between 0 - 1.<br />1 means 100% |
 | asset.api.preview-sizes | XS, S, M, L, XL | configure possible preview-sizes (will limit precalcuation + assetRead previewSizes) |
