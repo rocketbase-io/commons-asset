@@ -1,5 +1,6 @@
 package io.rocketbase.commons.dto.asset;
 
+import io.rocketbase.commons.util.Nulls;
 import lombok.Getter;
 
 import java.util.Arrays;
@@ -9,16 +10,20 @@ import java.util.Set;
 
 public enum AssetType {
 
-    JPEG("image/jpeg"),
+    JPEG("image/jpeg", "jpg"),
     PNG("image/png"),
+    APNG("image/apng"),
     GIF("image/gif"),
     TIFF("image/tiff"),
-    SVG("image/svg+xml"),
+    BMP("image/bmp"),
+    ICO("image/x-ico", "ico"),
+    SVG("image/svg+xml", "svg"),
     WEBP("image/webp"),
     HEIF("image/heif"),
     HEIC("image/heic"),
     PDF("application/pdf"),
     ZIP("application/zip"),
+    CSV("application/csv"),
     XLS("application/msexcel"),
     XLSX("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"),
     DOC("application/msword"),
@@ -28,9 +33,15 @@ public enum AssetType {
 
     @Getter
     private String contentType;
+    private String fileExtension;
 
     AssetType(String contentType) {
+        this(contentType, null);
+    }
+
+    AssetType(String contentType, String fileExtension) {
         this.contentType = contentType;
+        this.fileExtension = fileExtension;
     }
 
     public static Set<String> getSupportedContentTypes() {
@@ -80,7 +91,7 @@ public enum AssetType {
     }
 
     public String getFileExtension() {
-        return JPEG.equals(this) ? "jpg" : name().toLowerCase();
+        return Nulls.notNull(fileExtension, name().toLowerCase());
     }
 
     public String getFileExtensionForSuffix() {

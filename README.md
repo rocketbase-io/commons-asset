@@ -85,7 +85,7 @@ Containing an implementation for storing asset references...
 | asset.api.delete   | true              | when false no delete is possible                             |
 | asset.api.copy   | true              | when false no copy is possible                             |
 | asset.api.batch    | true              | you can disable batch endpoint                               |
-| asset.api.analyse | tru | you can disable analyse endpoint |
+| asset.api.analyse | true | you can disable analyse endpoint |
 | asset.api.preview  | true              | should only been taken in case of mongo-storage<br />please consider also using outside caching |
 | asset.api.detect-resolution    | true              | you can disable image resolution detection                              |
 | asset.api.detect-colors    | true              | you can disable image colorThief                              |
