@@ -1,17 +1,22 @@
 package io.rocketbase.commons.service;
 
 import io.rocketbase.commons.converter.AssetConverter;
-import io.rocketbase.commons.dto.asset.AssetAnalyse;
-import io.rocketbase.commons.dto.asset.PreviewSize;
+import io.rocketbase.commons.dto.asset.*;
 import io.rocketbase.commons.dto.batch.*;
 import io.rocketbase.commons.exception.AssetErrorCodes;
 import io.rocketbase.commons.exception.InvalidContentTypeException;
 import io.rocketbase.commons.model.AssetEntity;
 import io.rocketbase.commons.service.download.DownloadService;
+import io.rocketbase.commons.util.Nulls;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 
 import javax.annotation.Resource;
 import java.util.List;
+import java.util.Optional;
 
+@Slf4j
 public class AssetBatchService {
 
     @Resource
@@ -19,6 +24,9 @@ public class AssetBatchService {
 
     @Resource
     private AssetService assetService;
+
+    @Resource
+    private AssetRepository<AssetEntity> assetRepository;
 
     @Resource
     private DownloadService downloadService;
@@ -34,9 +42,7 @@ public class AssetBatchService {
         AssetBatchResult.AssetBatchResultBuilder builder = AssetBatchResult.builder();
         for (AssetBatchWriteEntry entry : assetBatch.getEntries()) {
             try {
-                DownloadService.TempDownload download = downloadService.downloadUrl(entry.getUrl());
-                AssetEntity asset = assetService.storeAndDeleteFile(download.getFile(), download.getFilename(), download.getFile().length(), entry.getUrl(), entry);
-                builder.success(entry.getUrl(), assetConverter.fromEntity(asset, previewSizes));
+                builder.success(entry.getUrl(), assetConverter.fromEntity(downloadOrUseCache(entry, assetBatch.getUseCache()), previewSizes));
             } catch (DownloadService.DownloadError e) {
                 builder.failure(entry.getUrl(), e.getErrorCode());
             } catch (InvalidContentTypeException e) {
@@ -46,6 +52,18 @@ public class AssetBatchService {
             }
         }
         return builder.build();
+    }
+
+    public Optional<AssetRead> migrateSingle(String url, AssetUploadMeta meta, boolean useCache) {
+        try {
+            AssetEntity entity = downloadOrUseCache(url, meta, useCache);
+            if (entity != null) {
+                return Optional.of(assetConverter.fromEntity(entity));
+            }
+        } catch (Exception e) {
+            log.error("couldn't migrate url: {}, error: {}", url, e.getMessage());
+        }
+        return Optional.empty();
     }
 
     /**
@@ -58,9 +76,7 @@ public class AssetBatchService {
         AssetBatchResultWithoutPreviews.AssetBatchResultWithoutPreviewsBuilder builder = AssetBatchResultWithoutPreviews.builder();
         for (AssetBatchWriteEntry entry : assetBatch.getEntries()) {
             try {
-                DownloadService.TempDownload download = downloadService.downloadUrl(entry.getUrl());
-                AssetEntity asset = assetService.storeAndDeleteFile(download.getFile(), download.getFilename(), download.getFile().length(), entry.getUrl(), entry);
-                builder.success(entry.getUrl(), assetConverter.fromEntityWithoutPreviews(asset));
+                builder.success(entry.getUrl(), assetConverter.fromEntityWithoutPreviews(downloadOrUseCache(entry, assetBatch.getUseCache())));
             } catch (DownloadService.DownloadError e) {
                 builder.failure(entry.getUrl(), e.getErrorCode());
             } catch (InvalidContentTypeException e) {
@@ -70,6 +86,24 @@ public class AssetBatchService {
             }
         }
         return builder.build();
+    }
+
+    protected AssetEntity downloadOrUseCache(AssetBatchWriteEntry entry, Boolean useCache) throws Exception {
+        return downloadOrUseCache(entry.getUrl(), entry, useCache);
+    }
+
+    protected AssetEntity downloadOrUseCache(String url, AssetUploadMeta meta, Boolean useCache) throws Exception {
+        if (Nulls.notNull(useCache, false)) {
+            Page<AssetEntity> page = assetRepository.findAll(QueryAsset.builder()
+                    .referenceUrl(url)
+                    .build(), PageRequest.of(0, 1));
+            if (page.getTotalElements() == 1) {
+                return page.getContent().get(0);
+            }
+        }
+        DownloadService.TempDownload download = downloadService.downloadUrl(url);
+        AssetEntity asset = assetService.storeAndDeleteFile(download.getFile(), download.getFilename(), download.getFile().length(), url, meta);
+        return asset;
     }
 
     /**

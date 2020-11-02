@@ -12,6 +12,11 @@ import java.util.List;
 @AllArgsConstructor
 public class AssetBatchWrite implements Serializable {
 
+    /**
+     * when enabled pre check if downloadUrl has already been downloaded - then take it
+     */
+    private Boolean useCache;
+
     @Singular
     @NotNull
     private List<AssetBatchWriteEntry> entries;

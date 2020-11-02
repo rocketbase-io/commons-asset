@@ -670,6 +670,11 @@
     "AssetBatchWrite": {
       "type": "object",
       "properties": {
+        "useCache":{
+          "type": "boolean",
+          "default": "false",
+          "description": "when enabled pre check if downloadUrl has already been downloaded - then take it"
+        },
         "entries": {
           "type": "array",
           "items": {
