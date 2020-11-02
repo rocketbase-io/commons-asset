@@ -2,7 +2,7 @@
   "swagger": "2.0",
   "info": {
     "description": "Provides services + rest-controller to handle asset with different storage engines.",
-    "version": "4.1.0",
+    "version": "4.4.0",
     "title": "commons-asset api",
     "contact": {
       "name": "rocketbase.io",
