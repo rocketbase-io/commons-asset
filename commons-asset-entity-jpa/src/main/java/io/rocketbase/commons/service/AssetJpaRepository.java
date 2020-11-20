@@ -3,7 +3,7 @@ package io.rocketbase.commons.service;
 import com.google.common.hash.Hashing;
 import io.rocketbase.commons.dto.asset.QueryAsset;
 import io.rocketbase.commons.model.AssetJpaEntity;
-import io.rocketbase.commons.model.AssetJpaKeyValueJpaEntity;
+import io.rocketbase.commons.model.AssetJpaKeyValueEntity;
 import io.rocketbase.commons.repository.AssetEntityRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -113,9 +113,9 @@ public class AssetJpaRepository implements AssetRepository<AssetJpaEntity>, Pred
             root.fetch("keyValues", JoinType.LEFT);
 
             if (query.getKeyValues() != null && !query.getKeyValues().isEmpty()) {
-                Subquery<AssetJpaKeyValueJpaEntity> subQuery = criteriaQuery.subquery(AssetJpaKeyValueJpaEntity.class);
-                Root<AssetJpaKeyValueJpaEntity> subRoot = subQuery.from(AssetJpaKeyValueJpaEntity.class);
-                Join<AssetJpaKeyValueJpaEntity, AssetJpaEntity> subJoin = subRoot.join("asset", JoinType.INNER);
+                Subquery<AssetJpaKeyValueEntity> subQuery = criteriaQuery.subquery(AssetJpaKeyValueEntity.class);
+                Root<AssetJpaKeyValueEntity> subRoot = subQuery.from(AssetJpaKeyValueEntity.class);
+                Join<AssetJpaKeyValueEntity, AssetJpaEntity> subJoin = subRoot.join("asset", JoinType.INNER);
                 subQuery.select(subJoin.get("id"));
 
                 List<Predicate> subPredicates = new ArrayList<>();

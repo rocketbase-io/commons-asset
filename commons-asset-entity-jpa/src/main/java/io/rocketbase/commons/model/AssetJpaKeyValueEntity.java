@@ -29,7 +29,7 @@ import java.time.Instant;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class AssetJpaKeyValueJpaEntity implements Serializable {
+public class AssetJpaKeyValueEntity implements Serializable {
 
     @Id
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
@@ -54,7 +54,7 @@ public class AssetJpaKeyValueJpaEntity implements Serializable {
     @LastModifiedDate
     private Instant lastUpdate;
 
-    public AssetJpaKeyValueJpaEntity(AssetJpaEntity asset, String fieldKey, String fieldValue) {
+    public AssetJpaKeyValueEntity(AssetJpaEntity asset, String fieldKey, String fieldValue) {
         this.asset = asset;
         this.fieldKey = fieldKey;
         this.fieldValue = fieldValue;

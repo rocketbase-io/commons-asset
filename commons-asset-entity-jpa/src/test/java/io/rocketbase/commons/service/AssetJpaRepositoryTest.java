@@ -5,7 +5,7 @@ import io.rocketbase.commons.dto.asset.AssetType;
 import io.rocketbase.commons.dto.asset.QueryAsset;
 import io.rocketbase.commons.model.AssetEntity;
 import io.rocketbase.commons.model.AssetJpaEntity;
-import io.rocketbase.commons.model.AssetJpaKeyValueJpaEntity;
+import io.rocketbase.commons.model.AssetJpaKeyValueEntity;
 import io.rocketbase.commons.repository.AssetEntityRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.Before;
@@ -46,9 +46,9 @@ public class AssetJpaRepositoryTest {
     private AssetEntityRepository repository;
 
     protected AssetJpaEntity buildKeyValues(AssetJpaEntity entity, Pair<String, String>... values) {
-        List<AssetJpaKeyValueJpaEntity> keyValues = new ArrayList<>();
+        List<AssetJpaKeyValueEntity> keyValues = new ArrayList<>();
         for (Pair<String, String> v : values) {
-            keyValues.add(new AssetJpaKeyValueJpaEntity(entity, v.getFirst(), v.getSecond()));
+            keyValues.add(new AssetJpaKeyValueEntity(entity, v.getFirst(), v.getSecond()));
         }
         entity.setKeyValues(keyValues);
         return entity;
@@ -124,7 +124,7 @@ public class AssetJpaRepositoryTest {
                     assertThat(v.getId(), notNullValue());
                     assertThat(v.getCreated(), notNullValue());
                     if (v.getKeyValues() != null) {
-                        for (AssetJpaKeyValueJpaEntity e : v.getKeyValueEntities()) {
+                        for (AssetJpaKeyValueEntity e : v.getKeyValueEntities()) {
                             assertThat(e.getFieldValueHash(), notNullValue());
                             assertThat(e.getLastUpdate(), notNullValue());
                         }

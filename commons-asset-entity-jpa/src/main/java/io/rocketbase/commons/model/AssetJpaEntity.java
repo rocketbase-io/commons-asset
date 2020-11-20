@@ -103,7 +103,7 @@ public class AssetJpaEntity implements AssetEntity {
     private String lqip;
 
     @OneToMany(mappedBy = "asset", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<AssetJpaKeyValueJpaEntity> keyValues;
+    private List<AssetJpaKeyValueEntity> keyValues;
 
     @Nullable
     private Instant eol;
@@ -143,7 +143,7 @@ public class AssetJpaEntity implements AssetEntity {
         }
 
         return ImmutableMap.copyOf(keyValues.stream()
-                .collect(Collectors.toMap(AssetJpaKeyValueJpaEntity::getFieldKey, AssetJpaKeyValueJpaEntity::getFieldValue)));
+                .collect(Collectors.toMap(AssetJpaKeyValueEntity::getFieldKey, AssetJpaKeyValueEntity::getFieldValue)));
     }
 
     @Override
@@ -160,7 +160,7 @@ public class AssetJpaEntity implements AssetEntity {
         findKeyValue(key).ifPresent(v -> getKeyValueEntities().remove(v));
     }
 
-    public Optional<AssetJpaKeyValueJpaEntity> findKeyValue(String key) {
+    public Optional<AssetJpaKeyValueEntity> findKeyValue(String key) {
         if (getKeyValueEntities() != null && key != null) {
             return getKeyValueEntities().stream().filter(v -> v.getFieldKey().equals(key))
                     .findFirst();
@@ -168,7 +168,7 @@ public class AssetJpaEntity implements AssetEntity {
         return Optional.empty();
     }
 
-    public List<AssetJpaKeyValueJpaEntity> getKeyValueEntities() {
+    public List<AssetJpaKeyValueEntity> getKeyValueEntities() {
         return keyValues;
     }
 
