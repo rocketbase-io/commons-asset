@@ -106,7 +106,7 @@ SOFTWARE.
         <maven.compiler.target>1.8</maven.compiler.target>
         <maven.javadoc.failOnError>false</maven.javadoc.failOnError>
 
-        <spring-boot.version>2.3.4.RELEASE</spring-boot.version>
+        <spring-boot.version>2.3.6.RELEASE</spring-boot.version>
 
         <commons-rest.version>2.1.0</commons-rest.version>
         <guava.version>30.0-jre</guava.version>
@@ -116,7 +116,7 @@ SOFTWARE.
         <thumbnailator.version>0.4.11</thumbnailator.version>
         <jacoco.version>0.8.6</jacoco.version>
         <colors.version>0.5.1</colors.version>
-        <aws-sdk-java.version>1.11.882</aws-sdk-java.version>
+        <aws-sdk-java.version>1.11.905</aws-sdk-java.version>
         <imgproxy.version>0.1.0</imgproxy.version>
         <im4java.version>1.4.2</im4java.version>
     </properties>
