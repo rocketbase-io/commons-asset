@@ -5,7 +5,7 @@ import lombok.RequiredArgsConstructor;
 
 @Getter
 @RequiredArgsConstructor
-public class SimplePreviewParameter implements PreviewParameter {
+public class DefaultPreviewParameter implements PreviewParameter {
 
     private final int maxWidth;
 

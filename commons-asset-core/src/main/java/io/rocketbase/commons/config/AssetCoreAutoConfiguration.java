@@ -2,7 +2,7 @@ package io.rocketbase.commons.config;
 
 import io.rocketbase.commons.converter.*;
 import io.rocketbase.commons.dto.asset.PreviewSize;
-import io.rocketbase.commons.dto.asset.SimplePreviewParameter;
+import io.rocketbase.commons.dto.asset.DefaultPreviewParameter;
 import io.rocketbase.commons.service.*;
 import io.rocketbase.commons.service.download.DefaultDownloadService;
 import io.rocketbase.commons.service.download.DownloadService;
@@ -143,7 +143,7 @@ public class AssetCoreAutoConfiguration implements Serializable {
                 .detectColors(assetApiProperties.isDetectColors())
                 .detectResolution(assetApiProperties.isDetectResolution())
                 .lqipEnabled(assetLqipProperties.isEnabled())
-                .lqipPreview(new SimplePreviewParameter(assetLqipProperties.getMaxWidth(), assetLqipProperties.getMaxHeight(), assetLqipProperties.getQuality()))
+                .lqipPreview(new DefaultPreviewParameter(assetLqipProperties.getMaxWidth(), assetLqipProperties.getMaxHeight(), assetLqipProperties.getQuality()))
                 .build();
     }
 

@@ -3,7 +3,7 @@ package io.rocketbase.commons.service.handler;
 import io.rocketbase.commons.dto.ImageHandlingResult;
 import io.rocketbase.commons.dto.asset.AssetType;
 import io.rocketbase.commons.dto.asset.PreviewSize;
-import io.rocketbase.commons.dto.asset.SimplePreviewParameter;
+import io.rocketbase.commons.dto.asset.DefaultPreviewParameter;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.Test;
 
@@ -48,7 +48,7 @@ public class DefaultJavaAssetHandlerTest {
     public void getPreviewOfPngWithoutBackground() throws Exception {
         // given
         AssetHandler previewService = new DefaultJavaAssetHandler(AssetHandlerConfig.builder()
-                .lqipPreview(new SimplePreviewParameter(50, 50, 0.07f))
+                .lqipPreview(new DefaultPreviewParameter(50, 50, 0.07f))
                 .build());
         URL asset = ClassLoader.getSystemResource("assets/icon-tomate.png");
         PreviewSize size = PreviewSize.S;
@@ -68,7 +68,7 @@ public class DefaultJavaAssetHandlerTest {
     public void getPreviewOfPngWithBackground() throws Exception {
         // given
         AssetHandler previewService = new DefaultJavaAssetHandler(AssetHandlerConfig.builder()
-                .lqipPreview(new SimplePreviewParameter(50, 50, 0.07f))
+                .lqipPreview(new DefaultPreviewParameter(50, 50, 0.07f))
                 .build());
         URL asset = ClassLoader.getSystemResource("assets/icon-tomate.png");
         PreviewSize size = PreviewSize.S;
@@ -89,7 +89,7 @@ public class DefaultJavaAssetHandlerTest {
     public void getLqipJpeg() throws Exception {
         // given
         AssetHandler previewService = new DefaultJavaAssetHandler(AssetHandlerConfig.builder()
-                .lqipPreview(new SimplePreviewParameter(75, 75, 0.07f))
+                .lqipPreview(new DefaultPreviewParameter(75, 75, 0.07f))
                 .build());
         URL asset = ClassLoader.getSystemResource("assets/max-duzij-qAjJk-un3BI-unsplash.jpg");
 
@@ -119,7 +119,7 @@ public class DefaultJavaAssetHandlerTest {
     public void getLqipGif() throws Exception {
         // given
         AssetHandler previewService = new DefaultJavaAssetHandler(AssetHandlerConfig.builder()
-                .lqipPreview(new SimplePreviewParameter(50, 50, 0.07f))
+                .lqipPreview(new DefaultPreviewParameter(50, 50, 0.07f))
                 .build());
         URL asset = ClassLoader.getSystemResource("assets/rocketbase.gif");
 

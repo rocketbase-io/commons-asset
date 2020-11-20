@@ -2,7 +2,7 @@ package io.rocketbase.commons.config;
 
 
 import io.rocketbase.commons.dto.asset.PreviewParameter;
-import io.rocketbase.commons.dto.asset.SimplePreviewParameter;
+import io.rocketbase.commons.dto.asset.DefaultPreviewParameter;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -30,7 +30,7 @@ public class AssetShrinkProperties implements Serializable {
     private float quality = 0.9f;
 
     public PreviewParameter getPreviewParameter() {
-        return new SimplePreviewParameter(maxWidth, maxHeight, quality);
+        return new DefaultPreviewParameter(maxWidth, maxHeight, quality);
     }
 
 }
