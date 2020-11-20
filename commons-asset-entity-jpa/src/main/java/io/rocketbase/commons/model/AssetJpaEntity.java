@@ -1,21 +1,24 @@
 package io.rocketbase.commons.model;
 
+import com.google.common.collect.ImmutableMap;
 import io.rocketbase.commons.dto.asset.AssetType;
 import io.rocketbase.commons.dto.asset.ColorPalette;
 import io.rocketbase.commons.dto.asset.Resolution;
+import io.rocketbase.commons.service.AssetJpaRepository;
 import io.rocketbase.commons.util.Nulls;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-
 import org.springframework.lang.Nullable;
+import org.springframework.util.StringUtils;
+
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.time.Instant;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
+import java.util.stream.Collectors;
 
 
 @Entity
@@ -99,18 +102,8 @@ public class AssetJpaEntity implements AssetEntity {
     @Lob
     private String lqip;
 
-    @ElementCollection
-    @CollectionTable(
-            name = "co_asset_keyvalue",
-            joinColumns = @JoinColumn(name = "asset_id"),
-            uniqueConstraints = @UniqueConstraint(name = "uk_asset_keyvalue", columnNames = {"asset_id", "field_key"}),
-            indexes = @Index(name = "idx_asset_keyvalue", columnList = "asset_id")
-    )
-    @MapKeyColumn(name = "field_key", length = 50)
-    @Lob
-    @Column(name = "field_value", nullable = false)
-    @Builder.Default
-    private Map<String, String> keyValueMap = new HashMap<>();
+    @OneToMany(mappedBy = "asset", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<AssetJpaKeyValueJpaEntity> keyValues;
 
     @Nullable
     private Instant eol;
@@ -145,7 +138,52 @@ public class AssetJpaEntity implements AssetEntity {
 
     @Override
     public Map<String, String> getKeyValues() {
-        return keyValueMap;
+        if (keyValues == null) {
+            return Collections.emptyMap();
+        }
+
+        return ImmutableMap.copyOf(keyValues.stream()
+                .collect(Collectors.toMap(AssetJpaKeyValueJpaEntity::getFieldKey, AssetJpaKeyValueJpaEntity::getFieldValue)));
+    }
+
+    @Override
+    public AssetEntity addKeyValue(String key, String value) {
+        if (getKeyValueEntities() == null) {
+            setKeyValues(new ArrayList<>());
+        }
+        findKeyValue(key).ifPresent(v -> v.setFieldValue(value));
+        return this;
+    }
+
+    @Override
+    public void removeKeyValue(String key) {
+        findKeyValue(key).ifPresent(v -> getKeyValueEntities().remove(v));
+    }
+
+    public Optional<AssetJpaKeyValueJpaEntity> findKeyValue(String key) {
+        if (getKeyValueEntities() != null && key != null) {
+            return getKeyValueEntities().stream().filter(v -> v.getFieldKey().equals(key))
+                    .findFirst();
+        }
+        return Optional.empty();
+    }
+
+    public List<AssetJpaKeyValueJpaEntity> getKeyValueEntities() {
+        return keyValues;
+    }
+
+    @PrePersist
+    @PreUpdate
+    public void onPrePersistUpdate() {
+        if (getId() == null) {
+            setId(UUID.randomUUID().toString());
+        }
+        if (!StringUtils.isEmpty(getReferenceUrl())) {
+            setReferenceHash(AssetJpaRepository.hashValue(getReferenceUrl()));
+        }
+        if (created == null) {
+            created = Instant.now();
+        }
     }
 
     public AssetJpaEntity(String id) {

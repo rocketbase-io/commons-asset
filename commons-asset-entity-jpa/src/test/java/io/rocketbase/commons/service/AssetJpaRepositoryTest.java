@@ -5,6 +5,7 @@ import io.rocketbase.commons.dto.asset.AssetType;
 import io.rocketbase.commons.dto.asset.QueryAsset;
 import io.rocketbase.commons.model.AssetEntity;
 import io.rocketbase.commons.model.AssetJpaEntity;
+import io.rocketbase.commons.model.AssetJpaKeyValueJpaEntity;
 import io.rocketbase.commons.repository.AssetEntityRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.Before;
@@ -16,16 +17,16 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.util.Pair;
 import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.time.temporal.ChronoUnit;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Set;
-import java.util.UUID;
 import java.util.stream.Collectors;
 
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -44,12 +45,13 @@ public class AssetJpaRepositoryTest {
     @Resource
     private AssetEntityRepository repository;
 
-    protected Map<String, String> buildKeyValues(Pair<String, String>... values) {
-        Map<String, String> result = new HashMap<>();
+    protected AssetJpaEntity buildKeyValues(AssetJpaEntity entity, Pair<String, String>... values) {
+        List<AssetJpaKeyValueJpaEntity> keyValues = new ArrayList<>();
         for (Pair<String, String> v : values) {
-            result.putIfAbsent(v.getFirst(), v.getSecond());
+            keyValues.add(new AssetJpaKeyValueJpaEntity(entity, v.getFirst(), v.getSecond()));
         }
-        return result;
+        entity.setKeyValues(keyValues);
+        return entity;
     }
 
     @Before
@@ -57,75 +59,77 @@ public class AssetJpaRepositoryTest {
         repository.deleteAll();
 
 
-        assetRepository.save(AssetJpaEntity.builder()
-                .id(UUID.randomUUID().toString())
-                .created(Instant.now())
-                .type(AssetType.JPEG)
-                .originalFilename("oRiginalF.jpg")
-                .created(LocalDateTime.of(2018, 3, 1, 10, 22).toInstant(ZoneOffset.UTC))
-                .keyValueMap(buildKeyValues(Pair.of("_test", "v"), Pair.of("user", "123")))
-                .fileSize(1234L)
-                .build());
-        assetRepository.save(AssetJpaEntity.builder()
-                .id(UUID.randomUUID().toString())
-                .created(Instant.now())
-                .type(AssetType.JPEG)
-                .originalFilename("second.jpg")
-                .created(LocalDateTime.of(2018, 2, 20, 10, 30).toInstant(ZoneOffset.UTC))
-                .keyValueMap(buildKeyValues(Pair.of("_test", "v"), Pair.of("user", "123"), Pair.of("extra", "1")))
-                .fileSize(1234L)
-                .build());
-        assetRepository.save(AssetJpaEntity.builder()
-                .id(UUID.randomUUID().toString())
-                .created(Instant.now())
-                .type(AssetType.PDF)
-                .originalFilename("second-doc.pdf")
-                .referenceUrl("http://www.other.com/second-doc.pdf")
-                .created(LocalDateTime.of(2018, 3, 3, 11, 0).toInstant(ZoneOffset.UTC))
-                .keyValueMap(buildKeyValues(Pair.of("_test", "v"), Pair.of("user", "123")))
-                .fileSize(2345L)
-                .build());
-        assetRepository.save(AssetJpaEntity.builder()
-                .id(UUID.randomUUID().toString())
-                .created(Instant.now())
-                .type(AssetType.PDF)
-                .originalFilename("sample.pdf")
-                .referenceUrl("http://www.rocketbase.io/sample.pdf")
+        assetRepository.save(buildKeyValues(AssetJpaEntity.builder()
+                        .type(AssetType.JPEG)
+                        .originalFilename("oRiginalF.jpg")
+                        .created(LocalDateTime.of(2018, 3, 1, 10, 22).toInstant(ZoneOffset.UTC))
+                        .fileSize(1234L)
+                        .build(),
+                Pair.of("_test", "v"), Pair.of("user", "123"))
+        );
+        assetRepository.save(buildKeyValues(AssetJpaEntity.builder()
+                        .type(AssetType.JPEG)
+                        .originalFilename("second.jpg")
+                        .created(LocalDateTime.of(2018, 2, 20, 10, 30).toInstant(ZoneOffset.UTC))
+                        .fileSize(1234L)
+                        .build(),
+                Pair.of("_test", "v"), Pair.of("user", "123"), Pair.of("extra", "1")));
+        assetRepository.save(buildKeyValues(AssetJpaEntity.builder()
+                        .type(AssetType.PDF)
+                        .originalFilename("second-doc.pdf")
+                        .referenceUrl("http://www.other.com/second-doc.pdf")
+                        .created(LocalDateTime.of(2018, 3, 3, 11, 0).toInstant(ZoneOffset.UTC))
+                        .fileSize(2345L)
+                        .build(),
+                Pair.of("_test", "v"), Pair.of("user", "123")));
+        assetRepository.save(buildKeyValues(AssetJpaEntity.builder()
+                        .type(AssetType.PDF)
+                        .originalFilename("sample.pdf")
+                        .referenceUrl("http://www.rocketbase.io/sample.pdf")
+                        .created(LocalDateTime.of(2018, 4, 11, 2, 0).toInstant(ZoneOffset.UTC))
+                        .fileSize(2345L)
+                        .build(),
+                Pair.of("_test", "v"), Pair.of("user", "123")));
+        assetRepository.save(buildKeyValues(AssetJpaEntity.builder()
+                        .type(AssetType.PDF)
+                        .originalFilename("eol.pdf")
+                        .created(LocalDateTime.of(2019, 12, 31, 11, 0).toInstant(ZoneOffset.UTC))
+                        .eol(Instant.now().minus(5, ChronoUnit.MINUTES))
+                        .fileSize(4567L)
+                        .build(),
+                Pair.of("_test", "v"), Pair.of("user", "MoP")));
+        assetRepository.save(buildKeyValues(AssetJpaEntity.builder()
+                        .type(AssetType.JPEG)
+                        .originalFilename("should-expire-future.jpg")
+                        .created(LocalDateTime.of(2020, 1, 14, 13, 30).toInstant(ZoneOffset.UTC))
+                        .eol(Instant.now().plus(10, ChronoUnit.DAYS))
+                        .fileSize(1568L)
+                        .build(),
+                Pair.of("_test", "v"), Pair.of("user", "mop")));
+        assetRepository.save(buildKeyValues(AssetJpaEntity.builder()
+                        .type(AssetType.GIF)
+                        .originalFilename("expired.gif")
+                        .created(LocalDateTime.of(2020, 2, 2, 22, 30).toInstant(ZoneOffset.UTC))
+                        .eol(Instant.now().minus(10, ChronoUnit.DAYS))
+                        .fileSize(968L)
+                        .build(),
+                Pair.of("_test", "v"), Pair.of("user", "MOP")));
+    }
 
-                .created(LocalDateTime.of(2018, 4, 11, 2, 0).toInstant(ZoneOffset.UTC))
-                .keyValueMap(buildKeyValues(Pair.of("_test", "v"), Pair.of("user", "123")))
-                .fileSize(2345L)
-                .build());
-        assetRepository.save(AssetJpaEntity.builder()
-                .id(UUID.randomUUID().toString())
-                .created(Instant.now())
-                .type(AssetType.PDF)
-                .originalFilename("eol.pdf")
-                .created(LocalDateTime.of(2019, 12, 31, 11, 0).toInstant(ZoneOffset.UTC))
-                .keyValueMap(buildKeyValues(Pair.of("_test", "v"), Pair.of("user", "MoP")))
-                .eol(Instant.now().minus(5, ChronoUnit.MINUTES))
-                .fileSize(4567L)
-                .build());
-        assetRepository.save(AssetJpaEntity.builder()
-                .id(UUID.randomUUID().toString())
-                .created(Instant.now())
-                .type(AssetType.JPEG)
-                .originalFilename("should-expire-future.jpg")
-                .created(LocalDateTime.of(2020, 1, 14, 13, 30).toInstant(ZoneOffset.UTC))
-                .keyValueMap(buildKeyValues(Pair.of("_test", "v"), Pair.of("user", "mop")))
-                .eol(Instant.now().plus(10, ChronoUnit.DAYS))
-                .fileSize(1568L)
-                .build());
-        assetRepository.save(AssetJpaEntity.builder()
-                .id(UUID.randomUUID().toString())
-                .created(Instant.now())
-                .type(AssetType.GIF)
-                .originalFilename("expired.gif")
-                .created(LocalDateTime.of(2020, 2, 2, 22, 30).toInstant(ZoneOffset.UTC))
-                .keyValueMap(buildKeyValues(Pair.of("_test", "v"), Pair.of("user", "MOP")))
-                .eol(Instant.now().minus(10, ChronoUnit.DAYS))
-                .fileSize(968L)
-                .build());
+    @Test
+    @Transactional
+    public void testOnPrePersistUpdate() {
+        repository.findAll()
+                .forEach(v -> {
+                    assertThat(v.getId(), notNullValue());
+                    assertThat(v.getCreated(), notNullValue());
+                    if (v.getKeyValues() != null) {
+                        for (AssetJpaKeyValueJpaEntity e : v.getKeyValueEntities()) {
+                            assertThat(e.getFieldValueHash(), notNullValue());
+                            assertThat(e.getLastUpdate(), notNullValue());
+                        }
+                    }
+                });
     }
 
     @Test
@@ -229,6 +233,7 @@ public class AssetJpaRepositoryTest {
                 .type(AssetType.JPEG)
                 .type(AssetType.PNG)
                 .originalFilename("ORIGINAL")
+                .keyValue("_test", "v")
                 .build();
         // when
         Page<AssetJpaEntity> page = assetRepository.findAll(query, pageable);
@@ -320,6 +325,52 @@ public class AssetJpaRepositoryTest {
         assertThat(page, notNullValue());
         assertThat(page.getNumberOfElements(), equalTo(3));
         assertThat(page.getContent().stream().filter(v -> v.getKeyValue("user").equalsIgnoreCase("mop")).count(), equalTo(3L));
+    }
+
+    @Test
+    public void checkKeyValueRemoveAfterPersist() {
+        // given
+        AssetJpaEntity entity = assetRepository.save(buildKeyValues(AssetJpaEntity.builder()
+                        .type(AssetType.JPEG)
+                        .originalFilename("second.jpg")
+                        .created(LocalDateTime.of(2018, 2, 20, 10, 30).toInstant(ZoneOffset.UTC))
+                        .fileSize(1234L)
+                        .build(),
+                Pair.of("_test", "v"), Pair.of("user", "123"), Pair.of("extra", "1")));
+
+        // when
+        entity.removeKeyValue("extra");
+        assetRepository.save(entity);
+        entity = assetRepository.findById(entity.getId()).get();
+
+        // then
+        assertThat(entity.hasKeyValue("extra"), equalTo(false));
+        assertThat(entity.getKeyValueEntities().size(), equalTo(2));
+    }
+
+    @Test
+    public void checkKeyValueLastModified() throws InterruptedException {
+        // given
+        AssetJpaEntity entity = assetRepository.save(buildKeyValues(AssetJpaEntity.builder()
+                        .type(AssetType.JPEG)
+                        .originalFilename("second.jpg")
+                        .created(LocalDateTime.of(2018, 2, 20, 10, 30).toInstant(ZoneOffset.UTC))
+                        .fileSize(1234L)
+                        .build(),
+                Pair.of("_test", "v"), Pair.of("user", "123"), Pair.of("extra", "1")));
+
+        // when
+        Thread.sleep(101);
+        entity.addKeyValue("user", "345");
+        assetRepository.save(entity);
+
+        entity = assetRepository.findById(entity.getId()).get();
+
+        // then
+        assertThat(entity.getKeyValueEntities().size(), equalTo(3));
+        assertThat(entity.findKeyValue("user").get().getLastUpdate(),
+                greaterThan(entity.findKeyValue("_test").get().getLastUpdate()));
+
     }
 
 }

@@ -3,15 +3,14 @@ package io.rocketbase.commons.service;
 import com.google.common.hash.Hashing;
 import io.rocketbase.commons.dto.asset.QueryAsset;
 import io.rocketbase.commons.model.AssetJpaEntity;
+import io.rocketbase.commons.model.AssetJpaKeyValueJpaEntity;
 import io.rocketbase.commons.repository.AssetEntityRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
-import org.springframework.util.StringUtils;
 
-import javax.persistence.criteria.MapJoin;
-import javax.persistence.criteria.Predicate;
+import javax.persistence.criteria.*;
 import javax.transaction.Transactional;
 import java.nio.charset.Charset;
 import java.time.Instant;
@@ -21,6 +20,13 @@ import java.util.*;
 public class AssetJpaRepository implements AssetRepository<AssetJpaEntity>, PredicateHelper {
 
     private final AssetEntityRepository assetEntityRepository;
+
+    public static String hashValue(String value) {
+        if (value == null) {
+            return null;
+        }
+        return Hashing.sha256().hashString(value, Charset.forName("UTF8")).toString();
+    }
 
     /**
      * search first by id, when not found by systemRefId
@@ -57,9 +63,6 @@ public class AssetJpaRepository implements AssetRepository<AssetJpaEntity>, Pred
     @Override
     @Transactional
     public AssetJpaEntity save(AssetJpaEntity entity) {
-        if (!StringUtils.isEmpty(entity.getReferenceUrl())) {
-            entity.setReferenceHash(Hashing.sha256().hashString(entity.getReferenceUrl(), Charset.forName("UTF8")).toString());
-        }
         return initLazyObjects(assetEntityRepository.save(entity));
     }
 
@@ -106,21 +109,28 @@ public class AssetJpaRepository implements AssetRepository<AssetJpaEntity>, Pred
                 }
             }
 
+            criteriaQuery.distinct(true);
+            root.fetch("keyValues", JoinType.LEFT);
+
             if (query.getKeyValues() != null && !query.getKeyValues().isEmpty()) {
-                criteriaQuery.distinct(true);
-                MapJoin<AssetJpaEntity, String, String> mapJoin = root.joinMap("keyValueMap");
+                Subquery<AssetJpaKeyValueJpaEntity> subQuery = criteriaQuery.subquery(AssetJpaKeyValueJpaEntity.class);
+                Root<AssetJpaKeyValueJpaEntity> subRoot = subQuery.from(AssetJpaKeyValueJpaEntity.class);
+                Join<AssetJpaKeyValueJpaEntity, AssetJpaEntity> subJoin = subRoot.join("asset", JoinType.INNER);
+                subQuery.select(subJoin.get("id"));
+
+                List<Predicate> subPredicates = new ArrayList<>();
                 for (Map.Entry<String, String> keyEntry : query.getKeyValues().entrySet()) {
-                    predicates.add(cb.and(cb.equal(mapJoin.key(), keyEntry.getKey()), cb.equal(cb.lower(mapJoin.value()), keyEntry.getValue().toLowerCase())));
+                    subPredicates.add(cb.and(cb.equal(subRoot.get("fieldKey"), keyEntry.getKey()),
+                            cb.equal(subRoot.get("fieldValueHash"), hashValue(keyEntry.getValue().toLowerCase()))
+                    ));
                 }
+                subQuery.where(subPredicates.toArray(new Predicate[]{}));
+                Expression<String> exp = root.get("id");
+                predicates.add(exp.in(subQuery));
             }
             return cb.and(predicates.toArray(new Predicate[]{}));
         };
-
-        Page<AssetJpaEntity> result = assetEntityRepository.findAll(specification, pageable);
-        // in order to initialize lazy map
-        result.stream()
-                .forEach(v -> initLazyObjects(v));
-        return result;
+        return assetEntityRepository.findAll(specification, pageable);
     }
 
     @Override
@@ -132,9 +142,9 @@ public class AssetJpaRepository implements AssetRepository<AssetJpaEntity>, Pred
     }
 
     protected AssetJpaEntity initLazyObjects(AssetJpaEntity entity) {
-        if (entity != null && entity.getKeyValueMap() != null) {
+        if (entity != null && entity.getKeyValues() != null) {
             // in order to initialize lazy map
-            entity.getKeyValueMap().size();
+            entity.getKeyValues().size();
         }
         return entity;
     }
