@@ -38,29 +38,39 @@ The main Objects are: **AssetReference** that is used to store in MongoDb in cas
 
 ***AssetReference sample:***
 
+![photo-1595776430819-9aa35f06830b.jpeg](commons-asset-server/src/test/resources/assets/photo-1595776430819-9aa35f06830b.jpeg | width=150)
+
 ```json
 {
-    "id": "5b0f6bf23c5ded0ee5dcab57",
-    "urlPath": "a/b/5/7/5b0f6bf23c5ded0ee5dcab57.jpg",
-    "type": "JPEG",
-    "context": "people-shoot",
-    "meta": {
-        "created": "2018-05-31T07:28:50.239",
-        "originalFilename": "photo-1478472190689-fa020c20809a.jpeg",
-        "fileSize": 1216844,
-        "resolution": {
-            "width": 4094,
-            "height": 2730
-        },
-        "colorPalette": {
-            "primary": "#395427",
-            "colors": ["#ced5dd", "#80c9f3", "#74a043"]
-        }
+  "id" : "5fc6076bb8f6921c45eedae5",
+  "urlPath" : "5fc6076bb8f6921c45eedae5",
+  "type" : "JPEG",
+  "meta" : {
+    "created" : "2020-12-01T09:05:47.039Z",
+    "originalFilename" : "photo-1595776430819-9aa35f06830b.jpeg",
+    "fileSize" : 183740,
+    "resolution" : {
+      "width" : 1950,
+      "height" : 1300
     },
-  	"keyValues": {
-      "extra": "value"
-    },
-  	"eol": "data:image/jpeg;base64...."
+    "colorPalette" : {
+      "primary" : "#b0b2b5",
+      "colors" : [ "#302f2a", "#4a5355" ]
+    }
+  },
+  "lqip" : "data:image/jpeg;base64,/9j/4AAQSkZJRgABAgAAAQABAAD/2wBDAKBueIx4ZKCMgoy0qqC+8P//8Nzc8P//////////////////////////////////////////////////////////2wBDAaq0tPDS8P//////////////////////////////////////////////////////////////////////////////wAARCAAhADIDASIAAhEBAxEB/8QAHwAAAQUBAQEBAQEAAAAAAAAAAAECAwQFBgcICQoL/8QAtRAAAgEDAwIEAwUFBAQAAAF9AQIDAAQRBRIhMUEGE1FhByJxFDKBkaEII0KxwRVS0fAkM2JyggkKFhcYGRolJicoKSo0NTY3ODk6Q0RFRkdISUpTVFVWV1hZWmNkZWZnaGlqc3R1dnd4eXqDhIWGh4iJipKTlJWWl5iZmqKjpKWmp6ipqrKztLW2t7i5usLDxMXGx8jJytLT1NXW19jZ2uHi4+Tl5ufo6erx8vP09fb3+Pn6/8QAHwEAAwEBAQEBAQEBAQAAAAAAAAECAwQFBgcICQoL/8QAtREAAgECBAQDBAcFBAQAAQJ3AAECAxEEBSExBhJBUQdhcRMiMoEIFEKRobHBCSMzUvAVYnLRChYkNOEl8RcYGRomJygpKjU2Nzg5OkNERUZHSElKU1RVVldYWVpjZGVmZ2hpanN0dXZ3eHl6goOEhYaHiImKkpOUlZaXmJmaoqOkpaanqKmqsrO0tba3uLm6wsPExcbHyMnK0tPU1dbX2Nna4uPk5ebn6Onq8vP09fb3+Pn6/9oADAMBAAIRAxEAPwCSiohL7Uvme1AElGaj8wUhegB5YDvTS57VHmjNAC5PqaKbRQBJtP8Aepdp9acKWgBm0+pppDe9S0lAEXPqaTn1qVlBphQigBtFGKKAJRS0UUAFLRRQAUhoooASiiigD//Z",
+  "previews" : {
+    "s" : "http://localhost:51857/api/asset/5fc6076bb8f6921c45eedae5/s",
+    "m" : "http://localhost:51857/api/asset/5fc6076bb8f6921c45eedae5/m",
+    "l" : "http://localhost:51857/api/asset/5fc6076bb8f6921c45eedae5/l",
+    "responsive" : {
+      "sizes" : "(max-width: 1200px) 100vw, 1200px",
+      "srcset" : "http://localhost:51857/api/asset/5fc6076bb8f6921c45eedae5/s 300w, http://localhost:51857/api/asset/5fc6076bb8f6921c45eedae5/m 600w, http://localhost:51857/api/asset/5fc6076bb8f6921c45eedae5/l 1200w",
+      "src" : "http://localhost:51857/api/asset/5fc6076bb8f6921c45eedae5/l"
+    }
+  },
+  "download" : "http://localhost:51857/api/asset/5fc6076bb8f6921c45eedae5/b",
+  "keyValues" : { }
 }
 ```
 
@@ -249,6 +259,7 @@ Simple preconfiguration to use imgproxy for rendering thumbs via [imgproxy](http
 | asset.imgproxy.base-url | **required** | required base start path to store files |
 | asset.imgproxy.key      | optional     |                                         |
 | asset.imgproxy.salt     | optional     |                                         |
+| asset.imgproxy.enlarge  | false        | should img-proxy return enlarged thumbs |
 
 ## commons-asset-server-filepond
 
