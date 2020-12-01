@@ -25,7 +25,7 @@ public class AssetConverterTest {
                 .originalFilename("original.png")
                 .type(AssetType.PNG)
                 .systemRefId("123")
-                .resolution(new Resolution(100, 200))
+                .resolution(new Resolution(1000, 2000))
                 .build();
     }
 
