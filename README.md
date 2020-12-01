@@ -38,7 +38,7 @@ The main Objects are: **AssetReference** that is used to store in MongoDb in cas
 
 ***AssetReference sample:***
 
-![photo-1595776430819-9aa35f06830b.jpeg](commons-asset-server/src/test/resources/assets/photo-1595776430819-9aa35f06830b.jpeg | width=150)
+<img src="/commons-asset-server/src/test/resources/assets/photo-1595776430819-9aa35f06830b.jpeg" align="left" height="100" width="150" >
 
 ```json
 {
