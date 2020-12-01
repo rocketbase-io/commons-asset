@@ -14,12 +14,19 @@ export interface AssetMeta {
     referenceUrl?: string;
 }
 
+export interface ResponsiveImage {
+    sizes: string;
+    srcset: string;
+    src?: string;
+}
+
 export interface AssetPreviews {
-    XS?: string;
-    S?: string;
-    M?: string;
-    L?: string;
-    XL?: string;
+    xs?: string;
+    s?: string;
+    m?: string;
+    l?: string;
+    xl?: string;
+    responsive?: ResponsiveImage;
 }
 
 export interface AssetRead extends AssetReference, rest.HasKeyValue {

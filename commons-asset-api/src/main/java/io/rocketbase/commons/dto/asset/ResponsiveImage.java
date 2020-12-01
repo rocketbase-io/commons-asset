@@ -25,7 +25,7 @@ public class ResponsiveImage implements Serializable {
     private String srcset;
 
     /**
-     * contains the talles preview url as default src (browser will detect best fitting preview from srcset)
+     * contains the tallest preview url as default src (browser will detect best fitting preview from srcset)
      */
     private String src;
 
