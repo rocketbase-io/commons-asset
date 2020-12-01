@@ -24,5 +24,7 @@ public class AssetImgproxyProperties implements Serializable {
     private String key;
 
     private String salt;
+    
+    private boolean enlarge = false;
 
 }

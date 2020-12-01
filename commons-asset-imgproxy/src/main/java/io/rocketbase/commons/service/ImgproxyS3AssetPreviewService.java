@@ -39,7 +39,7 @@ public class ImgproxyS3AssetPreviewService extends AbstractAssetPreviewService {
         Signature signature = Signature.of(new SignatureConfiguration(imgproxyProperties.getBaseUrl(),
                 imgproxyProperties.getKey(),
                 imgproxyProperties.getSalt()))
-                .resize(ResizeType.fit, previewSize.getMaxWidth(), previewSize.getMaxHeight(), true);
+                .resize(ResizeType.fit, previewSize.getMaxWidth(), previewSize.getMaxHeight(), imgproxyProperties.isEnlarge());
         return signature.url("s3://" + getBucket(AssetReference) + "/" + AssetReference.getUrlPath());
     }
 
