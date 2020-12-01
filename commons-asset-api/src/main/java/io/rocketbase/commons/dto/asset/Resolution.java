@@ -74,6 +74,20 @@ public class Resolution implements Serializable {
     }
 
     /**
+     * check's if resolution is bigger than given size or at least bigger then previewSize before
+     *
+     * @return true = thumb should be calculated, false = original file too small
+     */
+    @JsonIgnore
+    public boolean shouldThumbBeCalculated(PreviewSize previewSize) {
+        boolean result = isBiggerThan(previewSize);
+        if (!result && previewSize != null && previewSize.ordinal() > 0 ) {
+            result = isBiggerThan(PreviewSize.values()[previewSize.ordinal()-1]);
+        }
+        return result;
+    }
+
+    /**
      * calculate the final resolution in case the image should fit within given size
      *
      * @return null in case of missing width/height<br>

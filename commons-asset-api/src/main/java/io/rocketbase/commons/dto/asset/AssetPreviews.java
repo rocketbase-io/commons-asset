@@ -9,9 +9,11 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.lang.Nullable;
 
 import java.io.Serializable;
 import java.util.Map;
+import java.util.TreeMap;
 
 @Data
 @Builder
@@ -26,6 +28,12 @@ public class AssetPreviews implements Serializable {
      * please use AssetPreviews:getPreview
      */
     private Map<PreviewSize, String> previewMap;
+
+    /**
+     * calculated Responsive Image Breakpoints
+     */
+    @Nullable
+    private ResponsiveImage responsive;
 
     /**
      * return's preview of given size <br>
@@ -51,5 +59,18 @@ public class AssetPreviews implements Serializable {
             }
         }
         return null;
+    }
+
+    public AssetPreviews add(PreviewSize size, String url) {
+        if (previewMap == null) {
+            previewMap = new TreeMap<>();
+        }
+        previewMap.put(size, url);
+        return this;
+    }
+
+    public AssetPreviews withResponsive(ResponsiveImage responsive) {
+        setResponsive(responsive);
+        return this;
     }
 }

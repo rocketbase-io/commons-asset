@@ -1,21 +1,23 @@
 package io.rocketbase.commons.converter;
 
+import com.google.common.base.Joiner;
+import com.google.common.collect.Sets;
 import io.rocketbase.commons.config.AssetApiProperties;
 import io.rocketbase.commons.dto.asset.*;
 import io.rocketbase.commons.holder.PreviewSizeContextHolder;
 import io.rocketbase.commons.model.AssetEntity;
+import io.rocketbase.commons.util.Nulls;
 import lombok.RequiredArgsConstructor;
 
+import java.text.MessageFormat;
 import java.time.Instant;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
 public class AssetConverter {
 
+    public static final String RESPONSIVE_SIZES_FORMAT = "(max-width: {0,number,#}px) 100vw, {0,number,#}px";
     private final AssetApiProperties assetApiProperties;
     private final AssetPreviewService assetPreviewService;
 
@@ -40,18 +42,60 @@ public class AssetConverter {
     protected void injectPreviewsAndDownload(AssetRead result, List<PreviewSize> sizes) {
         if (result != null) {
             if (result.getType() != null && assetPreviewService.isPreviewSupported(result.getType())) {
-                result.setPreviews(AssetPreviews.builder()
-                        .previewMap(new HashMap<>())
-                        .build());
+                AssetPreviews assetPreviews = new AssetPreviews(new TreeMap<>(), null);
+                result.setPreviews(assetPreviews);
 
-                assetApiProperties.filterAllowedPreviewSizes(((sizes == null || sizes.isEmpty()) ? getDefaultPreviewSizes() : sizes))
-                        .forEach(s -> result.getPreviews().getPreviewMap()
+                // detect requested previewSizes
+                List<PreviewSize> previewSizes = assetApiProperties.filterAllowedPreviewSizes(((sizes == null || sizes.isEmpty()) ? getDefaultPreviewSizes() : sizes));
+                // filter too tall previewSizes (that are larger then original resolution)
+                boolean skippedSizes = false;
+                Resolution resolution = result.getMeta() != null ? result.getMeta().getResolution() : null;
+                if (resolution != null) {
+                    List<PreviewSize> tooBigSizes = previewSizes.stream()
+                            .filter(size -> !resolution.shouldThumbBeCalculated(size))
+                            .collect(Collectors.toList());
+                    skippedSizes = !tooBigSizes.isEmpty();
+                    previewSizes.removeAll(tooBigSizes);
+
+                }
+                // fill previewUrls
+                previewSizes
+                        .forEach(s -> assetPreviews.getPreviewMap()
                                 .put(s, assetPreviewService.getPreviewUrl(result, s)));
+                // calculate responsiveImage
+                assetPreviews.setResponsive(calculateResponsive(result, previewSizes, resolution, skippedSizes));
+
             }
             if (assetApiProperties.isDownload()) {
                 result.setDownload(assetPreviewService.getDownloadUrl(result));
             }
         }
+    }
+
+    protected ResponsiveImage calculateResponsive(AssetReference reference, List<PreviewSize> previewSizes, Resolution resolution, boolean skippedSizes) {
+        if (!Nulls.noneNullValue(reference, previewSizes, resolution)) {
+            return null;
+        }
+        ResponsiveImage result = new ResponsiveImage();
+        List<String> srcSet = new ArrayList<>();
+        Resolution calculated = null;
+        String previewUrl = null;
+        for (PreviewSize size : Sets.newTreeSet(previewSizes)) {
+            calculated = resolution.calculateWithAspectRatio(size.getMaxWidth(), size.getMaxHeight());
+            previewUrl = assetPreviewService.getPreviewUrl(reference, size);
+            srcSet.add(String.format("%s %dw", previewUrl, calculated.getWidth()));
+        }
+        if (skippedSizes && assetApiProperties.isDownload()) {
+            String downloadUrl = assetPreviewService.getDownloadUrl(reference);
+            srcSet.add(String.format("%s %dw", downloadUrl, resolution.getWidth()));
+            result.setSrc(downloadUrl);
+            result.setSizes(MessageFormat.format(RESPONSIVE_SIZES_FORMAT, resolution.getWidth()));
+        } else {
+            result.setSrc(previewUrl);
+            result.setSizes(MessageFormat.format(RESPONSIVE_SIZES_FORMAT, calculated.getWidth()));
+        }
+        result.setSrcset(Joiner.on(", ").join(srcSet));
+        return result;
     }
 
     public AssetRead toRead(AssetReference reference) {
