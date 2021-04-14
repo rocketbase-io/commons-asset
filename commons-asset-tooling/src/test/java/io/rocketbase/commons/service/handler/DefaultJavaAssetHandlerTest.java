@@ -2,10 +2,10 @@ package io.rocketbase.commons.service.handler;
 
 import io.rocketbase.commons.dto.ImageHandlingResult;
 import io.rocketbase.commons.dto.asset.AssetType;
-import io.rocketbase.commons.dto.asset.PreviewSize;
 import io.rocketbase.commons.dto.asset.DefaultPreviewParameter;
+import io.rocketbase.commons.dto.asset.PreviewSize;
 import lombok.extern.slf4j.Slf4j;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;

@@ -4,7 +4,7 @@ import io.rocketbase.commons.config.AssetApiProperties;
 import io.rocketbase.commons.dto.asset.*;
 import io.rocketbase.commons.model.AssetEntity;
 import io.rocketbase.commons.model.AssetMongoEntity;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.time.Instant;
 import java.util.Arrays;

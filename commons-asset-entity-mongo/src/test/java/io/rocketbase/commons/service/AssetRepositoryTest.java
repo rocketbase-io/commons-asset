@@ -1,20 +1,18 @@
 package io.rocketbase.commons.service;
 
 import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.Maps;
 import io.rocketbase.commons.BaseIntegrationTest;
 import io.rocketbase.commons.dto.asset.AssetType;
 import io.rocketbase.commons.dto.asset.QueryAsset;
 import io.rocketbase.commons.model.AssetEntity;
 import io.rocketbase.commons.model.AssetMongoEntity;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Query;
-import org.springframework.data.util.Pair;
 
 import javax.annotation.Resource;
 import java.time.Instant;
@@ -22,8 +20,6 @@ import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.time.temporal.ChronoUnit;
 import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -41,7 +37,7 @@ public class AssetRepositoryTest extends BaseIntegrationTest {
     private AssetRepository assetRepository;
 
 
-    @Before
+    @BeforeEach
     public void beforeTest() {
         mongoTemplate.remove(new Query(), AssetMongoEntity.class);
 

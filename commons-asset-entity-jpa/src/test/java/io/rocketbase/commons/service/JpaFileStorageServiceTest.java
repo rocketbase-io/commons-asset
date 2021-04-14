@@ -12,11 +12,9 @@ import io.rocketbase.commons.model.AssetFileEntity;
 import lombok.*;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.IOUtils;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.core.io.InputStreamResource;
-import org.springframework.test.context.junit4.SpringRunner;
 
 import javax.annotation.Resource;
 import javax.persistence.EntityManager;
@@ -29,11 +27,9 @@ import java.util.HashMap;
 import java.util.Map;
 
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.Matchers.notNullValue;
+import static org.hamcrest.Matchers.*;
 
 @Slf4j
-@RunWith(SpringRunner.class)
 @SpringBootTest(classes = Application.class, webEnvironment = SpringBootTest.WebEnvironment.NONE)
 @Transactional
 public class JpaFileStorageServiceTest {
@@ -59,7 +55,7 @@ public class JpaFileStorageServiceTest {
     }
 
 
-    @Test(expected = NotFoundException.class)
+    @Test
     public void deleteTest() throws Exception {
         // given
         AssetEntity assetEntity = getSampleAssetEntity();
@@ -70,7 +66,11 @@ public class JpaFileStorageServiceTest {
         // when
         getStorage().delete(assetEntity);
         // then
-        getStorage().download(assetEntity);
+        try {
+            getStorage().download(assetEntity);
+        } catch (Exception e) {
+            assertThat(e, instanceOf(NotFoundException.class));
+        }
     }
 
     @Test

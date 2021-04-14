@@ -4,7 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import io.rocketbase.commons.dto.asset.AssetPreviews;
 import io.rocketbase.commons.dto.asset.PreviewSize;
 import io.rocketbase.commons.dto.asset.ResponsiveImage;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;

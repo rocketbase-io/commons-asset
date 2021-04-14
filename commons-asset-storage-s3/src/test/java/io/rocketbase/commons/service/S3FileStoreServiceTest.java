@@ -1,14 +1,17 @@
 package io.rocketbase.commons.service;
 
 import io.rocketbase.commons.config.AssetS3Properties;
-import io.rocketbase.commons.dto.asset.*;
+import io.rocketbase.commons.dto.asset.AssetType;
+import io.rocketbase.commons.dto.asset.ColorPalette;
+import io.rocketbase.commons.dto.asset.DefaultAssetReference;
+import io.rocketbase.commons.dto.asset.Resolution;
 import io.rocketbase.commons.model.AssetEntity;
 import io.rocketbase.commons.util.UrlParts;
 import lombok.*;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.IOUtils;
-import org.junit.Ignore;
-import org.junit.Test;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 import org.springframework.core.io.InputStreamResource;
 
 import java.io.File;
@@ -37,7 +40,7 @@ public class S3FileStoreServiceTest {
     }
 
     @Test
-    @Ignore
+    @Disabled
     public void uploadTest() throws Exception {
         // given
         AssetEntity assetEntity = getSampleAssetEntity();
@@ -52,7 +55,7 @@ public class S3FileStoreServiceTest {
     }
 
     @Test
-    @Ignore
+    @Disabled
     public void uploadTestUmlaute() throws Exception {
         // given
         AssetEntity assetEntity = getSampleAssetEntity();
@@ -78,7 +81,7 @@ public class S3FileStoreServiceTest {
     }
 
     @Test
-    @Ignore
+    @Disabled
     public void getDownloadUrl() {
         String url = getStorage().getDownloadUrl(DefaultAssetReference.builder()
                 .id("ac47975c-8fe0-40ad-b811-eb80c899fcae")
@@ -91,7 +94,7 @@ public class S3FileStoreServiceTest {
     }
 
     @Test
-    @Ignore
+    @Disabled
     public void downloadTest() throws Exception {
         // given
         AssetEntity assetEntity = getSampleAssetEntity();

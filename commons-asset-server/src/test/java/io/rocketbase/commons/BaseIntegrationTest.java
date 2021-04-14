@@ -3,20 +3,16 @@ package io.rocketbase.commons;
 
 import io.rocketbase.commons.model.AssetEntity;
 import lombok.Getter;
-import org.junit.Before;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.gridfs.GridFsTemplate;
-import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.junit4.SpringRunner;
 
 import javax.annotation.Resource;
 
-@RunWith(SpringRunner.class)
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@SpringBootTest(classes = TestApplication.class, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 public abstract class BaseIntegrationTest {
 
     @Getter
@@ -29,7 +25,7 @@ public abstract class BaseIntegrationTest {
     @Resource
     private GridFsTemplate gridFsTemplate;
 
-    @Before
+    @BeforeEach
     public void cleanUpBefore() {
         gridFsTemplate.delete(new Query());
         mongoTemplate.findAllAndRemove(new Query(), AssetEntity.class);

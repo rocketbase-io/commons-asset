@@ -1,7 +1,7 @@
 package io.rocketbase.commons.service.download;
 
 import io.rocketbase.commons.dto.asset.AssetType;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.client.ClientHttpResponse;

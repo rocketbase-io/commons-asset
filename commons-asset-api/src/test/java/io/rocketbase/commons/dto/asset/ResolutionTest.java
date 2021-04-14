@@ -1,14 +1,9 @@
 package io.rocketbase.commons.dto.asset;
 
-import org.junit.Test;
-import org.springframework.context.i18n.LocaleContextHolder;
-
-import java.util.Locale;
+import org.junit.jupiter.api.Test;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.Matchers.notNullValue;
-import static org.junit.Assert.*;
 
 public class ResolutionTest {
 

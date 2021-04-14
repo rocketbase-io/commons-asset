@@ -11,7 +11,7 @@ import io.rocketbase.commons.service.AssetService;
 import io.rocketbase.commons.service.MongoFileStorageService;
 import lombok.SneakyThrows;
 import org.apache.commons.io.IOUtils;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.test.context.ActiveProfiles;

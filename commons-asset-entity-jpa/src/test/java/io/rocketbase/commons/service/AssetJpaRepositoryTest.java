@@ -7,17 +7,14 @@ import io.rocketbase.commons.dto.asset.QueryAsset;
 import io.rocketbase.commons.model.AssetEntity;
 import io.rocketbase.commons.model.AssetJpaEntity;
 import lombok.extern.slf4j.Slf4j;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.support.SimpleJpaRepository;
-import org.springframework.data.util.Pair;
-import org.springframework.test.context.junit4.SpringRunner;
 
 import javax.annotation.Resource;
 import javax.persistence.EntityManager;
@@ -34,7 +31,6 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 
 @Slf4j
-@RunWith(SpringRunner.class)
 @SpringBootTest(classes = Application.class, webEnvironment = SpringBootTest.WebEnvironment.NONE)
 @Transactional
 public class AssetJpaRepositoryTest implements InitializingBean {
@@ -57,7 +53,7 @@ public class AssetJpaRepositoryTest implements InitializingBean {
         repository = new SimpleJpaRepository<>(AssetJpaEntity.class, entityManager);
     }
 
-    @Before
+    @BeforeEach
     public void beforeTest() {
         repository.deleteAll();
 

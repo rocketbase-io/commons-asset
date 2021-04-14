@@ -12,7 +12,7 @@ import io.rocketbase.commons.resource.AssetResource;
 import io.rocketbase.commons.service.AssetService;
 import lombok.SneakyThrows;
 import org.assertj.core.api.Fail;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.test.context.ActiveProfiles;

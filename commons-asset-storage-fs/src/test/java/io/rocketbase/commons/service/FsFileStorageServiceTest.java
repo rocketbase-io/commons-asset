@@ -9,7 +9,7 @@ import io.rocketbase.commons.util.UrlParts;
 import lombok.*;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.springframework.core.io.InputStreamResource;
 
 import java.io.File;

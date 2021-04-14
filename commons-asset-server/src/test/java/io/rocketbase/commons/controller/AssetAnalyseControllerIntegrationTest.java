@@ -8,7 +8,7 @@ import io.rocketbase.commons.dto.batch.AssetBatchAnalyseResult;
 import io.rocketbase.commons.exception.AssetErrorCodes;
 import io.rocketbase.commons.resource.AssetResource;
 import lombok.SneakyThrows;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.test.context.ActiveProfiles;

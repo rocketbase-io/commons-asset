@@ -2,7 +2,7 @@ package io.rocketbase.commons.converter;
 
 import io.rocketbase.commons.config.AssetApiProperties;
 import io.rocketbase.commons.dto.asset.*;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.Arrays;
 
