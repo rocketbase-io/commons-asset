@@ -2,18 +2,24 @@ package io.rocketbase.commons.service;
 
 import com.google.common.hash.Hashing;
 import io.rocketbase.commons.model.AssetJpaEntity;
-import io.rocketbase.commons.repository.AssetEntityRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.jpa.domain.Specification;
+import org.springframework.data.jpa.repository.support.SimpleJpaRepository;
 
-import javax.annotation.Resource;
+import javax.persistence.EntityManager;
 import javax.transaction.Transactional;
 import java.nio.charset.Charset;
 
 public class ReferenceHashMigrationService {
 
-    @Resource
-    private AssetEntityRepository assetEntityRepository;
+    private final EntityManager em;
+    private final SimpleJpaRepository<AssetJpaEntity, String> repository;
+
+    public ReferenceHashMigrationService(EntityManager entityManager) {
+        this.em = entityManager;
+        repository = new SimpleJpaRepository<>(AssetJpaEntity.class, entityManager);
+    }
 
     @Transactional
     public void generateHashesForReferenceUrls(int batchSize) {
@@ -24,12 +30,15 @@ public class ReferenceHashMigrationService {
     }
 
     private boolean updateBatch(int batchSize) {
-        Page<AssetJpaEntity> page = assetEntityRepository.findAssetsWithMissingReferenceHash(PageRequest.of(0, batchSize));
+        Specification<AssetJpaEntity> specification = (root, criteriaQuery, cb) ->
+                cb.and(cb.isNull(root.get("referenceHash")), cb.isNotNull(root.get("referenceUrl")));
+
+        Page<AssetJpaEntity> page = repository.findAll(specification, PageRequest.of(0, batchSize));
         if (page.getNumberOfElements() > 0) {
             for (AssetJpaEntity e : page.getContent()) {
                 e.setReferenceHash(Hashing.sha256().hashString(e.getReferenceUrl(), Charset.forName("UTF8")).toString());
             }
-            assetEntityRepository.saveAll(page.getContent());
+            repository.saveAll(page.getContent());
             return true;
         }
         return false;

@@ -1,11 +1,14 @@
 package io.rocketbase.commons.dto.asset;
 
-import lombok.*;
-
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.springframework.lang.Nullable;
+
 import java.io.Serializable;
 import java.time.Instant;
-import java.util.List;
+import java.util.Collection;
 import java.util.Map;
 
 @Data
@@ -24,18 +27,26 @@ public class QueryAsset implements Serializable {
     private String originalFilename;
 
     /**
+     * search exact match
+     */
+    @Nullable
+    private String systemRefId;
+
+    /**
      * in mongo-implementation it's a regex "like" search<br>
      * in mysql it's an exact hash compare (limitations within mysql of column/index length)
      */
     @Nullable
     private String referenceUrl;
 
+    /**
+     * search exact match
+     */
     @Nullable
     private String context;
 
-    @Singular
     @Nullable
-    private List<AssetType> types;
+    private Collection<AssetType> types;
 
     /**
      * true: queries all assets that has an eol value<br>
@@ -56,7 +67,6 @@ public class QueryAsset implements Serializable {
     /**
      * search for given key and value with exact match ignore cases
      */
-    @Singular
     @Nullable
     private Map<String, String> keyValues;
 }

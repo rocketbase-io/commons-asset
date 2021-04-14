@@ -1,12 +1,15 @@
 package io.rocketbase.commons.dto.asset;
 
 
+import io.rocketbase.commons.converter.BytesConverter;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import org.springframework.lang.Nullable;
+
+import java.beans.Transient;
 import java.io.Serializable;
 import java.time.Instant;
 
@@ -47,5 +50,10 @@ public class AssetMeta implements Serializable {
             this.resolution = other.resolution != null ? new Resolution(other.resolution) : null;
             this.colorPalette = other.colorPalette != null ? new ColorPalette(other.colorPalette) : null;
             this.referenceUrl = other.referenceUrl;
+    }
+
+    @Transient
+    public String getFileSizeHumanReadable() {
+        return BytesConverter.humanReadableBytes(fileSize);
     }
 }

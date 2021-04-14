@@ -19,7 +19,6 @@ public class DefaultAssetUploadMeta implements AssetUploadMeta {
     private String context;
 
     @Nullable
-    @Singular
     private Map<String, String> keyValues;
 
     @Nullable

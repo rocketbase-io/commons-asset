@@ -93,13 +93,13 @@ public class AssetResource implements BaseRestResource {
     /**
      * search for asset by id or systemRefId
      *
-     * @param sid assetId or systemRefId
+     * @param id assetId
      * @return AssetData
      */
-    public AssetRead find(String sid) {
+    public AssetRead find(String id) {
         ResponseEntity<AssetRead> response;
         try {
-            response = getRestTemplate().exchange(getUriBuilder().path("/" + sid)
+            response = getRestTemplate().exchange(getUriBuilder().path("/" + id)
                             .toUriString(),
                     HttpMethod.GET,
                     null,
@@ -259,11 +259,11 @@ public class AssetResource implements BaseRestResource {
     /**
      * lookup asset and download file
      *
-     * @param sid assetId or systemRefId
+     * @param id assetId
      * @return tmp-file with content of asset
      */
-    public File downloadAsset(String sid) {
-        File file = getRestTemplate().execute(getUriBuilder().path("/" + sid).path("/b")
+    public File downloadAsset(String id) {
+        File file = getRestTemplate().execute(getUriBuilder().path("/" + id).path("/b")
                 .toUriString(), HttpMethod.GET, null, clientHttpResponse -> {
             File ret = File.createTempFile("download", "tmp");
             StreamUtils.copy(clientHttpResponse.getBody(), new FileOutputStream(ret));

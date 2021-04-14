@@ -1,5 +1,7 @@
 package io.rocketbase.commons.service;
 
+import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.Maps;
 import io.rocketbase.commons.BaseIntegrationTest;
 import io.rocketbase.commons.dto.asset.AssetType;
 import io.rocketbase.commons.dto.asset.QueryAsset;
@@ -19,6 +21,7 @@ import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.time.temporal.ChronoUnit;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
@@ -37,70 +40,69 @@ public class AssetRepositoryTest extends BaseIntegrationTest {
     @Resource
     private AssetRepository assetRepository;
 
-    protected Map<String, String> buildKeyValues(Pair<String, String>... values) {
-        Map<String, String> result = new HashMap<>();
-        for (Pair<String, String> v : values) {
-            result.putIfAbsent(v.getFirst(), v.getSecond());
-        }
-        return result;
-    }
 
     @Before
     public void beforeTest() {
         mongoTemplate.remove(new Query(), AssetMongoEntity.class);
 
         mongoTemplate.save(AssetMongoEntity.builder()
+                .id("abb1b2a3-8bb7-4d7d-bc3f-fbf3118a5633" )
                 .type(AssetType.JPEG)
                 .originalFilename("oRiginalF.jpg")
                 .created(LocalDateTime.of(2018, 3, 1, 10, 22).toInstant(ZoneOffset.UTC))
-                .keyValueMap(buildKeyValues(Pair.of("_test", "v"), Pair.of("user", "123")))
+                .keyValueMap(ImmutableMap.of("_test", "v","user", "123"))
                 .fileSize(1234L)
                 .build());
         mongoTemplate.save(AssetMongoEntity.builder()
+                .id("d70b671e-fb9e-4260-94be-826d227f4fdb")
                 .type(AssetType.JPEG)
                 .originalFilename("second.jpg")
                 .created(LocalDateTime.of(2018, 2, 20, 10, 30).toInstant(ZoneOffset.UTC))
-                .keyValueMap(buildKeyValues(Pair.of("_test", "v"), Pair.of("user", "123"), Pair.of("extra", "1")))
+                .keyValueMap(ImmutableMap.of("_test", "v","user", "123", "extra", "1"))
                 .fileSize(1234L)
                 .build());
         mongoTemplate.save(AssetMongoEntity.builder()
+                .id("95a8b1af-ec0d-402c-8f2a-00ccae51ba5f")
                 .type(AssetType.PDF)
                 .originalFilename("second-doc.pdf")
                 .referenceUrl("http://www.other.com/second-doc.pdf")
                 .created(LocalDateTime.of(2018, 3, 3, 11, 0).toInstant(ZoneOffset.UTC))
-                .keyValueMap(buildKeyValues(Pair.of("_test", "v"), Pair.of("user", "123")))
+                .keyValueMap(ImmutableMap.of("_test", "v","user", "123"))
                 .fileSize(2345L)
                 .build());
         mongoTemplate.save(AssetMongoEntity.builder()
+                .id("b2ae9cb4-92dd-4158-81f4-82808c3b2d54")
                 .type(AssetType.PDF)
                 .originalFilename("sample.pdf")
                 .referenceUrl("http://www.rocketbase.io/sample.pdf")
-
                 .created(LocalDateTime.of(2018, 4, 11, 2, 0).toInstant(ZoneOffset.UTC))
-                .keyValueMap(buildKeyValues(Pair.of("_test", "v"), Pair.of("user", "123")))
+                .keyValueMap(ImmutableMap.of("_test", "v","user", "123"))
                 .fileSize(2345L)
                 .build());
         mongoTemplate.save(AssetMongoEntity.builder()
+                .id("a0489b53-9512-4e46-97cc-1f7597c828ec")
                 .type(AssetType.PDF)
                 .originalFilename("eol.pdf")
                 .created(LocalDateTime.of(2019, 12, 31, 11, 0).toInstant(ZoneOffset.UTC))
-                .keyValueMap(buildKeyValues(Pair.of("_test", "v"), Pair.of("user", "MoP")))
+                .keyValueMap(ImmutableMap.of("_test", "v","user", "MoP"))
                 .eol(Instant.now().minus(5, ChronoUnit.MINUTES))
                 .fileSize(4567L)
                 .build());
         mongoTemplate.save(AssetMongoEntity.builder()
+                .id("282ac4d6-6ece-43d1-b9e9-d032ddb59799")
                 .type(AssetType.JPEG)
                 .originalFilename("should-expire-future.jpg")
                 .created(LocalDateTime.of(2020, 1, 14, 13, 30).toInstant(ZoneOffset.UTC))
-                .keyValueMap(buildKeyValues(Pair.of("_test", "v"), Pair.of("user", "mop")))
+                .keyValueMap(ImmutableMap.of("_test", "v","user", "mop"))
                 .eol(Instant.now().plus(10, ChronoUnit.DAYS))
                 .fileSize(1568L)
                 .build());
         mongoTemplate.save(AssetMongoEntity.builder()
+                .id("c24f5c69-7e9e-478c-aacd-0d6506380a2c")
                 .type(AssetType.GIF)
                 .originalFilename("expired.gif")
                 .created(LocalDateTime.of(2020, 2, 2, 22, 30).toInstant(ZoneOffset.UTC))
-                .keyValueMap(buildKeyValues(Pair.of("_test", "v"), Pair.of("user", "MOP")))
+                .keyValueMap(ImmutableMap.of("_test", "v","user", "MOP"))
                 .eol(Instant.now().minus(10, ChronoUnit.DAYS))
                 .fileSize(968L)
                 .build());
@@ -110,8 +112,7 @@ public class AssetRepositoryTest extends BaseIntegrationTest {
     public void findAllByType() {
         // given
         QueryAsset query = QueryAsset.builder()
-                .type(AssetType.JPEG)
-                .type(AssetType.PNG)
+                .types(Arrays.asList(AssetType.JPEG, AssetType.PNG))
                 .build();
         // when
         Page<AssetEntity> page = assetRepository.findAll(query, pageable);
@@ -201,8 +202,7 @@ public class AssetRepositoryTest extends BaseIntegrationTest {
         QueryAsset query = QueryAsset.builder()
                 .before(LocalDateTime.of(2018, 3, 20, 23, 59).toInstant(ZoneOffset.UTC))
                 .after(LocalDateTime.of(2018, 3, 1, 0, 0).toInstant(ZoneOffset.UTC))
-                .type(AssetType.JPEG)
-                .type(AssetType.PNG)
+                .types(Arrays.asList(AssetType.JPEG, AssetType.PNG))
                 .originalFilename("ORIGINAL")
                 .build();
         // when
@@ -253,8 +253,7 @@ public class AssetRepositoryTest extends BaseIntegrationTest {
         // given
         QueryAsset query = QueryAsset.builder()
                 .after(LocalDateTime.of(2018, 3, 1, 9, 0).toInstant(ZoneOffset.UTC))
-                .type(AssetType.JPEG)
-                .type(AssetType.PDF)
+                .types(Arrays.asList(AssetType.JPEG, AssetType.PDF))
                 .isEol(true)
                 .build();
         // when
@@ -271,7 +270,7 @@ public class AssetRepositoryTest extends BaseIntegrationTest {
     public void findKeyValueExtra() {
         // given
         QueryAsset query = QueryAsset.builder()
-                .keyValue("extra", "1")
+                .keyValues(ImmutableMap.of("extra", "1"))
                 .build();
         // when
         Page<AssetEntity> page = assetRepository.findAll(query, pageable);
@@ -286,7 +285,7 @@ public class AssetRepositoryTest extends BaseIntegrationTest {
     public void findKeyValueCaseInsensitive() {
         // given
         QueryAsset query = QueryAsset.builder()
-                .keyValue("user", "MOp")
+                .keyValues(ImmutableMap.of("user", "MOp"))
                 .build();
         // when
         Page<AssetEntity> page = assetRepository.findAll(query, pageable);

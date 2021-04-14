@@ -66,6 +66,11 @@
             </exclusions>
         </dependency>
         <dependency>
+            <groupId>de.flapdoodle.embed</groupId>
+            <artifactId>de.flapdoodle.embed.mongo</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
             <groupId>io.rocketbase.commons</groupId>
             <artifactId>commons-asset-storage-mongo</artifactId>
             <version>${project.version}</version>

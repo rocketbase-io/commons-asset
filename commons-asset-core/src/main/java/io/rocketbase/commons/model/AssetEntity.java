@@ -3,6 +3,8 @@ package io.rocketbase.commons.model;
 import io.rocketbase.commons.dto.asset.*;
 import org.springframework.data.annotation.Transient;
 
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
 import java.time.Instant;
 import java.util.Map;
 
@@ -10,21 +12,25 @@ public interface AssetEntity extends AssetReference, EntityWithKeyValue<AssetEnt
 
     void setId(String id);
 
-    void setSystemRefId(String systemRefId);
+    void setSystemRefId(@Size(max = 100) String systemRefId);
 
-    void setUrlPath(String urlPath);
+    void setUrlPath(@Size(max = 500) String urlPath);
 
-    void setType(AssetType type);
+    void setType(@NotNull AssetType type);
 
-    void setContext(String context);
+    void setContext(@Size(max = 100) String context);
 
     Instant getCreated();
 
     void setCreated(Instant created);
 
+    Instant getModified();
+
+    String getModifiedBy();
+
     String getOriginalFilename();
 
-    void setOriginalFilename(String originalFilename);
+    void setOriginalFilename(@Size(max = 255) String originalFilename);
 
     long getFileSize();
 
@@ -40,7 +46,7 @@ public interface AssetEntity extends AssetReference, EntityWithKeyValue<AssetEnt
 
     String getReferenceUrl();
 
-    void setReferenceUrl(String referenceUrl);
+    void setReferenceUrl(@Size(max = 2000) String referenceUrl);
 
     String getLqip();
 

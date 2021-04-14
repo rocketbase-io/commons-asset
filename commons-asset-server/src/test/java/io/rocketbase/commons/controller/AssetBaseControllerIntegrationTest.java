@@ -217,10 +217,9 @@ public class AssetBaseControllerIntegrationTest extends BaseIntegrationTest {
         String failure = "https://gitlab.com/notfound.jpg";
 
         // when
-        AssetBatchResult result = assetResource.processBatchFileUrls(AssetBatchWrite.builder()
-                .entry(new AssetBatchWriteEntry(success))
-                .entry(new AssetBatchWriteEntry(failure))
-                .build());
+        AssetBatchResult result = assetResource.processBatchFileUrls(new AssetBatchWrite()
+                .withEntry(new AssetBatchWriteEntry(success))
+                .withEntry(new AssetBatchWriteEntry(failure)));
         //
         assertThat(result, notNullValue());
         assertThat(result.getSucceeded().size(), equalTo(1));

@@ -7,6 +7,9 @@ import io.rocketbase.commons.util.QueryParamParser;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.util.UriComponentsBuilder;
 
+import java.util.HashSet;
+import java.util.Set;
+
 public class QueryAssetConverter {
 
     public static UriComponentsBuilder addParams(UriComponentsBuilder uriBuilder, QueryAsset query) {
@@ -16,6 +19,7 @@ public class QueryAssetConverter {
             QueryParamBuilder.appendParams(uriBuilder, "originalFilename", query.getOriginalFilename());
             QueryParamBuilder.appendParams(uriBuilder, "referenceUrl", query.getReferenceUrl());
             QueryParamBuilder.appendParams(uriBuilder, "context", query.getContext());
+            QueryParamBuilder.appendParams(uriBuilder, "systemRefId", query.getSystemRefId());
             if (query.getTypes() != null) {
                 uriBuilder.queryParam("type", query.getTypes());
             }
@@ -32,22 +36,23 @@ public class QueryAssetConverter {
         QueryAsset.QueryAssetBuilder builder = QueryAsset.builder()
                 .before(QueryParamParser.parseInstant(params, "before", null))
                 .after(QueryParamParser.parseInstant(params, "after", null))
-                .originalFilename(params.containsKey("originalFilename") ? params.getFirst("originalFilename") : null)
-                .context(params.containsKey("context") ? params.getFirst("context") : null)
-                .referenceUrl(params.containsKey("referenceUrl") ? params.getFirst("referenceUrl") : null)
+                .systemRefId(params.getFirst("systemRefId"))
+                .originalFilename(params.getFirst("originalFilename"))
+                .context(params.getFirst("context"))
+                .referenceUrl(params.getFirst("referenceUrl"))
                 .hasEolValue(QueryParamParser.parseBoolean(params, "hasEolValue", null))
                 .isEol(QueryParamParser.parseBoolean(params, "isEol", null))
-                .keyValues(QueryParamParser.parseKeyValue("keyValue", params))
-        ;
+                .keyValues(QueryParamParser.parseKeyValue("keyValue", params));
 
         if (params.containsKey("type")) {
-            params.get("type").forEach(t -> {
+            Set<AssetType> types = new HashSet<>();
+            for (String t : params.get("type")) {
                 try {
-                    AssetType assetType = AssetType.valueOf(t.toUpperCase());
-                    builder.type(assetType);
+                    types.add(AssetType.valueOf(t.toUpperCase()));
                 } catch (Exception e) {
                 }
-            });
+            }
+            builder.types(types);
         }
         return builder.build();
     }

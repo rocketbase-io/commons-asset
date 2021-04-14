@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.lang.Nullable;
 
 import java.io.Serializable;
@@ -74,6 +75,19 @@ public class Resolution implements Serializable {
     }
 
     /**
+     * check's if resolution is bigger than given size
+     *
+     * @return true = bigger then given parameter, false = smaller or null
+     */
+    @JsonIgnore
+    public boolean isBiggerThan(Resolution resolution) {
+        if (resolution == null) {
+            return false;
+        }
+        return isBiggerThan(resolution.getWidth(), resolution.getHeight());
+    }
+
+    /**
      * check's if resolution is bigger than given size or at least bigger then previewSize before
      *
      * @return true = thumb should be calculated, false = original file too small
@@ -111,5 +125,10 @@ public class Resolution implements Serializable {
         } else {
             return this;
         }
+    }
+
+    @Override
+    public String toString() {
+        return String.format("%d x %d", width, height);
     }
 }

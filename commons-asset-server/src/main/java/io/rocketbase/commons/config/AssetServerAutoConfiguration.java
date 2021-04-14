@@ -81,12 +81,6 @@ public class AssetServerAutoConfiguration implements Serializable {
 
     @Bean
     @ConditionalOnMissingBean
-    public SystemRefIdAlreadyUsedExceptionHandler systemRefIdAlreadyUsedExceptionHandler() {
-        return new SystemRefIdAlreadyUsedExceptionHandler();
-    }
-
-    @Bean
-    @ConditionalOnMissingBean
     public UnprocessableAssetExceptionHandler unprocessableAssetExceptionHandler() {
         return new UnprocessableAssetExceptionHandler();
     }

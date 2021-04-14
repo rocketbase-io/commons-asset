@@ -77,17 +77,17 @@ public class AssetBaseController implements BaseController {
         return PageableResult.contentPage(assetConverter.fromEntities(pageResult.getContent(), QueryPreviewSizeConverter.getPreviewSizes(params)), pageResult);
     }
 
-    @RequestMapping(value = "/{sid}", method = RequestMethod.GET)
-    public AssetRead getAsset(@PathVariable("sid") String sid, @RequestParam(required = false) MultiValueMap<String, String> params) {
-        AssetEntity entity = assetService.findByIdOrSystemRefId(sid)
+    @RequestMapping(value = "/{id}", method = RequestMethod.GET)
+    public AssetRead getAsset(@PathVariable("id") String id, @RequestParam(required = false) MultiValueMap<String, String> params) {
+        AssetEntity entity = assetService.findById(id)
                 .orElseThrow(() -> new NotFoundException());
         return assetConverter.fromEntityByRequestContext(entity, QueryPreviewSizeConverter.getPreviewSizes(params));
     }
 
-    @RequestMapping(value = "/{sid}", method = RequestMethod.PUT)
-    public AssetRead updateAsset(@PathVariable("sid") String sid, @RequestBody @NotNull @Validated AssetUpdate update,
+    @RequestMapping(value = "/{id}", method = RequestMethod.PUT)
+    public AssetRead updateAsset(@PathVariable("id") String id, @RequestBody @NotNull @Validated AssetUpdate update,
                                  @RequestParam(required = false) MultiValueMap<String, String> params) {
-        AssetEntity entity = assetService.findByIdOrSystemRefId(sid)
+        AssetEntity entity = assetService.findById(id)
                 .orElseThrow(() -> new NotFoundException());
         return assetConverter.fromEntityByRequestContext(assetService.update(entity, update), QueryPreviewSizeConverter.getPreviewSizes(params));
     }

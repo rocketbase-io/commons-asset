@@ -24,10 +24,10 @@ public class AssetCopyController implements BaseController {
     @Resource
     private AssetConverter assetConverter;
 
-    @RequestMapping(value = "/{sid}/copy", method = RequestMethod.POST)
-    public AssetRead copyAsset(@PathVariable("sid") String sid,
+    @RequestMapping(value = "/{id}/copy", method = RequestMethod.POST)
+    public AssetRead copyAsset(@PathVariable("id") String id,
                                @RequestParam(required = false) MultiValueMap<String, String> params) {
-        AssetEntity assetEntity = assetService.copyByIdOrSystemRefId(sid);
+        AssetEntity assetEntity = assetService.copyById(id);
 
         return assetConverter.fromEntityByRequestContext(assetEntity, QueryPreviewSizeConverter.getPreviewSizes(params));
     }

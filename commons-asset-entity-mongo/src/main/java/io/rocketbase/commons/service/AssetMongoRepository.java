@@ -36,30 +36,10 @@ public class AssetMongoRepository implements AssetRepository<AssetMongoEntity> {
 
     private final boolean mongoEnsureInde;
 
-    /**
-     * search first by id, when not found by systemRefId
-     *
-     * @param sid database id or systemRefId
-     */
-    @Override
-    public Optional<AssetMongoEntity> findByIdOrSystemRefId(String sid) {
-        Optional<AssetMongoEntity> optional = findById(sid);
-        if (!optional.isPresent()) {
-            return findBySystemRefId(sid);
-        }
-        return optional;
-    }
 
     @Override
     public Optional<AssetMongoEntity> findById(String sid) {
         AssetMongoEntity entity = mongoTemplate.findOne(getIdQuery(sid), AssetMongoEntity.class);
-        return Optional.ofNullable(entity);
-    }
-
-    @Override
-    public Optional<AssetMongoEntity> findBySystemRefId(String systemRefId) {
-        AssetMongoEntity entity = mongoTemplate.findOne(new Query(Criteria.where("systemRefId")
-                .is(systemRefId)), AssetMongoEntity.class);
         return Optional.ofNullable(entity);
     }
 
@@ -106,6 +86,9 @@ public class AssetMongoRepository implements AssetRepository<AssetMongoEntity> {
                     criteria.gte(query.getAfter());
                 }
                 result.addCriteria(criteria);
+            }
+            if (!StringUtils.isEmpty(query.getSystemRefId())) {
+                result.addCriteria(Criteria.where("systemRefId").is(query.getSystemRefId()));
             }
             if (!StringUtils.isEmpty(query.getOriginalFilename())) {
                 result.addCriteria(Criteria.where("originalFilename").regex(query.getOriginalFilename().trim(), "i"));

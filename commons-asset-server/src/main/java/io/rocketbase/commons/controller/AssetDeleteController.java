@@ -21,9 +21,9 @@ public class AssetDeleteController implements BaseController {
     @Resource
     private AssetService assetService;
 
-    @RequestMapping(value = "/{sid}", method = RequestMethod.DELETE)
-    public ResponseEntity<Void> deleteAsset(@PathVariable("sid") String sid) {
-        assetService.deleteByIdOrSystemRefId(sid);
+    @RequestMapping(value = "/{id}", method = RequestMethod.DELETE)
+    public ResponseEntity<Void> deleteAsset(@PathVariable("id") String id) {
+        assetService.deleteById(id);
 
         return new ResponseEntity<>(HttpStatus.OK);
     }

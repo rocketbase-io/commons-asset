@@ -155,6 +155,10 @@ public class FsFileStorageServiceTest {
 
         private Instant created;
 
+        private Instant modified;
+
+        private String modifiedBy;
+
         private String originalFilename;
 
         private long fileSize;

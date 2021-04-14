@@ -95,7 +95,6 @@ SOFTWARE.
 
     <build>
         <plugins>
-            <!--
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-javadoc-plugin</artifactId>
@@ -108,12 +107,12 @@ SOFTWARE.
                             <goal>javadoc</goal>
                         </goals>
                         <configuration>
-                            <doclet>com.github.markusbernhardt.xmldoclet.XmlDoclet</doclet>
+                            <doclet>com.github.markusbernhardt.xmldoclet.NewXmlDoclet</doclet>
                             <useStandardDocletOptions>false</useStandardDocletOptions>
                             <docletArtifact>
-                                <groupId>com.github.markusbernhardt</groupId>
+                                <groupId>com.github.vojtechhabarta</groupId>
                                 <artifactId>xml-doclet</artifactId>
-                                <version>1.0.6-SNAPSHOT</version>
+                                <version>rewrite-using-new-javadoc-api-SNAPSHOT</version>
                             </docletArtifact>
                         </configuration>
                     </execution>
@@ -146,7 +145,7 @@ SOFTWARE.
                         <classPattern>io.rocketbase.commons.dto.asset.**</classPattern>
                         <classPattern>io.rocketbase.commons.dto.batch.**</classPattern>
                         <classPattern>io.rocketbase.commons.dto.batch.**</classPattern>
-                        <classPattern>io.rocketbase.commons.exception.*Codes</classPattern>
+                        <classPattern>io.rocketbase.commons.exception.AssetErrorCodes</classPattern>
                     </classPatterns>
                     <excludeClassPatterns>
                         <excludeClassPattern>**Builder</excludeClassPattern>
@@ -166,6 +165,10 @@ SOFTWARE.
                         <customTypeMapping>java.time.LocalTime:string</customTypeMapping>
                         <customTypeMapping>java.time.LocalDateTime:string</customTypeMapping>
                         <customTypeMapping>java.time.Instant:string</customTypeMapping>
+                        <customTypeMapping><![CDATA[java.util.Map<String, AssetErrorCodes>:Record<string,AssetErrorCodes>]]></customTypeMapping>
+                        <customTypeMapping><![CDATA[java.util.Map<String, AssetReference>:Record<string,AssetReference>]]></customTypeMapping>
+                        <customTypeMapping><![CDATA[java.util.Map<String, AssetRead>:Record<string,AssetRead>]]></customTypeMapping>
+                        <customTypeMapping><![CDATA[java.util.Map<String, AssetAnalyse>:Record<string,AssetAnalyse>]]></customTypeMapping>
                         <customTypeMapping><![CDATA[java.util.Map<T1, T2>:Record<string,string>]]></customTypeMapping>
                         <customTypeMapping>io.rocketbase.commons.obfuscated.ObfuscatedId:string</customTypeMapping>
                         <customTypeMapping>io.rocketbase.commons.dto.ErrorResponse:rest.ErrorResponse</customTypeMapping>
@@ -188,7 +191,6 @@ SOFTWARE.
                     <noTslintDisable>true</noTslintDisable>
                 </configuration>
             </plugin>
-            -->
         </plugins>
     </build>
 

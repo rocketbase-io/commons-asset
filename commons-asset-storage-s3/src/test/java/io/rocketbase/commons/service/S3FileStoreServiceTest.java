@@ -159,6 +159,10 @@ public class S3FileStoreServiceTest {
 
         private Instant created;
 
+        private Instant modified;
+
+        private String modifiedBy;
+
         private String originalFilename;
 
         private long fileSize;

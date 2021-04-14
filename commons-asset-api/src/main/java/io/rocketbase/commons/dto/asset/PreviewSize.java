@@ -1,5 +1,6 @@
 package io.rocketbase.commons.dto.asset;
 
+import com.fasterxml.jackson.annotation.JsonValue;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
@@ -10,11 +11,14 @@ import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
 public enum PreviewSize implements PreviewParameter {
-    XS(150, 150, 0.7f),
-    S(300, 300, 0.75f),
-    M(600, 600, 0.8f),
-    L(1200, 1200, 0.85f),
-    XL(1900, 1900, 0.85f);
+    XS("xs", 150, 150, 0.7f),
+    S("s", 300, 300, 0.75f),
+    M("m", 600, 600, 0.8f),
+    L("l", 1200, 1200, 0.85f),
+    XL("xl", 1900, 1900, 0.85f);
+
+    @JsonValue
+    private final String value;
 
     @Getter
     private final int maxWidth;

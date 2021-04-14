@@ -95,9 +95,7 @@ public class AssetService {
      */
     public AssetEntity update(AssetEntity asset, AssetUpdate update) {
         handleKeyValues(asset, update.getKeyValues());
-        if (!StringUtils.isEmpty(update.getSystemRefId()) && assetRepository.findBySystemRefId(update.getSystemRefId()).isPresent()) {
-            throw new SystemRefIdAlreadyUsedException();
-        }
+
         asset.setSystemRefId(update.getSystemRefId());
         asset.setEol(update.getEol());
 
@@ -107,6 +105,7 @@ public class AssetService {
 
     protected void handleKeyValues(AssetEntity entity, Map<String, String> keyValues) {
         if (keyValues != null) {
+            entity.validateKeyValues();
             keyValues.forEach((key, value) -> {
                 if (value != null) {
                     entity.addKeyValue(key, value);
@@ -140,16 +139,12 @@ public class AssetService {
         return assetType;
     }
 
-    public Optional<AssetEntity> findByIdOrSystemRefId(String sid) {
-        return assetRepository.findByIdOrSystemRefId(sid);
-    }
-
     public Optional<AssetEntity> findById(String id) {
         return assetRepository.findById(id);
     }
 
-    public void deleteByIdOrSystemRefId(String sid) {
-        AssetEntity asset = assetRepository.findByIdOrSystemRefId(sid)
+    public void deleteById(String id) {
+        AssetEntity asset = assetRepository.findById(id)
                 .orElseThrow(NotFoundException::new);
 
         applicationEventPublisher.publishEvent(new AssetDeleteEvent(this, asset));
@@ -159,13 +154,6 @@ public class AssetService {
     }
 
     private AssetEntity saveAndUploadAsset(AssetType type, File file, String originalFilename, long size, String referenceUrl, AssetUploadMeta uploadMeta) {
-
-        if (Nulls.notNull(uploadMeta, AssetUploadMeta::getSystemRefId, null) != null) {
-            if (assetRepository.findBySystemRefId(uploadMeta.getSystemRefId()).isPresent()) {
-                throw new SystemRefIdAlreadyUsedException();
-            }
-        }
-
         AssetAnalyse analyse = assetHandler.getAnalyse(type, file, originalFilename);
         OriginalUploadModifier.Modification modification = originalUploadModifier.modifyUploadBeforeSave(analyse, file, uploadMeta);
 
@@ -206,8 +194,8 @@ public class AssetService {
         return assetHandler.getAnalyse(assetType, file, originalFilename);
     }
 
-    public AssetEntity copyByIdOrSystemRefId(String sid) {
-        AssetEntity source = assetRepository.findByIdOrSystemRefId(sid)
+    public AssetEntity copyById(String id) {
+        AssetEntity source = assetRepository.findById(id)
                 .orElseThrow(NotFoundException::new);
 
         AssetEntity target = assetRepository.initNewInstance();

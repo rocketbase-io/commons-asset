@@ -1,3 +1,5 @@
+// Generated using typescript-generator version 2.27.744 on 2020-12-11 21:00:38.
+
 import * as rest from "./commons-rest-api.d.ts";
 
 export interface AssetAnalyse extends AssetMeta {
@@ -12,6 +14,7 @@ export interface AssetMeta {
     resolution?: Resolution;
     colorPalette?: ColorPalette;
     referenceUrl?: string;
+    fileSizeHumanReadable: string;
 }
 
 export interface ResponsiveImage {
@@ -34,6 +37,9 @@ export interface AssetRead extends AssetReference, rest.HasKeyValue {
     download?: string;
     keyValues?: Record<string, string>;
     eol?: string;
+    created: string;
+    modifiedBy: string;
+    modified: string;
 }
 
 /**
@@ -108,16 +114,11 @@ export interface ColorPalette {
     colors: string[];
 }
 
-export interface PreviewParameter {
-    defaultQuality: number;
-    maxWidth: number;
-    maxHeight: number;
-}
-
 export interface QueryAsset {
     before?: string;
     after?: string;
     originalFilename?: string;
+    systemRefId?: string;
     referenceUrl?: string;
     context?: string;
     types?: AssetType[];
@@ -155,8 +156,8 @@ export interface AssetBatchWriteEntry extends AssetUploadMeta {
     url: string;
 }
 
-export type AssetErrorCodes = "INVALID_CONTENT_TYPE" | "NOT_ALLOWED_CONTENT_TYPE" | "ASSET_FILE_IS_EMPTY" | "SYSTEM_REF_ID_ALREADY_USED" | "UNPROCESSABLE_ASSET" | "NOT_DOWNLOADABLE";
+export type AssetType = "jpeg" | "png" | "apng" | "gif" | "tiff" | "bmp" | "ico" | "svg" | "webp" | "heif" | "heic" | "pdf" | "zip" | "tar" | "rar" | "gzip" | "7z" | "xls" | "xlsx" | "doc" | "docx" | "ppt" | "pptx" | "odp" | "ods" | "odt" | "csv" | "txt" | "json" | "rtf" | "xml" | "mpeg" | "mp4" | "mpv" | "mov" | "avi" | "wmv" | "webm" | "ogv" | "ogx" | "aac" | "mp3" | "oga" | "wav" | "weba";
 
-export type AssetType = "JPEG" | "PNG" | "APNG" | "GIF" | "TIFF" | "BMP" | "ICO" | "SVG" | "WEBP" | "HEIF" | "HEIC" | "PDF" | "ZIP" | "CSV" | "XLS" | "XLSX" | "DOC" | "DOCX" | "PPT" | "PPTX";
+export type PreviewSize = "xs" | "s" | "m" | "l" | "xl";
 
-export type PreviewSize = "XS" | "S" | "M" | "L" | "XL";
+export type AssetErrorCodes = "invalid_content_type" | "not_allowed_content_type" | "asset_file_is_empty" | "system_ref_id_already_used" | "unprocessable_asset" | "not_downloadable";

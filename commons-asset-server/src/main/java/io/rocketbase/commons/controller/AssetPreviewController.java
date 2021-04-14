@@ -41,11 +41,11 @@ public class AssetPreviewController implements BaseController {
     private AssetHandler assetHandler;
 
     @SneakyThrows
-    @RequestMapping(value = "/{sid}/{size}", method = RequestMethod.GET)
+    @RequestMapping(value = "/{id}/{size}", method = RequestMethod.GET)
     @ResponseBody
-    public ResponseEntity<FileSystemResource> getPreview(@PathVariable("sid") String sid, @PathVariable("size") String size, @RequestParam(required = false) MultiValueMap<String, String> params) {
+    public ResponseEntity<FileSystemResource> getPreview(@PathVariable("id") String id, @PathVariable("size") String size, @RequestParam(required = false) MultiValueMap<String, String> params) {
         PreviewSize previewSize = PreviewSize.getByName(size, PreviewSize.S);
-        AssetEntity entity = assetService.findByIdOrSystemRefId(sid)
+        AssetEntity entity = assetService.findById(id)
                 .orElseThrow(() -> new NotFoundException());
 
         if (assetApiProperties.isPrecalculate()) {

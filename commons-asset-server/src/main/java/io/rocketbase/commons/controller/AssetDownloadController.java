@@ -30,13 +30,13 @@ public class AssetDownloadController implements BaseController {
     /**
      * used to get raw content
      *
-     * @param sid id or systemRefId of asset
+     * @param id id of asset
      * @return content-stream
      */
-    @RequestMapping(value = "/{sid}/b", method = RequestMethod.GET)
+    @RequestMapping(value = "/{id}/b", method = RequestMethod.GET)
     @ResponseBody
-    public ResponseEntity<InputStreamResource> downloadAsset(@PathVariable("sid") String sid, @RequestParam(required = false) MultiValueMap<String, String> params) {
-        AssetEntity entity = assetService.findByIdOrSystemRefId(sid)
+    public ResponseEntity<InputStreamResource> downloadAsset(@PathVariable("id") String id, @RequestParam(required = false) MultiValueMap<String, String> params) {
+        AssetEntity entity = assetService.findById(id)
                 .orElseThrow(() -> new NotFoundException());
         InputStreamResource streamResource = fileStorageService.download(entity);
 

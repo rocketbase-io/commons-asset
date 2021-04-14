@@ -1,5 +1,6 @@
 package io.rocketbase.commons.dto.asset;
 
+import com.fasterxml.jackson.annotation.JsonValue;
 import io.rocketbase.commons.util.Nulls;
 import lombok.Getter;
 
@@ -10,36 +11,74 @@ import java.util.Set;
 
 public enum AssetType {
 
-    JPEG("image/jpeg", "jpg"),
-    PNG("image/png"),
-    APNG("image/apng"),
-    GIF("image/gif"),
-    TIFF("image/tiff"),
-    BMP("image/bmp"),
-    ICO("image/x-ico", "ico"),
-    SVG("image/svg+xml", "svg"),
-    WEBP("image/webp"),
-    HEIF("image/heif"),
-    HEIC("image/heic"),
-    PDF("application/pdf"),
-    ZIP("application/zip"),
-    CSV("application/csv"),
-    XLS("application/msexcel"),
-    XLSX("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"),
-    DOC("application/msword"),
-    DOCX("application/vnd.openxmlformats-officedocument.wordprocessingml.document"),
-    PPT("application/vnd.ms-powerpoint"),
-    PPTX("application/vnd.openxmlformats-officedocument.presentationml.presentation");
+    // images
+    JPEG("jpeg", "image/jpeg", "jpg"),
+    PNG("png", "image/png"),
+    APNG("apng", "image/apng"),
+    GIF("gif", "image/gif"),
+    TIFF("tiff", "image/tiff"),
+    BMP("bmp", "image/bmp"),
+    ICO("ico", "image/x-ico", "ico"),
+    SVG("svg", "image/svg+xml", "svg"),
+    WEBP("webp", "image/webp"),
+    HEIF("heif", "image/heif"),
+    HEIC("heic", "image/heic"),
+    // pdf
+    PDF("pdf", "application/pdf"),
+    // compressed files
+    ZIP("zip", "application/zip"),
+    TAR("tar", "application/x-tar"),
+    RAR("rar", "application/vnd.rar"),
+    GZIP("gzip", "application/gzip"),
+    _7z("7z", "application/x-7z-compressed"),
+    // microsoft office
+    XLS("xls", "application/msexcel"),
+    XLSX("xlsx", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"),
+    DOC("doc", "application/msword"),
+    DOCX("docx", "application/vnd.openxmlformats-officedocument.wordprocessingml.document"),
+    PPT("ppt", "application/vnd.ms-powerpoint"),
+    PPTX("pptx", "application/vnd.openxmlformats-officedocument.presentationml.presentation"),
+    // open document
+    ODP("odp", "application/vnd.oasis.opendocument.presentation"),
+    ODS("ods", "application/vnd.oasis.opendocument.spreadsheet"),
+    ODT("odt", "application/vnd.oasis.opendocument.text"),
+    // text files
+    CSV("csv", "application/csv"),
+    TXT("txt", "application/text"),
+    JSON("json", "application/json"),
+    RTF("rtf", "application/rtf"),
+    XML("xml", "application/xml"),
+    // video
+    MPEG("mpeg", "video/mpeg"),
+    MP4("mp4", "video/mp4"),
+    MPV("mpv", "video/mpv"),
+    MOV("mov", "video/quicktime"),
+    AVI("avi", "video/x-msvideo"),
+    WMV("wmv", "video/x-ms-wmv"),
+    WEBM("webm", "video/webm"),
+    OGV("ogv", "video/ogg"),
+    OGX("ogx", "application/ogg"),
+    // audio
+    AAC("aac", "audio/aac"),
+    MP3("mp3", "audio/mpeg"),
+    OGA("oga", "audio/ogg"),
+    WAV("wav", "audio/wav"),
+    WEBA("weba", "audio/webm");
+
+    @JsonValue
+    private final String value;
 
     @Getter
-    private String contentType;
-    private String fileExtension;
+    private final String contentType;
 
-    AssetType(String contentType) {
-        this(contentType, null);
+    private final String fileExtension;
+
+    AssetType(String value, String contentType) {
+        this(value, contentType, null);
     }
 
-    AssetType(String contentType, String fileExtension) {
+    AssetType(String value, String contentType, String fileExtension) {
+        this.value = value;
         this.contentType = contentType;
         this.fileExtension = fileExtension;
     }

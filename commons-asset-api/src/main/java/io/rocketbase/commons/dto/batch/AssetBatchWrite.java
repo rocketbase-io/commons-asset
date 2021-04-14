@@ -1,10 +1,14 @@
 package io.rocketbase.commons.dto.batch;
 
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.springframework.lang.Nullable;
 
 import javax.validation.constraints.NotNull;
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
 
 @Data
@@ -19,7 +23,15 @@ public class AssetBatchWrite implements Serializable {
     @Nullable
     private Boolean useCache;
 
-    @Singular
     @NotNull
     private List<AssetBatchWriteEntry> entries;
+
+    public AssetBatchWrite withEntry(AssetBatchWriteEntry entry) {
+        if (entries == null) {
+            entries = new ArrayList<>();
+        }
+        entries.add(entry);
+        return this;
+    }
+
 }

@@ -9,11 +9,7 @@ import java.util.Optional;
 
 public interface AssetRepository<T extends AssetEntity> {
 
-    Optional<T> findByIdOrSystemRefId(String sid);
-
-    Optional<T> findById(String sid);
-
-    Optional<T> findBySystemRefId(String systemRefId);
+    Optional<T> findById(String id);
 
     boolean delete(String id);
 

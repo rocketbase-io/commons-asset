@@ -1,34 +1,31 @@
 package io.rocketbase.commons.model;
 
-import com.google.common.collect.ImmutableMap;
 import io.rocketbase.commons.dto.asset.AssetType;
 import io.rocketbase.commons.dto.asset.ColorPalette;
 import io.rocketbase.commons.dto.asset.Resolution;
-import io.rocketbase.commons.service.AssetJpaRepository;
 import io.rocketbase.commons.util.Nulls;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedBy;
+import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.lang.Nullable;
-import org.springframework.util.StringUtils;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
 import java.time.Instant;
-import java.util.*;
-import java.util.stream.Collectors;
+import java.util.HashMap;
+import java.util.Map;
 
 
 @Entity
 @Table(name = "co_asset",
-        uniqueConstraints = {
-                @UniqueConstraint(name = "uk_asset_system_ref_if", columnNames = {"systemRefId"})
-        },
         indexes = {
-                @Index(name = "idx_asset_reference_hash", columnList = "referenceHash"),
+                @Index(name = "idx_asset_reference_hash", columnList = "reference_hash"),
                 @Index(name = "idx_asset_context", columnList = "context"),
+                @Index(name = "idx_asset_systemrefid", columnList = "system_ref_id")
         }
 )
 @Data
@@ -38,39 +35,49 @@ import java.util.stream.Collectors;
 public class AssetJpaEntity implements AssetEntity {
 
     @Id
-    @Column(length = 36, nullable = false)
+    @Column(name = "id", length = 36)
     private String id;
 
-    @Size(max = 100)
-    @Column(length = 100)
+    @Nullable
+    @Column(name = "system_ref_id", length = 100)
     private String systemRefId;
 
     /**
      * relative path of storage
      */
-    @Size(max = 500)
-    @Column(length = 500)
+    @Column(name = "url_path", length = 500)
     private String urlPath;
 
-    @Enumerated(EnumType.STRING)
     @NotNull
-    @Column(length = 10, nullable = false)
+    @Enumerated(EnumType.STRING)
+    @Column(name = "type", length = 10)
     private AssetType type;
 
     /**
      * allows to store individual grouping for assets to find all picture of a flexible type<br>
      * for example all avatar images or backgrounds...
      */
-    @Size(max = 100)
-    @Column(length = 100)
+    @Column(name = "context", length = 100)
     private String context;
 
     @NotNull
-    @Column(nullable = false)
+    @CreatedDate
+    @Column(name = "created")
     private Instant created;
 
+    @LastModifiedBy
+    @Column(name = "modified_by", length = 36)
+    private String modifiedBy;
+
+    @NotNull
+    @LastModifiedDate
+    @Column(name = "modified")
+    private Instant modified;
+
+    @Column(name = "original_filename")
     private String originalFilename;
 
+    @Column(name = "file_size")
     private long fileSize;
 
     /**
@@ -88,24 +95,36 @@ public class AssetJpaEntity implements AssetEntity {
     /**
      * only filled in case of batch downloaded image
      */
-    @Size(max = 64)
-    @Column(length = 64)
+    @Column(name = "reference_hash", length = 64)
     private String referenceHash;
 
     /**
      * only filled in case of batch downloaded image
      */
-    @Size(max = 2000)
-    @Column(length = 2000)
+    @Column(name = "reference_url", length = 2000)
     private String referenceUrl;
 
     @Lob
+    @Column(name = "lqip")
     private String lqip;
 
-    @OneToMany(mappedBy = "asset", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<AssetJpaKeyValueEntity> keyValues;
+    @ElementCollection
+    @CollectionTable(
+            name = "co_asset_keyvalue",
+            joinColumns = @JoinColumn(name = "asset_id", referencedColumnName = "id",
+                    foreignKey = @ForeignKey(name = "fk_asset_keyvalue__asset")),
+            uniqueConstraints = @UniqueConstraint(name = "uk_asset_keyvalue", columnNames = {"asset_id", "field_key"}),
+            indexes = {
+                    @Index(name = "idx_asset_keyvalue_asset", columnList = "asset_id"),
+                    @Index(name = "idx_asset_keyvalue_value", columnList = "field_key, field_value"),
+            }
+    )
+    @MapKeyColumn(name = "field_key", length = 50)
+    @Column(name = "field_value", length = 255, nullable = false)
+    @Builder.Default
+    private Map<String, String> keyValueMap = new HashMap<>();
 
-    @Nullable
+    @Column(name = "eol")
     private Instant eol;
 
     @Override
@@ -138,52 +157,7 @@ public class AssetJpaEntity implements AssetEntity {
 
     @Override
     public Map<String, String> getKeyValues() {
-        if (keyValues == null) {
-            return Collections.emptyMap();
-        }
-
-        return ImmutableMap.copyOf(keyValues.stream()
-                .collect(Collectors.toMap(AssetJpaKeyValueEntity::getFieldKey, AssetJpaKeyValueEntity::getFieldValue)));
-    }
-
-    @Override
-    public AssetEntity addKeyValue(String key, String value) {
-        if (getKeyValueEntities() == null) {
-            setKeyValues(new ArrayList<>());
-        }
-        findKeyValue(key).ifPresent(v -> v.setFieldValue(value));
-        return this;
-    }
-
-    @Override
-    public void removeKeyValue(String key) {
-        findKeyValue(key).ifPresent(v -> getKeyValueEntities().remove(v));
-    }
-
-    public Optional<AssetJpaKeyValueEntity> findKeyValue(String key) {
-        if (getKeyValueEntities() != null && key != null) {
-            return getKeyValueEntities().stream().filter(v -> v.getFieldKey().equals(key))
-                    .findFirst();
-        }
-        return Optional.empty();
-    }
-
-    public List<AssetJpaKeyValueEntity> getKeyValueEntities() {
-        return keyValues;
-    }
-
-    @PrePersist
-    @PreUpdate
-    public void onPrePersistUpdate() {
-        if (getId() == null) {
-            setId(UUID.randomUUID().toString());
-        }
-        if (!StringUtils.isEmpty(getReferenceUrl())) {
-            setReferenceHash(AssetJpaRepository.hashValue(getReferenceUrl()));
-        }
-        if (created == null) {
-            created = Instant.now();
-        }
+        return keyValueMap;
     }
 
     public AssetJpaEntity(String id) {

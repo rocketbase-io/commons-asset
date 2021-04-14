@@ -161,6 +161,9 @@ public class AssetConverter {
                 .keyValues(filterInvisibleKeys(entity.getKeyValues()))
                 .lqip(entity.getLqip())
                 .eol(entity.getEol())
+                .created(entity.getCreated())
+                .modifiedBy(entity.getModifiedBy())
+                .modified(entity.getModified())
                 .build();
     }
 
@@ -171,7 +174,7 @@ public class AssetConverter {
         return entity.toReference();
     }
 
-    public List<AssetRead> fromEntities(List<AssetEntity> entities, List<PreviewSize> sizes) {
+    public List<AssetRead> fromEntities(List<? extends AssetEntity> entities, List<PreviewSize> sizes) {
         if (entities == null) {
             return null;
         }

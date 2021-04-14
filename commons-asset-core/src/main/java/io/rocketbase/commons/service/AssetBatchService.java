@@ -9,6 +9,7 @@ import io.rocketbase.commons.model.AssetEntity;
 import io.rocketbase.commons.service.download.DownloadService;
 import io.rocketbase.commons.util.Nulls;
 import lombok.extern.slf4j.Slf4j;
+import org.checkerframework.checker.units.qual.A;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 
@@ -39,19 +40,19 @@ public class AssetBatchService {
      * @return divided in succeeded and failed with key of url
      */
     public AssetBatchResult batch(AssetBatchWrite assetBatch, List<PreviewSize> previewSizes) {
-        AssetBatchResult.AssetBatchResultBuilder builder = AssetBatchResult.builder();
+        AssetBatchResult result = new AssetBatchResult();
         for (AssetBatchWriteEntry entry : assetBatch.getEntries()) {
             try {
-                builder.success(entry.getUrl(), assetConverter.fromEntity(downloadOrUseCache(entry, assetBatch.getUseCache()), previewSizes));
+                result.addSuccess(entry.getUrl(), assetConverter.fromEntity(downloadOrUseCache(entry, assetBatch.getUseCache()), previewSizes));
             } catch (DownloadService.DownloadError e) {
-                builder.failure(entry.getUrl(), e.getErrorCode());
+                result.addFailure(entry.getUrl(), e.getErrorCode());
             } catch (InvalidContentTypeException e) {
-                builder.failure(entry.getUrl(), AssetErrorCodes.INVALID_CONTENT_TYPE);
+                result.addFailure(entry.getUrl(), AssetErrorCodes.INVALID_CONTENT_TYPE);
             } catch (Exception e) {
-                builder.failure(entry.getUrl(), AssetErrorCodes.UNPROCESSABLE_ASSET);
+                result.addFailure(entry.getUrl(), AssetErrorCodes.UNPROCESSABLE_ASSET);
             }
         }
-        return builder.build();
+        return result;
     }
 
     public Optional<AssetRead> migrateSingle(String url, AssetUploadMeta meta, boolean useCache) {
@@ -73,19 +74,19 @@ public class AssetBatchService {
      * @return divided in succeeded and failed with key of url
      */
     public AssetBatchResultWithoutPreviews batchWithoutPreviews(AssetBatchWrite assetBatch) {
-        AssetBatchResultWithoutPreviews.AssetBatchResultWithoutPreviewsBuilder builder = AssetBatchResultWithoutPreviews.builder();
+        AssetBatchResultWithoutPreviews result = new AssetBatchResultWithoutPreviews();
         for (AssetBatchWriteEntry entry : assetBatch.getEntries()) {
             try {
-                builder.success(entry.getUrl(), assetConverter.fromEntityWithoutPreviews(downloadOrUseCache(entry, assetBatch.getUseCache())));
+                result.addSuccess(entry.getUrl(), assetConverter.fromEntityWithoutPreviews(downloadOrUseCache(entry, assetBatch.getUseCache())));
             } catch (DownloadService.DownloadError e) {
-                builder.failure(entry.getUrl(), e.getErrorCode());
+                result.addFailure(entry.getUrl(), e.getErrorCode());
             } catch (InvalidContentTypeException e) {
-                builder.failure(entry.getUrl(), AssetErrorCodes.INVALID_CONTENT_TYPE);
+                result.addFailure(entry.getUrl(), AssetErrorCodes.INVALID_CONTENT_TYPE);
             } catch (Exception e) {
-                builder.failure(entry.getUrl(), AssetErrorCodes.UNPROCESSABLE_ASSET);
+                result.addFailure(entry.getUrl(), AssetErrorCodes.UNPROCESSABLE_ASSET);
             }
         }
-        return builder.build();
+        return result;
     }
 
     protected AssetEntity downloadOrUseCache(AssetBatchWriteEntry entry, Boolean useCache) throws Exception {
@@ -113,27 +114,27 @@ public class AssetBatchService {
      * @return divided in succeeded and failed with key of url
      */
     public AssetBatchAnalyseResult batchAnalyse(List<String> urls) {
-        AssetBatchAnalyseResult.AssetBatchAnalyseResultBuilder builder = AssetBatchAnalyseResult.builder();
+        AssetBatchAnalyseResult result = new AssetBatchAnalyseResult();
         for (String url : urls) {
             DownloadService.TempDownload download = null;
             try {
                 download = downloadService.downloadUrl(url);
                 AssetAnalyse analyse = assetService.analyse(download.getFile(), download.getFilename());
                 analyse.setReferenceUrl(url);
-                builder.success(url, analyse);
+                result.addSuccess(url, analyse);
             } catch (DownloadService.DownloadError e) {
-                builder.failure(url, e.getErrorCode());
+                result.addFailure(url, e.getErrorCode());
             } catch (InvalidContentTypeException e) {
-                builder.failure(url, AssetErrorCodes.INVALID_CONTENT_TYPE);
+                result.addFailure(url, AssetErrorCodes.INVALID_CONTENT_TYPE);
             } catch (Exception e) {
-                builder.failure(url, AssetErrorCodes.UNPROCESSABLE_ASSET);
+                result.addFailure(url, AssetErrorCodes.UNPROCESSABLE_ASSET);
             } finally {
                 if (download != null && download.getFile() != null) {
                     download.getFile().delete();
                 }
             }
         }
-        return builder.build();
+        return result;
     }
 
 }

@@ -1,8 +1,4 @@
 spring:
-  # database connection
-  data:
-    mongodb:
-      database: commons-asset-sample-test
   # json configuration
   jackson:
     serialization:
