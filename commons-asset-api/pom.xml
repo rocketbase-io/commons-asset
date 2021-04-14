@@ -95,6 +95,7 @@ SOFTWARE.
 
     <build>
         <plugins>
+            <!--
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-javadoc-plugin</artifactId>
@@ -191,6 +192,7 @@ SOFTWARE.
                     <noTslintDisable>true</noTslintDisable>
                 </configuration>
             </plugin>
+            -->
         </plugins>
     </build>
 
