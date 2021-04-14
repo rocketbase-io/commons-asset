@@ -13,7 +13,7 @@ import org.springframework.test.context.ActiveProfiles;
 
 import javax.annotation.Resource;
 
-@SpringBootTest(classes = TestApplication.class, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @ActiveProfiles(profiles = "test")
 public abstract class BaseIntegrationTest {
 

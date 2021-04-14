@@ -12,7 +12,7 @@ import org.springframework.data.mongodb.gridfs.GridFsTemplate;
 
 import javax.annotation.Resource;
 
-@SpringBootTest(classes = TestApplication.class, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 public abstract class BaseIntegrationTest {
 
     @Getter

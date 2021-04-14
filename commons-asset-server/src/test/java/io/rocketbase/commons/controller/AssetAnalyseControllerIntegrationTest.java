@@ -8,6 +8,7 @@ import io.rocketbase.commons.dto.batch.AssetBatchAnalyseResult;
 import io.rocketbase.commons.exception.AssetErrorCodes;
 import io.rocketbase.commons.resource.AssetResource;
 import lombok.SneakyThrows;
+import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ResourceLoader;
@@ -22,6 +23,7 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.notNullValue;
 
 @ActiveProfiles(profiles = "test")
+@Slf4j
 public class AssetAnalyseControllerIntegrationTest extends BaseIntegrationTest {
 
     @Autowired
@@ -31,7 +33,7 @@ public class AssetAnalyseControllerIntegrationTest extends BaseIntegrationTest {
     @Test
     public void testAnalyseFile() {
         // given
-        AssetResource assetResource = getAssetResource();
+        AssetResource assetResource = new AssetResource(baseUrl);
 
         // when
         File uploadFile = resourceLoader.getResource("classpath:assets/sample.png")
@@ -51,7 +53,7 @@ public class AssetAnalyseControllerIntegrationTest extends BaseIntegrationTest {
     @Test
     public void testProcessBatchAnalyse() {
         //
-        AssetResource assetResource = getAssetResource();
+        AssetResource assetResource = new AssetResource(baseUrl);
         String success = "https://cdn.rocketbase.io/assets/signature/rocketbase-signature-20179.png";
         String failure = "https://gitlab.com/notfound.jpg";
 
@@ -67,10 +69,6 @@ public class AssetAnalyseControllerIntegrationTest extends BaseIntegrationTest {
         // gitlab response with 404 html page that is text/plain detected
         assertThat(result.getFailed().get(failure), equalTo(AssetErrorCodes.NOT_DOWNLOADABLE));
 
-    }
-
-    private AssetResource getAssetResource() {
-        return new AssetResource(getBaseUrl());
     }
 
 }

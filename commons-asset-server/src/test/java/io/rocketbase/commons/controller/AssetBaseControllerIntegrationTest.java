@@ -39,7 +39,7 @@ public class AssetBaseControllerIntegrationTest extends BaseIntegrationTest {
     @Test
     public void testUploadPng() {
         // given
-        AssetResource assetResource = getAssetResource();
+        AssetResource assetResource = new AssetResource(baseUrl);
 
         // when
         File uploadFile = resourceLoader.getResource("classpath:assets/sample.png")
@@ -52,14 +52,14 @@ public class AssetBaseControllerIntegrationTest extends BaseIntegrationTest {
         assertThat(result.getMeta().getFileSize(), equalTo(3572L));
         assertThat(result.getMeta().getResolution(), equalTo(new Resolution(200, 40)));
         assertThat(result.getMeta().getOriginalFilename(), equalTo(uploadFile.getName()));
-        assertThat(result.getDownload(), startsWith(getBaseUrl()));
+        assertThat(result.getDownload(), startsWith(baseUrl));
     }
 
     @SneakyThrows
     @Test
     public void testUploadJpg() {
         // given
-        AssetResource assetResource = getAssetResource();
+        AssetResource assetResource = new AssetResource(baseUrl);
 
         // when
         File uploadFile = resourceLoader.getResource("classpath:assets/sample.jpg")
@@ -78,7 +78,7 @@ public class AssetBaseControllerIntegrationTest extends BaseIntegrationTest {
     @Test
     public void testUploadJpgWithKeyValues() {
         // given
-        AssetResource assetResource = getAssetResource();
+        AssetResource assetResource = new AssetResource(baseUrl);
 
         // when
         File uploadFile = resourceLoader.getResource("classpath:assets/sample.jpg")
@@ -120,7 +120,7 @@ public class AssetBaseControllerIntegrationTest extends BaseIntegrationTest {
     @Test
     public void testUploadGif() {
         // given
-        AssetResource assetResource = getAssetResource();
+        AssetResource assetResource = new AssetResource(baseUrl);
 
         // when
         File uploadFile = resourceLoader.getResource("classpath:assets/sample.gif")
@@ -139,7 +139,7 @@ public class AssetBaseControllerIntegrationTest extends BaseIntegrationTest {
     @Test
     public void testUploadPdf() {
         // given
-        AssetResource assetResource = getAssetResource();
+        AssetResource assetResource = new AssetResource(baseUrl);
 
         // when
         File uploadFile = resourceLoader.getResource("classpath:assets/sample.pdf")
@@ -158,7 +158,7 @@ public class AssetBaseControllerIntegrationTest extends BaseIntegrationTest {
     @Test
     public void testUploadZip() {
         // given
-        AssetResource assetResource = getAssetResource();
+        AssetResource assetResource = new AssetResource(baseUrl);
 
         // when
         File uploadFile = resourceLoader.getResource("classpath:assets/sample.zip")
@@ -177,7 +177,7 @@ public class AssetBaseControllerIntegrationTest extends BaseIntegrationTest {
     @Test
     public void testDelete() {
         // given
-        AssetResource assetResource = getAssetResource();
+        AssetResource assetResource = new AssetResource(baseUrl);
         File uploadFile = resourceLoader.getResource("classpath:assets/sample.zip")
                 .getFile();
         AssetRead result = assetResource.uploadFile(new FileInputStream(uploadFile), uploadFile.getName());
@@ -194,7 +194,7 @@ public class AssetBaseControllerIntegrationTest extends BaseIntegrationTest {
     @Test
     public void testUploadInvalidContentType() {
         // given
-        AssetResource assetResource = getAssetResource();
+        AssetResource assetResource = new AssetResource(baseUrl);
 
         // when
         File uploadFile = resourceLoader.getResource("classpath:assets/invalid-sample.txt")
@@ -212,7 +212,7 @@ public class AssetBaseControllerIntegrationTest extends BaseIntegrationTest {
     //@Test
     public void testBatch() {
         //
-        AssetResource assetResource = getAssetResource();
+        AssetResource assetResource = new AssetResource(baseUrl);
         String success = "https://cdn.rocketbase.io/assets/signature/rocketbase-signature-20179.png";
         String failure = "https://gitlab.com/notfound.jpg";
 
@@ -235,7 +235,7 @@ public class AssetBaseControllerIntegrationTest extends BaseIntegrationTest {
     @Test
     public void testUpdateAsset() {
         // given
-        AssetResource assetResource = getAssetResource();
+        AssetResource assetResource = new AssetResource(baseUrl);
 
         // when
         File uploadFile = resourceLoader.getResource("classpath:assets/sample.jpg").getFile();
@@ -276,7 +276,7 @@ public class AssetBaseControllerIntegrationTest extends BaseIntegrationTest {
     @Test
     public void testUploadTooBigAsset() {
         // given
-        AssetResource assetResource = getAssetResource();
+        AssetResource assetResource = new AssetResource(baseUrl);
 
         // when
         File uploadFile = resourceLoader.getResource("classpath:assets/pierre-bamin-X16N5J0uRD4-unsplash.jpg")
@@ -295,7 +295,7 @@ public class AssetBaseControllerIntegrationTest extends BaseIntegrationTest {
     @Test
     public void testUploadWebpJpeg() {
         // given
-        AssetResource assetResource = getAssetResource();
+        AssetResource assetResource = new AssetResource(baseUrl);
 
         // when
         File uploadFile = resourceLoader.getResource("classpath:assets/jpeg.webp")
@@ -314,7 +314,7 @@ public class AssetBaseControllerIntegrationTest extends BaseIntegrationTest {
     @Test
     public void testUploadHeic() {
         // given
-        AssetResource assetResource = getAssetResource();
+        AssetResource assetResource = new AssetResource(baseUrl);
 
         // when
         File uploadFile = resourceLoader.getResource("classpath:assets/sample.heic")
@@ -333,7 +333,7 @@ public class AssetBaseControllerIntegrationTest extends BaseIntegrationTest {
     @Test
     public void testUploadWebpPng() {
         // given
-        AssetResource assetResource = getAssetResource();
+        AssetResource assetResource = new AssetResource(baseUrl);
 
         // when
         File uploadFile = resourceLoader.getResource("classpath:assets/png.webp")
@@ -346,11 +346,6 @@ public class AssetBaseControllerIntegrationTest extends BaseIntegrationTest {
         assertThat(result.getMeta().getFileSize(), equalTo(16674L));
         assertThat(result.getMeta().getResolution(), nullValue());
         assertThat(result.getMeta().getOriginalFilename(), equalTo(uploadFile.getName()));
-    }
-
-
-    private AssetResource getAssetResource() {
-        return new AssetResource(getBaseUrl());
     }
 
 }

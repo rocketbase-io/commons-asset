@@ -9,7 +9,6 @@ import io.rocketbase.commons.exception.NotFoundException;
 import io.rocketbase.commons.resource.AssetResource;
 import io.rocketbase.commons.service.AssetService;
 import io.rocketbase.commons.service.MongoFileStorageService;
-import lombok.SneakyThrows;
 import org.apache.commons.io.IOUtils;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,11 +35,10 @@ public class AssetBaseControllerWithPrecalculatedIntegrationTest extends BaseInt
     @Resource
     private AssetService assetService;
 
-    @SneakyThrows
     @Test
-    public void testUploadJpg() {
+    public void testUploadJpg() throws Exception {
         // given
-        AssetResource assetResource = getAssetResource();
+        AssetResource assetResource = new AssetResource(baseUrl);
 
         // when
         File uploadFile = resourceLoader.getResource("classpath:assets/photo-1595776430819-9aa35f06830b.jpeg")
@@ -71,11 +69,10 @@ public class AssetBaseControllerWithPrecalculatedIntegrationTest extends BaseInt
         assertThat(analyseM.getResolution().getHeight(), lessThanOrEqualTo(PreviewSize.M.getMaxHeight()));
     }
 
-    @SneakyThrows
     @Test
-    public void testUploadPdf() {
+    public void testUploadPdf() throws Exception {
         // given
-        AssetResource assetResource = getAssetResource();
+        AssetResource assetResource = new AssetResource(baseUrl);
 
         // when
         File uploadFile = resourceLoader.getResource("classpath:assets/sample.pdf")
@@ -93,11 +90,6 @@ public class AssetBaseControllerWithPrecalculatedIntegrationTest extends BaseInt
         } catch (Exception e) {
             assertThat(e, instanceOf(NotFoundException.class));
         }
-    }
-
-
-    private AssetResource getAssetResource() {
-        return new AssetResource(getBaseUrl());
     }
 
 }
