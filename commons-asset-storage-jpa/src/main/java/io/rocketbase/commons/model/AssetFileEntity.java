@@ -19,7 +19,7 @@ import java.sql.Blob;
 public class AssetFileEntity {
 
     @Id
-    @Column(length = 39, nullable = false)
+    @Column(name = "id", length = 36)
     private String id;
 
     @Lob
