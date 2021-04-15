@@ -54,6 +54,7 @@ SOFTWARE.
         <module>commons-asset-imgproxy</module>
         <module>commons-asset-storage-fs</module>
         <module>commons-asset-server-filepond</module>
+        <module>schema-generation</module>
     </modules>
 
     <licenses>
