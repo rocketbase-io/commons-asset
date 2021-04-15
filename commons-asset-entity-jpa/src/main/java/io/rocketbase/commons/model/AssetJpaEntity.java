@@ -8,9 +8,6 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.springframework.data.annotation.CreatedDate;
-import org.springframework.data.annotation.LastModifiedBy;
-import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.lang.Nullable;
 
 import javax.persistence.*;
@@ -61,16 +58,13 @@ public class AssetJpaEntity implements AssetEntity {
     private String context;
 
     @NotNull
-    @CreatedDate
     @Column(name = "created", nullable = false)
     private Instant created;
 
-    @LastModifiedBy
     @Column(name = "modified_by", length = 36)
     private String modifiedBy;
 
     @NotNull
-    @LastModifiedDate
     @Column(name = "modified", nullable = false)
     private Instant modified;
 

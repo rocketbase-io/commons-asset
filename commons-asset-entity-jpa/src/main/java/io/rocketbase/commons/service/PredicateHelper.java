@@ -17,7 +17,7 @@ public interface PredicateHelper {
     }
 
     default void addToListIfNotEmpty(List<Predicate> list, String value, String path, Root root, CriteriaBuilder cb) {
-        if (!StringUtils.isEmpty(value)) {
+        if (StringUtils.hasText(value)) {
             list.add(cb.like(cb.lower(root.get(path)), buildLikeString(value)));
         }
     }

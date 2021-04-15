@@ -5,6 +5,7 @@ import io.rocketbase.commons.dto.asset.QueryAsset;
 import io.rocketbase.commons.model.AssetJpaEntity;
 import io.rocketbase.commons.model.AssetJpaEntity_;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.AuditorAware;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
@@ -24,10 +25,12 @@ import java.util.*;
 public class AssetJpaRepository implements AssetRepository<AssetJpaEntity>, PredicateHelper {
 
     private final EntityManager em;
+    private final AuditorAware auditorAware;
     private final SimpleJpaRepository<AssetJpaEntity, String> repository;
 
-    public AssetJpaRepository(EntityManager entityManager) {
+    public AssetJpaRepository(EntityManager entityManager, AuditorAware auditorAware) {
         this.em = entityManager;
+        this.auditorAware = auditorAware;
         repository = new SimpleJpaRepository<>(AssetJpaEntity.class, entityManager);
     }
 
@@ -59,6 +62,8 @@ public class AssetJpaRepository implements AssetRepository<AssetJpaEntity>, Pred
     @Override
     @Transactional
     public AssetJpaEntity save(AssetJpaEntity entity) {
+        entity.setModified(entity.getModified() == null ? entity.getCreated() : Instant.now());
+        entity.setModifiedBy(String.valueOf(auditorAware.getCurrentAuditor().orElse("")));
         return initLazyObjects(repository.save(entity));
     }
 

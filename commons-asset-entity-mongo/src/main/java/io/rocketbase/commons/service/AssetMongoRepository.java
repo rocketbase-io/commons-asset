@@ -8,13 +8,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.bson.types.ObjectId;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.event.EventListener;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.*;
 import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.data.mongodb.core.index.Index;
 import org.springframework.data.mongodb.core.index.IndexOperations;
-import org.springframework.data.mongodb.core.index.IndexResolver;
-import org.springframework.data.mongodb.core.index.MongoPersistentEntityIndexResolver;
 import org.springframework.data.mongodb.core.mapping.MongoMappingContext;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
@@ -31,11 +28,9 @@ import java.util.regex.Pattern;
 public class AssetMongoRepository implements AssetRepository<AssetMongoEntity> {
 
     private final MongoTemplate mongoTemplate;
-
     private final MongoMappingContext mongoMappingContext;
-
-    private final boolean mongoEnsureInde;
-
+    private final boolean mongoEnsureIndex;
+    private final AuditorAware auditorAware;
 
     @Override
     public Optional<AssetMongoEntity> findById(String sid) {
@@ -51,6 +46,8 @@ public class AssetMongoRepository implements AssetRepository<AssetMongoEntity> {
 
     @Override
     public AssetMongoEntity save(AssetMongoEntity entity) {
+        entity.setModified(entity.getModified() == null ? entity.getCreated() : Instant.now());
+        entity.setModifiedBy(String.valueOf(auditorAware.getCurrentAuditor().orElse("")));
         return mongoTemplate.save(entity);
     }
 
@@ -87,16 +84,16 @@ public class AssetMongoRepository implements AssetRepository<AssetMongoEntity> {
                 }
                 result.addCriteria(criteria);
             }
-            if (!StringUtils.isEmpty(query.getSystemRefId())) {
+            if (StringUtils.hasText(query.getSystemRefId())) {
                 result.addCriteria(Criteria.where("systemRefId").is(query.getSystemRefId()));
             }
-            if (!StringUtils.isEmpty(query.getOriginalFilename())) {
+            if (StringUtils.hasText(query.getOriginalFilename())) {
                 result.addCriteria(Criteria.where("originalFilename").regex(query.getOriginalFilename().trim(), "i"));
             }
-            if (!StringUtils.isEmpty(query.getReferenceUrl())) {
+            if (StringUtils.hasText(query.getReferenceUrl())) {
                 result.addCriteria(Criteria.where("referenceUrl").regex(query.getReferenceUrl().trim(), "i"));
             }
-            if (!StringUtils.isEmpty(query.getContext())) {
+            if (StringUtils.hasText(query.getContext())) {
                 result.addCriteria(Criteria.where("context").is(query.getContext()));
             }
             if (query.getTypes() != null && !query.getTypes().isEmpty()) {
@@ -126,11 +123,12 @@ public class AssetMongoRepository implements AssetRepository<AssetMongoEntity> {
 
     @EventListener(ApplicationReadyEvent.class)
     public void initIndicesAfterStartup() {
-        if (mongoEnsureInde) {
-            IndexOperations indexOps = mongoTemplate.indexOps(AssetMongoEntity.class);
+        if (mongoEnsureIndex) {
+            IndexOperations indexOperations = mongoTemplate.indexOps(AssetMongoEntity.class);
+            indexOperations.ensureIndex(new Index().on("systemRefId", Sort.Direction.ASC));
+            indexOperations.ensureIndex(new Index().on("context", Sort.Direction.ASC));
+            indexOperations.ensureIndex(new Index().on("eol", Sort.Direction.ASC));
 
-            IndexResolver resolver = new MongoPersistentEntityIndexResolver(mongoMappingContext);
-            resolver.resolveIndexFor(AssetMongoEntity.class).forEach(indexOps::ensureIndex);
             log.info("created index for AssetMongoEntity");
         } else {
             log.debug("disabled creating of index for AssetMongoEntity");
