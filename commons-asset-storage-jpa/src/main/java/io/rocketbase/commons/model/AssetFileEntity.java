@@ -18,8 +18,11 @@ import java.sql.Blob;
 @NoArgsConstructor
 public class AssetFileEntity {
 
+    /**
+     * longer to keep different preview sizes
+     */
     @Id
-    @Column(name = "id", length = 36)
+    @Column(name = "id", length = 39)
     private String id;
 
     @Lob
