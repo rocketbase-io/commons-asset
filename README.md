@@ -16,12 +16,13 @@ I've added a swagger api-documentation. You can find it within [src](./commons-a
 **Features:**
 * api and controller to handle asset-uploads
 * works with images: jpeg, gif, png, tiff, svg, webp, heic/heif and documents like: pdf, excel, word, powerpoint and zip
+  *(with 4.6 upwards a long list of other types like videos, audio and docs has been added)*
 * you can configure the allowed contentTypes via property *("asset.api.types")*
 * 4 different storage implementations (mongo-grid-fs / aws-s3 / jpa-blob / local-file)
 * embedded thumb service with different implementations (java / command-line ImageMagick or extermal services like imgproxy/thumbor)
 * java resource to communicate with api
 * batch downloading urls and storing them / analyzing
-* intergrated [color-thief](https://github.com/SvenWoltmann/color-thief-java) in order to get primary and other colors from photo
+* integrated [color-thief](https://github.com/SvenWoltmann/color-thief-java) in order to get primary and other colors from photo
 * optional LIQP (Low Quality Image Placeholder) option to have a placeholder for images in base64 encoded in ultra low resolution
 * optional preview calculation after upload 
 * configure available preview-sizes
