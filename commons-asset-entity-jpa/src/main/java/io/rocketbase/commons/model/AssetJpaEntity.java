@@ -50,7 +50,7 @@ public class AssetJpaEntity implements AssetEntity {
 
     @NotNull
     @Enumerated(EnumType.STRING)
-    @Column(name = "type", length = 10)
+    @Column(name = "type", length = 10, nullable = false)
     private AssetType type;
 
     /**
@@ -62,7 +62,7 @@ public class AssetJpaEntity implements AssetEntity {
 
     @NotNull
     @CreatedDate
-    @Column(name = "created")
+    @Column(name = "created", nullable = false)
     private Instant created;
 
     @LastModifiedBy
@@ -71,13 +71,13 @@ public class AssetJpaEntity implements AssetEntity {
 
     @NotNull
     @LastModifiedDate
-    @Column(name = "modified")
+    @Column(name = "modified", nullable = false)
     private Instant modified;
 
     @Column(name = "original_filename")
     private String originalFilename;
 
-    @Column(name = "file_size")
+    @Column(name = "file_size", nullable = false)
     private long fileSize;
 
     /**
@@ -111,9 +111,7 @@ public class AssetJpaEntity implements AssetEntity {
     @ElementCollection
     @CollectionTable(
             name = "co_asset_keyvalue",
-            joinColumns = @JoinColumn(name = "asset_id", referencedColumnName = "id",
-                    foreignKey = @ForeignKey(name = "fk_asset_keyvalue__asset")),
-            uniqueConstraints = @UniqueConstraint(name = "uk_asset_keyvalue", columnNames = {"asset_id", "field_key"}),
+            joinColumns = @JoinColumn(name = "asset_id", referencedColumnName = "id", foreignKey = @ForeignKey(name = "fk_asset_keyvalue__asset")),
             indexes = {
                     @Index(name = "idx_asset_keyvalue_asset", columnList = "asset_id"),
                     @Index(name = "idx_asset_keyvalue_value", columnList = "field_key, field_value"),

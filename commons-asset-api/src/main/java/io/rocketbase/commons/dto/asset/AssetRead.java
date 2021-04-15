@@ -30,20 +30,17 @@ public class AssetRead extends DefaultAssetReference implements HasKeyValue {
     @Nullable
     private Instant eol;
 
-    private Instant created;
-
     private String modifiedBy;
 
     private Instant modified;
 
     @Builder(builderMethodName = "builderRead")
-    public AssetRead(String id, String systemRefId, String urlPath, AssetType type, String context, AssetMeta meta, String lqip, AssetPreviews previews, String download, Map<String, String> keyValues, Instant eol, Instant created, String modifiedBy, Instant modified) {
+    public AssetRead(String id, String systemRefId, String urlPath, AssetType type, String context, AssetMeta meta, String lqip, AssetPreviews previews, String download, Map<String, String> keyValues, Instant eol, String modifiedBy, Instant modified) {
         super(id, systemRefId, urlPath, type, context, meta, lqip);
         setPreviews(previews);
         setDownload(download);
         setKeyValues(keyValues);
         setEol(eol);
-        setCreated(created);
         setModifiedBy(modifiedBy);
         setModified(modified);
     }

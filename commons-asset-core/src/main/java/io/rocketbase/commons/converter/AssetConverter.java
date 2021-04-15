@@ -161,7 +161,6 @@ public class AssetConverter {
                 .keyValues(filterInvisibleKeys(entity.getKeyValues()))
                 .lqip(entity.getLqip())
                 .eol(entity.getEol())
-                .created(entity.getCreated())
                 .modifiedBy(entity.getModifiedBy())
                 .modified(entity.getModified())
                 .build();
