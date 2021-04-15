@@ -1,0 +1,64 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog" xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext" xmlns:pro="http://www.liquibase.org/xml/ns/pro" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd http://www.liquibase.org/xml/ns/pro http://www.liquibase.org/xml/ns/pro/liquibase-pro-4.1.xsd http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.1.xsd">
+    <changeSet author="marten (generated)" id="1618493485791-1">
+        <createTable tableName="co_asset">
+            <column name="id" type="VARCHAR(36)">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="color_others" type="VARCHAR(50)"/>
+            <column name="color_primary" type="VARCHAR(7)"/>
+            <column name="context" type="VARCHAR(100)"/>
+            <column name="created" type="datetime">
+                <constraints nullable="false"/>
+            </column>
+            <column defaultValueComputed="NULL" name="eol" type="datetime"/>
+            <column name="file_size" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="lqip" type="LONGTEXT"/>
+            <column name="original_filename" type="VARCHAR(255)"/>
+            <column name="reference_hash" type="VARCHAR(64)"/>
+            <column name="reference_url" type="VARCHAR(2000)"/>
+            <column defaultValueComputed="NULL" name="resolution_height" type="INT"/>
+            <column defaultValueComputed="NULL" name="resolution_width" type="INT"/>
+            <column name="system_ref_id" type="VARCHAR(100)">
+                <constraints unique="true"/>
+            </column>
+            <column name="type" type="VARCHAR(10)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="url_path" type="VARCHAR(500)"/>
+        </createTable>
+    </changeSet>
+    <changeSet author="marten (generated)" id="1618493485791-2">
+        <createTable tableName="co_asset_keyvalue">
+            <column name="asset_id" type="VARCHAR(36)">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="field_value" type="LONGTEXT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="field_key" type="VARCHAR(50)">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+        </createTable>
+    </changeSet>
+    <changeSet author="marten (generated)" id="1618493485791-3">
+        <createIndex indexName="idx_asset_context" tableName="co_asset">
+            <column name="context"/>
+        </createIndex>
+    </changeSet>
+    <changeSet author="marten (generated)" id="1618493485791-4">
+        <createIndex indexName="idx_asset_keyvalue" tableName="co_asset_keyvalue">
+            <column name="asset_id"/>
+        </createIndex>
+    </changeSet>
+    <changeSet author="marten (generated)" id="1618493485791-5">
+        <createIndex indexName="idx_asset_reference_hash" tableName="co_asset">
+            <column name="reference_hash"/>
+        </createIndex>
+    </changeSet>
+    <changeSet author="marten (generated)" id="1618493485791-6">
+        <addForeignKeyConstraint baseColumnNames="asset_id" baseTableName="co_asset_keyvalue" constraintName="fk_asset_keyvalue__asset" deferrable="false" initiallyDeferred="false" onDelete="RESTRICT" onUpdate="RESTRICT" referencedColumnNames="id" referencedTableName="co_asset" validate="true"/>
+    </changeSet>
+</databaseChangeLog>

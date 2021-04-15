@@ -175,6 +175,8 @@ Implementation for MongoRepository + Mongo Entity...
 
 Implementation for JpaRepository + Jpa Entity...
 
+**If you want to see sql-create statements or liquibase changeLogs take a look in schema-generation/dist**
+
 ## commons-asset-storage-fs
 
 Local-FileStorageService
