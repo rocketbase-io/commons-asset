@@ -2,7 +2,7 @@
   "swagger": "2.0",
   "info": {
     "description": "Provides services + rest-controller to handle asset with different storage engines.",
-    "version": "4.4.0",
+    "version": "4.6.0",
     "title": "commons-asset api",
     "contact": {
       "name": "rocketbase.io",
@@ -102,7 +102,7 @@
           {
             "name": "type",
             "in": "query",
-            "description": "possible types JPEG, PNG, GIF, PDF, ZIP, XLS, XLSX, DOC, DOCX. allows to use multiple types for a list...",
+            "description": "possible types jpeg, png, gif, pdf, zip, xls, xlsx, doc, docx... allows to use multiple types for a list",
             "required": false,
             "type": "string"
           },
@@ -283,7 +283,7 @@
           {
             "name": "size",
             "in": "query",
-            "description": "allows to specify required preview-url. allow multiple times. values could be XS, S, M, L, XL",
+            "description": "allows to specify required preview-url. allow multiple times. values could be xs, s, m, l, xl",
             "required": false,
             "type": "string"
           }
@@ -311,7 +311,7 @@
         "deprecated": false
       }
     },
-    "/api/asset/{sid}": {
+    "/api/asset/{id}": {
       "get": {
         "tags": [
           "base"
@@ -325,14 +325,14 @@
           {
             "name": "size",
             "in": "query",
-            "description": "allows to specify required preview-url. allow multiple times. values could be XS, S, M, L, XL",
+            "description": "allows to specify required preview-url. allow multiple times. values could be xs, s, m, l, xl",
             "required": false,
             "type": "string"
           },
           {
-            "name": "sid",
+            "name": "id",
             "in": "path",
-            "description": "id or systemRefId (you've given optionally within upload process)",
+            "description": "id of asset",
             "required": true,
             "type": "string"
           }
@@ -368,9 +368,9 @@
         ],
         "parameters": [
           {
-            "name": "sid",
+            "name": "id",
             "in": "path",
-            "description": "id or systemRefId (you've given optionally within upload process)",
+            "description": "id of asset",
             "required": true,
             "type": "string"
           }
@@ -392,7 +392,7 @@
         "deprecated": false
       }
     },
-    "/api/asset/{sid}/b": {
+    "/api/asset/{id}/b": {
       "get": {
         "tags": [
           "download"
@@ -405,9 +405,9 @@
         ],
         "parameters": [
           {
-            "name": "sid",
+            "name": "id",
             "in": "path",
-            "description": "id or systemRefId (you've given optionally within upload process)",
+            "description": "id of asset",
             "required": true,
             "type": "string"
           },
@@ -436,7 +436,7 @@
         "deprecated": false
       }
     },
-    "/api/asset/{sid}/copy": {
+    "/api/asset/{id}/copy": {
       "post": {
         "tags": [
           "copy"
@@ -449,9 +449,9 @@
         ],
         "parameters": [
           {
-            "name": "sid",
+            "name": "id",
             "in": "path",
-            "description": "id or systemRefId (you've given optionally within upload process)",
+            "description": "id of asset",
             "required": true,
             "type": "string"
           }
@@ -476,7 +476,7 @@
         "deprecated": false
       }
     },
-    "/api/asset/{sid}/{size}": {
+    "/api/asset/{id}/{size}": {
       "get": {
         "tags": [
           "preview"
@@ -488,16 +488,16 @@
         ],
         "parameters": [
           {
-            "name": "sid",
+            "name": "id",
             "in": "path",
-            "description": "id or systemRefId (you've given optionally within upload process)",
+            "description": "id of asset",
             "required": true,
             "type": "string"
           },
           {
             "name": "size",
             "in": "path",
-            "description": "allows to specify required preview-url. values could be XS, S, M, L, XL",
+            "description": "allows to specify required preview-url. values could be xs, s, m, l, xl",
             "required": true,
             "type": "string"
           }
@@ -623,12 +623,12 @@
           "additionalProperties": {
             "type": "string",
             "enum": [
-              "INVALID_CONTENT_TYPE",
-              "NOT_ALLOWED_CONTENT_TYPE",
-              "ASSET_FILE_IS_EMPTY",
-              "SYSTEM_REF_ID_ALREADY_USED",
-              "UNPROCESSABLE_ASSET",
-              "NOT_DOWNLOADABLE"
+              "invalid_content_type",
+              "not_allowed_content_type",
+              "asset_file_is_empty",
+              "system_ref_id_already_used",
+              "unprocessable_asset",
+              "not_downloadable"
             ]
           }
         },
@@ -649,12 +649,12 @@
           "additionalProperties": {
             "type": "string",
             "enum": [
-              "INVALID_CONTENT_TYPE",
-              "NOT_ALLOWED_CONTENT_TYPE",
-              "ASSET_FILE_IS_EMPTY",
-              "SYSTEM_REF_ID_ALREADY_USED",
-              "UNPROCESSABLE_ASSET",
-              "NOT_DOWNLOADABLE"
+              "invalid_content_type",
+              "not_allowed_content_type",
+              "asset_file_is_empty",
+              "system_ref_id_already_used",
+              "unprocessable_asset",
+              "not_downloadable"
             ]
           }
         },
@@ -744,18 +744,51 @@
         "type": {
           "type": "string",
           "enum": [
-            "JPEG",
-            "PNG",
-            "GIF",
-            "TIFF",
-            "PDF",
-            "ZIP",
-            "XLS",
-            "XLSX",
-            "DOC",
-            "DOCX",
-            "PPT",
-            "PPTX"
+            "jpeg",
+            "png",
+            "apng",
+            "gif",
+            "tiff",
+            "bmp",
+            "ico",
+            "svg",
+            "webp",
+            "heif",
+            "heic",
+            "pdf",
+            "zip",
+            "tar",
+            "rar",
+            "gzip",
+            "7z",
+            "xls",
+            "xlsx",
+            "doc",
+            "docx",
+            "ppt",
+            "pptx",
+            "odp",
+            "ods",
+            "odt",
+            "csv",
+            "txt",
+            "json",
+            "rtf",
+            "xml",
+            "mpeg",
+            "mp4",
+            "mpv",
+            "mov",
+            "avi",
+            "wmv",
+            "webm",
+            "ogv",
+            "ogx",
+            "aac",
+            "mp3",
+            "oga",
+            "wav",
+            "weba"
           ]
         },
         "created": {
@@ -835,18 +868,51 @@
         "type": {
           "type": "string",
           "enum": [
-            "JPEG",
-            "PNG",
-            "GIF",
-            "TIFF",
-            "PDF",
-            "ZIP",
-            "XLS",
-            "XLSX",
-            "DOC",
-            "DOCX",
-            "PPT",
-            "PPTX"
+            "jpeg",
+            "png",
+            "apng",
+            "gif",
+            "tiff",
+            "bmp",
+            "ico",
+            "svg",
+            "webp",
+            "heif",
+            "heic",
+            "pdf",
+            "zip",
+            "tar",
+            "rar",
+            "gzip",
+            "7z",
+            "xls",
+            "xlsx",
+            "doc",
+            "docx",
+            "ppt",
+            "pptx",
+            "odp",
+            "ods",
+            "odt",
+            "csv",
+            "txt",
+            "json",
+            "rtf",
+            "xml",
+            "mpeg",
+            "mp4",
+            "mpv",
+            "mov",
+            "avi",
+            "wmv",
+            "webm",
+            "ogv",
+            "ogx",
+            "aac",
+            "mp3",
+            "oga",
+            "wav",
+            "weba"
           ]
         },
         "urlPath": {
