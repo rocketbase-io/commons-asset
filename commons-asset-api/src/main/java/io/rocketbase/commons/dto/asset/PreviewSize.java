@@ -17,6 +17,8 @@ public enum PreviewSize implements PreviewParameter {
     L("l", 1200, 1200, 0.85f),
     XL("xl", 1900, 1900, 0.85f);
 
+
+    @Getter
     @JsonValue
     private final String value;
 

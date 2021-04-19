@@ -65,6 +65,7 @@ public enum AssetType {
     WAV("wav", "audio/wav"),
     WEBA("weba", "audio/webm");
 
+    @Getter
     @JsonValue
     private final String value;
 
