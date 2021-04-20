@@ -11,6 +11,7 @@ import org.springframework.context.event.EventListener;
 import org.springframework.data.domain.*;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.index.Index;
+import org.springframework.data.mongodb.core.index.IndexInfo;
 import org.springframework.data.mongodb.core.index.IndexOperations;
 import org.springframework.data.mongodb.core.mapping.MongoMappingContext;
 import org.springframework.data.mongodb.core.query.Criteria;
@@ -18,6 +19,7 @@ import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.util.StringUtils;
 
 import java.time.Instant;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -125,6 +127,13 @@ public class AssetMongoRepository implements AssetRepository<AssetMongoEntity> {
     public void initIndicesAfterStartup() {
         if (mongoEnsureIndex) {
             IndexOperations indexOperations = mongoTemplate.indexOps(AssetMongoEntity.class);
+            for (IndexInfo i : indexOperations.getIndexInfo()) {
+               if ( i.isIndexForFields(Arrays.asList("systemRefId"))) {
+                   if (i.isUnique()) {
+                       indexOperations.dropIndex(i.getName());
+                   }
+               }
+            }
             indexOperations.ensureIndex(new Index().on("systemRefId", Sort.Direction.ASC));
             indexOperations.ensureIndex(new Index().on("context", Sort.Direction.ASC));
             indexOperations.ensureIndex(new Index().on("eol", Sort.Direction.ASC));

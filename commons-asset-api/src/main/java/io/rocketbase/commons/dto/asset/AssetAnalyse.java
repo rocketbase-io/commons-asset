@@ -29,6 +29,12 @@ public class AssetAnalyse extends AssetMeta {
         this.lqip = lqip;
     }
 
+    public AssetAnalyse(AssetMeta meta, AssetType type, String lqip) {
+        super(meta.getCreated(), meta.getOriginalFilename(), meta.getFileSize(), meta.getResolution(), meta.getColorPalette(), meta.getReferenceUrl());
+        this.type = type;
+        this.lqip = lqip;
+    }
+
     @Override
     public String toString() {
         return "AssetAnalyse(type=" + getType() + ", created=" + this.getCreated() + ", originalFilename=" + this.getOriginalFilename() + ", fileSize=" + this.getFileSize() + ", resolution=" + this.getResolution() + ", colorPalette=" + this.getColorPalette() + ", referenceUrl=" + this.getReferenceUrl() + ")";

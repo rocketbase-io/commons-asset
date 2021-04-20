@@ -3,13 +3,14 @@ package io.rocketbase.commons.service;
 import io.rocketbase.commons.converter.AssetConverter;
 import io.rocketbase.commons.dto.asset.*;
 import io.rocketbase.commons.dto.batch.*;
+import io.rocketbase.commons.event.AssetUrlAnalysed;
 import io.rocketbase.commons.exception.AssetErrorCodes;
 import io.rocketbase.commons.exception.InvalidContentTypeException;
 import io.rocketbase.commons.model.AssetEntity;
 import io.rocketbase.commons.service.download.DownloadService;
 import io.rocketbase.commons.util.Nulls;
 import lombok.extern.slf4j.Slf4j;
-import org.checkerframework.checker.units.qual.A;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 
@@ -31,6 +32,9 @@ public class AssetBatchService {
 
     @Resource
     private DownloadService downloadService;
+
+    @Resource
+    private ApplicationEventPublisher applicationEventPublisher;
 
     /**
      * will download given urls
@@ -104,6 +108,7 @@ public class AssetBatchService {
         }
         DownloadService.TempDownload download = downloadService.downloadUrl(url);
         AssetEntity asset = assetService.storeAndDeleteFile(download.getFile(), download.getFilename(), download.getFile().length(), url, meta);
+        applicationEventPublisher.publishEvent(new AssetUrlAnalysed(this, url, new AssetAnalyse(asset.getMeta(), asset.getType(), asset.getLqip()), asset.getId()));
         return asset;
     }
 
@@ -121,6 +126,7 @@ public class AssetBatchService {
                 download = downloadService.downloadUrl(url);
                 AssetAnalyse analyse = assetService.analyse(download.getFile(), download.getFilename());
                 analyse.setReferenceUrl(url);
+                applicationEventPublisher.publishEvent(new AssetUrlAnalysed(this, url, analyse, null));
                 result.addSuccess(url, analyse);
             } catch (DownloadService.DownloadError e) {
                 result.addFailure(url, e.getErrorCode());
