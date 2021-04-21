@@ -143,6 +143,7 @@ public class AssetCoreAutoConfiguration implements Serializable {
                 .detectColors(assetApiProperties.isDetectColors())
                 .detectResolution(assetApiProperties.isDetectResolution())
                 .lqipEnabled(assetLqipProperties.isEnabled())
+                .lqipThrowError(assetLqipProperties.isThrowError())
                 .lqipPreview(new DefaultPreviewParameter(assetLqipProperties.getMaxWidth(), assetLqipProperties.getMaxHeight(), assetLqipProperties.getQuality()))
                 .build();
     }

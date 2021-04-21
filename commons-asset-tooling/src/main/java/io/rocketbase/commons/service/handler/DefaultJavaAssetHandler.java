@@ -21,6 +21,7 @@ import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.time.Instant;
+import java.util.Optional;
 import java.util.Set;
 
 @RequiredArgsConstructor
@@ -86,7 +87,8 @@ public class DefaultJavaAssetHandler implements AssetHandler {
                     builder.colorPalette(ColorDetection.detect(bufferedImage));
                 }
                 if (config.isLqipEnabled()) {
-                    builder.lqip(getLqip(type, Thumbnails.of(bufferedImage)).base64());
+                    getLqip(type, Thumbnails.of(bufferedImage)).ifPresent(imageHandlingResult ->
+                            builder.lqip(imageHandlingResult.base64()));
                 }
             } catch (Exception e) {
                 log.error("could not read file information from file {}", file.getPath());
@@ -114,27 +116,34 @@ public class DefaultJavaAssetHandler implements AssetHandler {
         return null;
     }
 
-    public ImageHandlingResult getLqip(AssetType assetType, File file) {
+    public Optional<ImageHandlingResult> getLqip(AssetType assetType, File file) {
         if (!isPreviewSupported(assetType)) {
             throw new UnsupportedOperationException("assetType " + assetType.name() + " is not supported");
         }
-        return getLqip(assetType, Thumbnails.of(file));
+            return getLqip(assetType, Thumbnails.of(file));
     }
 
-    @SneakyThrows
-    protected ImageHandlingResult getLqip(AssetType type, Thumbnails.Builder builder) {
-        PreviewParameter previewSize = Nulls.notNull(config.getLqipPreview(), PreviewSize.XS);
-        builder
-                .size(previewSize.getMaxWidth(), previewSize.getMaxHeight())
-                .outputQuality(previewSize.getDefaultQuality())
-                .outputFormat("jpg");
-        if (type.couldHaveTransparency()) {
-            builder.addFilter(new Canvas(previewSize.getMaxWidth(), previewSize.getMaxHeight(), Positions.CENTER, Color.WHITE))
-                    .imageType(ThumbnailParameter.DEFAULT_IMAGE_TYPE);
-        }
+    protected Optional<ImageHandlingResult> getLqip(AssetType type, Thumbnails.Builder builder) {
+        try {
+            PreviewParameter previewSize = Nulls.notNull(config.getLqipPreview(), PreviewSize.XS);
+            builder
+                    .size(previewSize.getMaxWidth(), previewSize.getMaxHeight())
+                    .outputQuality(previewSize.getDefaultQuality())
+                    .outputFormat("jpg");
+            if (type.couldHaveTransparency()) {
+                builder.addFilter(new Canvas(previewSize.getMaxWidth(), previewSize.getMaxHeight(), Positions.CENTER, Color.WHITE))
+                        .imageType(ThumbnailParameter.DEFAULT_IMAGE_TYPE);
+            }
 
-        @Cleanup ByteArrayOutputStream thumbOs = new ByteArrayOutputStream();
-        builder.toOutputStream(thumbOs);
-        return new ImageHandlingResult(thumbOs.toByteArray(), AssetType.JPEG);
+            @Cleanup ByteArrayOutputStream thumbOs = new ByteArrayOutputStream();
+            builder.toOutputStream(thumbOs);
+            return Optional.of(new ImageHandlingResult(thumbOs.toByteArray(), AssetType.JPEG));
+        } catch (Exception e) {
+            log.error("couldn't process lqip error: {}", e.getMessage());
+            if (config.isLqipThrowError()) {
+                throw new UnsupportedOperationException("file is not processable");
+            }
+            return Optional.empty();
+        }
     }
 }

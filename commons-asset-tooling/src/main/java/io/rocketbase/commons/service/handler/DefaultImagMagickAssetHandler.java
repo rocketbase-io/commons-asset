@@ -17,6 +17,7 @@ import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.time.Instant;
+import java.util.Optional;
 
 @RequiredArgsConstructor
 @Slf4j
@@ -77,7 +78,8 @@ public class DefaultImagMagickAssetHandler implements AssetHandler {
                 builder.colorPalette(getColorPalette(type, file));
             }
             if (config.isLqipEnabled()) {
-                builder.lqip(getLqip(type, file).base64());
+                getLqip(type, file).ifPresent(imageHandlingResult ->
+                        builder.lqip(imageHandlingResult.base64()));
             }
         }
         return builder.build();
@@ -129,7 +131,7 @@ public class DefaultImagMagickAssetHandler implements AssetHandler {
     }
 
     @SneakyThrows
-    public ImageHandlingResult getLqip(AssetType type, File file) {
+    public Optional<ImageHandlingResult> getLqip(AssetType type, File file) {
         if (!isPreviewSupported(type)) {
             throw new UnsupportedOperationException("type " + type.name() + " is not supported");
         }
@@ -151,10 +153,13 @@ public class DefaultImagMagickAssetHandler implements AssetHandler {
             operation.addImage(tempFile.getAbsolutePath());
 
             convertCmd.run(operation);
-            return new ImageHandlingResult(IOUtils.toByteArray(tempFile.toURI()), AssetType.JPEG);
+            return Optional.of(new ImageHandlingResult(IOUtils.toByteArray(tempFile.toURI()), AssetType.JPEG));
         } catch (Exception e) {
             log.error("couldn't process lqip for file: {}, error: {}", file.getPath(), e.getMessage());
-            throw new UnsupportedOperationException("file is not processable");
+            if (config.isLqipThrowError()) {
+                throw new UnsupportedOperationException("file is not processable");
+            }
+            return Optional.empty();
         } finally {
             if (tempFile != null) {
                 try {

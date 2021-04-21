@@ -22,6 +22,8 @@ public class AssetHandlerConfig implements Serializable {
 
     private boolean lqipEnabled;
 
+    private boolean lqipThrowError;
+
     private Map<PreviewSize, Float> previewQuality;
 
     private PreviewParameter lqipPreview;

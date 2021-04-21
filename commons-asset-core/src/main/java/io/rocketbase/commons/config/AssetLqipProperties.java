@@ -21,6 +21,10 @@ import java.io.Serializable;
 public class AssetLqipProperties implements Serializable {
 
     private boolean enabled = false;
+    /**
+     * when enabled - lqip processing errors stop storing hole image save process
+     */
+    private boolean throwError = false;
 
     private int maxWidth = 50;
     private int maxHeight = 50;

@@ -7,6 +7,7 @@ import io.rocketbase.commons.dto.asset.Resolution;
 
 import javax.transaction.NotSupportedException;
 import java.io.File;
+import java.util.Optional;
 
 public interface AssetHandler {
 
@@ -24,5 +25,5 @@ public interface AssetHandler {
     /**
      * an ultra lowres image preview in base64 encoding
      */
-    ImageHandlingResult getLqip(AssetType type, File file);
+    Optional<ImageHandlingResult> getLqip(AssetType type, File file);
 }
