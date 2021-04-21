@@ -133,7 +133,12 @@ public class DefaultImagMagickAssetHandler implements AssetHandler {
     @SneakyThrows
     public Optional<ImageHandlingResult> getLqip(AssetType type, File file) {
         if (!isPreviewSupported(type)) {
-            throw new UnsupportedOperationException("type " + type.name() + " is not supported");
+            if (config.isLqipThrowError()) {
+                throw new UnsupportedOperationException("type " + type.name() + " is not supported");
+            } else {
+                log.error("lqip type: {} is not supported", type.name());
+                return Optional.empty();
+            }
         }
         PreviewParameter previewSize = Nulls.notNull(config.getLqipPreview(), PreviewSize.XS);
 

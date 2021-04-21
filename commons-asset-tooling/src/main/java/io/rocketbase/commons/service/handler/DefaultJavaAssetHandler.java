@@ -116,11 +116,16 @@ public class DefaultJavaAssetHandler implements AssetHandler {
         return null;
     }
 
-    public Optional<ImageHandlingResult> getLqip(AssetType assetType, File file) {
-        if (!isPreviewSupported(assetType)) {
-            throw new UnsupportedOperationException("assetType " + assetType.name() + " is not supported");
+    public Optional<ImageHandlingResult> getLqip(AssetType type, File file) {
+        if (!isPreviewSupported(type)) {
+            if (config.isLqipThrowError()) {
+                throw new UnsupportedOperationException("type " + type.name() + " is not supported");
+            } else {
+                log.error("lqip type: {} is not supported", type.name());
+                return Optional.empty();
+            }
         }
-            return getLqip(assetType, Thumbnails.of(file));
+        return getLqip(type, Thumbnails.of(file));
     }
 
     protected Optional<ImageHandlingResult> getLqip(AssetType type, Thumbnails.Builder builder) {

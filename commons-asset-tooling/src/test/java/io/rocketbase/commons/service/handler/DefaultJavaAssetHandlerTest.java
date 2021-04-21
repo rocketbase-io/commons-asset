@@ -5,6 +5,7 @@ import io.rocketbase.commons.dto.asset.AssetType;
 import io.rocketbase.commons.dto.asset.DefaultPreviewParameter;
 import io.rocketbase.commons.dto.asset.PreviewSize;
 import lombok.extern.slf4j.Slf4j;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import javax.imageio.ImageIO;
@@ -13,10 +14,10 @@ import java.io.File;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.lessThanOrEqualTo;
-import static org.hamcrest.Matchers.notNullValue;
+import static org.hamcrest.Matchers.*;
 
 @Slf4j
 public class DefaultJavaAssetHandlerTest {
@@ -94,10 +95,10 @@ public class DefaultJavaAssetHandlerTest {
         URL asset = ClassLoader.getSystemResource("assets/max-duzij-qAjJk-un3BI-unsplash.jpg");
 
         // when
-        ImageHandlingResult result = previewService.getLqip(AssetType.JPEG, new File(asset.toURI()));
+        Optional<ImageHandlingResult> result = previewService.getLqip(AssetType.JPEG, new File(asset.toURI()));
 
         // then
-        assertThat(result, notNullValue());
+        assertThat(result.isPresent(), equalTo(true));
         log.info("see lqip: {}", result);
     }
 
@@ -108,10 +109,10 @@ public class DefaultJavaAssetHandlerTest {
         URL asset = ClassLoader.getSystemResource("assets/pnggrad8rgb.png");
 
         // when
-        ImageHandlingResult result = previewService.getLqip(AssetType.PNG, new File(asset.toURI()));
+        Optional<ImageHandlingResult> result = previewService.getLqip(AssetType.PNG, new File(asset.toURI()));
 
         // then
-        assertThat(result, notNullValue());
+        assertThat(result.isPresent(), equalTo(true));
         log.info("see lqip: {}", result);
     }
 
@@ -124,11 +125,41 @@ public class DefaultJavaAssetHandlerTest {
         URL asset = ClassLoader.getSystemResource("assets/rocketbase.gif");
 
         // when
-        ImageHandlingResult result = previewService.getLqip(AssetType.GIF, new File(asset.toURI()));
+        Optional<ImageHandlingResult> result = previewService.getLqip(AssetType.GIF, new File(asset.toURI()));
 
         // then
-        assertThat(result, notNullValue());
+        assertThat(result.isPresent(), equalTo(true));
         log.info("see lqip: {}", result);
+    }
+
+    @Test
+    public void getLqipThrowErrorDisabled() throws Exception {
+        // given
+        AssetHandler previewService = new DefaultJavaAssetHandler(AssetHandlerConfig.builder()
+                .lqipPreview(new DefaultPreviewParameter(50, 50, 0.07f))
+                .build());
+        URL asset = ClassLoader.getSystemResource("assets/invalid-sample.txt");
+
+        // when
+        Optional<ImageHandlingResult> result = previewService.getLqip(AssetType.TXT, new File(asset.toURI()));
+
+        // then
+        assertThat(result.isPresent(), equalTo(false));
+    }
+
+    @Test
+    public void getLqipThrowErrorEnabled() throws Exception {
+        // given
+        AssetHandler previewService = new DefaultJavaAssetHandler(AssetHandlerConfig.builder()
+                .lqipThrowError(true)
+                .lqipPreview(new DefaultPreviewParameter(50, 50, 0.07f))
+                .build());
+        URL asset = ClassLoader.getSystemResource("assets/invalid-sample.txt");
+
+        // when / then
+        Assertions.assertThrows(UnsupportedOperationException.class, () -> {
+            previewService.getLqip(AssetType.TXT, new File(asset.toURI()));
+        });
     }
 
     protected Map<PreviewSize, Float> getPreviewQualityMap() {
