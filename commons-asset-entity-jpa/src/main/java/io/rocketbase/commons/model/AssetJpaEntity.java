@@ -152,6 +152,11 @@ public class AssetJpaEntity implements AssetEntity {
         return keyValueMap;
     }
 
+    @Override
+    public void setKeyValues(Map<String, String> keyValues) {
+        this.keyValueMap = keyValues;
+    }
+
     public AssetJpaEntity(String id) {
         this.id = id;
     }

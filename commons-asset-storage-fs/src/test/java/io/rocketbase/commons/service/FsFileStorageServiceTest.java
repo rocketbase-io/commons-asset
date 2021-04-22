@@ -175,8 +175,14 @@ public class FsFileStorageServiceTest {
 
         private Map<String, String> keyValueMap = new HashMap<>();
 
+        @Override
         public Map<String, String> getKeyValues() {
             return keyValueMap;
+        }
+
+        @Override
+        public void setKeyValues(Map<String, String> keyValues) {
+            this.keyValueMap = keyValues;
         }
     }
 }

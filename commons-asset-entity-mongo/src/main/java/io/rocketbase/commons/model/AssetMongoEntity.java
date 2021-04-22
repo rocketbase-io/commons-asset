@@ -94,4 +94,9 @@ public class AssetMongoEntity implements AssetEntity {
     public Map<String, String> getKeyValues() {
         return keyValueMap;
     }
+
+    @Override
+    public void setKeyValues(Map<String, String> keyValues) {
+        this.keyValueMap = keyValues;
+    }
 }
