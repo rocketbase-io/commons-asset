@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.lang.Nullable;
 
 import java.io.Serializable;
 
@@ -17,11 +18,13 @@ public class ResponsiveImage implements Serializable {
      * layout example: (max-width: 640px) 100vw, 640px<br>
      * max-width represents the tallest preview-with that is available (with given {@link PreviewSize} filters)
      */
+    @Nullable
     private String sizes;
 
     /**
      * layout example: https://preview/abc_w_300.png 300w, https://preview/abc_w_600.png 600w,  https://preview/abc_w.png 640w
      */
+    @Nullable
     private String srcset;
 
     /**

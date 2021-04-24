@@ -72,6 +72,7 @@ public enum AssetType {
     @Getter
     private final String contentType;
 
+    @Getter
     private final String fileExtension;
 
     AssetType(String value, String contentType) {

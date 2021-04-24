@@ -36,7 +36,7 @@ public interface AssetReference extends Serializable {
     String getContext();
 
     /**
-     * Low Quality Image Placeholder (LQIP) that is a base64 preview in ultra low-res + quality
+     * additional information to asset
      */
     AssetMeta getMeta();
 

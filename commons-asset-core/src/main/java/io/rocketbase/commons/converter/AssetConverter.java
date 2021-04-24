@@ -8,6 +8,8 @@ import io.rocketbase.commons.holder.PreviewSizeContextHolder;
 import io.rocketbase.commons.model.AssetEntity;
 import io.rocketbase.commons.util.Nulls;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.util.Pair;
+import org.springframework.lang.Nullable;
 
 import java.text.MessageFormat;
 import java.time.Instant;
@@ -45,25 +47,13 @@ public class AssetConverter {
                 AssetPreviews assetPreviews = new AssetPreviews(new TreeMap<>(), null);
                 result.setPreviews(assetPreviews);
 
-                // detect requested previewSizes
-                List<PreviewSize> previewSizes = assetApiProperties.filterAllowedPreviewSizes(((sizes == null || sizes.isEmpty()) ? getDefaultPreviewSizes() : sizes));
-                // filter too tall previewSizes (that are larger then original resolution)
-                boolean skippedSizes = false;
-                Resolution resolution = result.getMeta() != null ? result.getMeta().getResolution() : null;
-                if (resolution != null) {
-                    List<PreviewSize> tooBigSizes = previewSizes.stream()
-                            .filter(size -> !resolution.shouldThumbBeCalculated(size))
-                            .collect(Collectors.toList());
-                    skippedSizes = !tooBigSizes.isEmpty();
-                    previewSizes.removeAll(tooBigSizes);
-
-                }
+                Pair<List<PreviewSize>, Boolean> detectedSizes = detectSizes(result, sizes);
                 // fill previewUrls
-                previewSizes
+                detectedSizes.getFirst()
                         .forEach(s -> assetPreviews.getPreviewMap()
                                 .put(s, assetPreviewService.getPreviewUrl(result, s)));
                 // calculate responsiveImage
-                assetPreviews.setResponsive(calculateResponsive(result, previewSizes, resolution, skippedSizes));
+                assetPreviews.setResponsive(calculateResponsive(result, detectedSizes.getFirst(), detectedSizes.getSecond()));
 
             }
             if (assetApiProperties.isDownload()) {
@@ -72,11 +62,33 @@ public class AssetConverter {
         }
     }
 
-    protected ResponsiveImage calculateResponsive(AssetReference reference, List<PreviewSize> previewSizes, Resolution resolution, boolean skippedSizes) {
-        if (!Nulls.noneNullValue(reference, previewSizes, resolution)) {
+    protected Pair<List<PreviewSize>, Boolean> detectSizes(AssetReference reference, List<PreviewSize> sizes) {
+        // detect requested previewSizes
+        List<PreviewSize> previewSizes = assetApiProperties.filterAllowedPreviewSizes(((sizes == null || sizes.isEmpty()) ? getDefaultPreviewSizes() : sizes));
+        // filter too tall previewSizes (that are larger then original resolution)
+        boolean skippedSizes = false;
+        Resolution resolution = Nulls.notNull(reference.getMeta(), AssetMeta::getResolution, null);
+        if (resolution != null) {
+            List<PreviewSize> tooBigSizes = previewSizes.stream()
+                    .filter(size -> !resolution.shouldThumbBeCalculated(size))
+                    .collect(Collectors.toList());
+            skippedSizes = !tooBigSizes.isEmpty();
+            previewSizes.removeAll(tooBigSizes);
+
+        }
+        return Pair.of(previewSizes, skippedSizes);
+    }
+
+    protected ResponsiveImage calculateResponsive(AssetReference reference, List<PreviewSize> previewSizes, boolean skippedSizes) {
+        Resolution resolution = Nulls.notNull(reference.getMeta(), AssetMeta::getResolution, null);
+        if (!Nulls.noneNullValue(reference, previewSizes)) {
             return null;
         }
         ResponsiveImage result = new ResponsiveImage();
+        if (resolution == null && assetApiProperties.isDownload()) {
+            result.setSrc(assetPreviewService.getDownloadUrl(reference));
+            return result;
+        }
         List<String> srcSet = new ArrayList<>();
         Resolution calculated = null;
         String previewUrl = null;
@@ -99,13 +111,7 @@ public class AssetConverter {
     }
 
     public AssetRead toRead(AssetReference reference) {
-        List<PreviewSize> sizes = null;
-        try {
-            sizes = PreviewSizeContextHolder.hasValueSet() ? PreviewSizeContextHolder.getCurrent() : null;
-        } catch (Exception e) {
-            // could maybe throw error in case of reactive environment...
-        }
-        return toRead(reference, sizes);
+        return toRead(reference, getPreviewSizes());
     }
 
     public AssetRead toRead(AssetReference reference, List<PreviewSize> sizes) {
@@ -132,6 +138,26 @@ public class AssetConverter {
         injectPreviewsAndDownload(result, sizes);
 
         return result;
+    }
+
+    public AssetDisplay toDisplay(AssetReference reference) {
+        return toDisplay(reference, getPreviewSizes());
+    }
+
+    public AssetDisplay toDisplay(AssetReference reference, List<PreviewSize> sizes) {
+        if (reference == null) {
+            return null;
+        }
+        Pair<List<PreviewSize>, Boolean> detectedSizes = detectSizes(reference, sizes);
+
+        return AssetDisplay.builder()
+                .id(reference.getId())
+                .type(reference.getType())
+                .meta(reference.getMeta())
+                .image(calculateResponsive(reference, detectedSizes.getFirst(), detectedSizes.getSecond()))
+                .download(assetApiProperties.isDownload() ? assetPreviewService.getDownloadUrl(reference) : null)
+                .lqip(reference.getLqip())
+                .build();
     }
 
     /**
@@ -178,6 +204,16 @@ public class AssetConverter {
             return null;
         }
         return entities.stream().map(v -> fromEntity(v, sizes)).collect(Collectors.toList());
+    }
+
+    @Nullable
+    protected List<PreviewSize> getPreviewSizes() {
+        try {
+            return PreviewSizeContextHolder.hasValueSet() ? PreviewSizeContextHolder.getCurrent() : null;
+        } catch (Exception e) {
+            // could maybe throw error in case of reactive environment...
+            return null;
+        }
     }
 
 }
