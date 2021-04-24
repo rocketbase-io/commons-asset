@@ -18,9 +18,9 @@ export interface AssetMeta {
 }
 
 export interface ResponsiveImage {
-    sizes: string;
-    srcset: string;
-    src?: string;
+    sizes?: string;
+    srcset?: string;
+    src: string;
 }
 
 export interface AssetPreviews {
@@ -40,6 +40,18 @@ export interface AssetRead extends AssetReference, rest.HasKeyValue {
     created: string;
     modifiedBy: string;
     modified: string;
+}
+
+/**
+ * a short representation of {@link AssetRead} in order to reduce response values for rendering an asset within an application
+ */
+export interface AssetDisplay {
+    id: string;
+    type: AssetType;
+    meta: AssetMeta;
+    image?: ResponsiveImage;
+    download?: string;
+    lqip?: string;
 }
 
 /**
@@ -132,6 +144,12 @@ export interface Resolution {
     height: number;
 }
 
+export interface ResponsiveImage {
+    sizes?: string;
+    srcset?: string;
+    src: string;
+}
+
 export interface AssetBatchAnalyseResult {
     succeeded: Record<string, AssetAnalyse>;
     failed: Record<string, AssetErrorCodes>;
@@ -161,3 +179,70 @@ export type AssetType = "jpeg" | "png" | "apng" | "gif" | "tiff" | "bmp" | "ico"
 export type PreviewSize = "xs" | "s" | "m" | "l" | "xl";
 
 export type AssetErrorCodes = "invalid_content_type" | "not_allowed_content_type" | "asset_file_is_empty" | "system_ref_id_already_used" | "unprocessable_asset" | "not_downloadable";
+
+export function getMimeType(type: AssetType): string {
+    switch (type) {
+        case "jpeg": return "image/jpeg";
+        case "png": return "image/png";
+        case "apng": return "image/apng";
+        case "gif": return "image/gif";
+        case "tiff": return "image/tiff";
+        case "bmp": return "image/bmp";
+        case "ico": return "image/x-ico";
+        case "svg": return "image/svg+xml";
+        case "webp": return "image/webp";
+        case "heif": return "image/heif";
+        case "heic": return "image/heic";
+        case "pdf": return "application/pdf";
+        case "zip": return "application/zip";
+        case "tar": return "application/x-tar";
+        case "rar": return "application/vnd.rar";
+        case "gzip": return "application/gzip";
+        case "7z": return "application/x-7z-compressed";
+        case "xls": return "application/msexcel";
+        case "xlsx": return "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
+        case "doc": return "application/msword";
+        case "docx": return "application/vnd.openxmlformats-officedocument.wordprocessingml.document";
+        case "ppt": return "application/vnd.ms-powerpoint";
+        case "pptx": return "application/vnd.openxmlformats-officedocument.presentationml.presentation";
+        case "odp": return "application/vnd.oasis.opendocument.presentation";
+        case "ods": return "application/vnd.oasis.opendocument.spreadsheet";
+        case "odt": return "application/vnd.oasis.opendocument.text";
+        case "csv": return "application/csv";
+        case "txt": return "application/text";
+        case "json": return "application/json";
+        case "rtf": return "application/rtf";
+        case "xml": return "application/xml";
+        case "mpeg": return "video/mpeg";
+        case "mp4": return "video/mp4";
+        case "mpv": return "video/mpv";
+        case "mov": return "video/quicktime";
+        case "avi": return "video/x-msvideo";
+        case "wmv": return "video/x-ms-wmv";
+        case "webm": return "video/webm";
+        case "ogv": return "video/ogg";
+        case "ogx": return "application/ogg";
+        case "aac": return "audio/aac";
+        case "mp3": return "audio/mpeg";
+        case "oga": return "audio/ogg";
+        case "wav": return "audio/wav";
+        case "weba": return "audio/webm";
+        default: return "application/octet-stream";
+    }
+}
+
+export function isImage(type: AssetType): boolean {
+    const mimeType = getMimeType(type);
+    return mimeType.lastIndexOf("image", 0) === 0;
+}
+
+export function getMaximumSize(size: PreviewSize): number {
+    switch (size) {
+        case "xs": return 150;
+        case "s": return 300;
+        case "m": return 600;
+        case "l": return 1200;
+        case "xl": return 1900;
+        default: return -1;
+    }
+}
