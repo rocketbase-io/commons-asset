@@ -28,7 +28,7 @@ public enum AssetType {
     // compressed files
     ZIP("zip", "application/zip"),
     TAR("tar", "application/x-tar"),
-    RAR("rar", "application/vnd.rar"),
+    RAR("rar", "application/x-rar-compressed"),
     GZIP("gzip", "application/gzip"),
     _7z("7z", "application/x-7z-compressed"),
     // microsoft office
@@ -43,8 +43,8 @@ public enum AssetType {
     ODS("ods", "application/vnd.oasis.opendocument.spreadsheet"),
     ODT("odt", "application/vnd.oasis.opendocument.text"),
     // text files
-    CSV("csv", "application/csv"),
-    TXT("txt", "application/text"),
+    CSV("csv", "text/csv"),
+    TXT("txt", "text/text"),
     JSON("json", "application/json"),
     RTF("rtf", "application/rtf"),
     XML("xml", "application/xml"),

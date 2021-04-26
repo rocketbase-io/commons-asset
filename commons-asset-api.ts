@@ -174,66 +174,78 @@ export interface AssetBatchWriteEntry extends AssetUploadMeta {
     url: string;
 }
 
-export type AssetType = "jpeg" | "png" | "apng" | "gif" | "tiff" | "bmp" | "ico" | "svg" | "webp" | "heif" | "heic" | "pdf" | "zip" | "tar" | "rar" | "gzip" | "7z" | "xls" | "xlsx" | "doc" | "docx" | "ppt" | "pptx" | "odp" | "ods" | "odt" | "csv" | "txt" | "json" | "rtf" | "xml" | "mpeg" | "mp4" | "mpv" | "mov" | "avi" | "wmv" | "webm" | "ogv" | "ogx" | "aac" | "mp3" | "oga" | "wav" | "weba";
-
 export type PreviewSize = "xs" | "s" | "m" | "l" | "xl";
 
-export type AssetErrorCodes = "invalid_content_type" | "not_allowed_content_type" | "asset_file_is_empty" | "system_ref_id_already_used" | "unprocessable_asset" | "not_downloadable";
+export type AssetErrorCodes =
+    "invalid_content_type"
+    | "not_allowed_content_type"
+    | "asset_file_is_empty"
+    | "system_ref_id_already_used"
+    | "unprocessable_asset"
+    | "not_downloadable";
 
-export function getMimeType(type: AssetType): string {
-    switch (type) {
-        case "jpeg": return "image/jpeg";
-        case "png": return "image/png";
-        case "apng": return "image/apng";
-        case "gif": return "image/gif";
-        case "tiff": return "image/tiff";
-        case "bmp": return "image/bmp";
-        case "ico": return "image/x-ico";
-        case "svg": return "image/svg+xml";
-        case "webp": return "image/webp";
-        case "heif": return "image/heif";
-        case "heic": return "image/heic";
-        case "pdf": return "application/pdf";
-        case "zip": return "application/zip";
-        case "tar": return "application/x-tar";
-        case "rar": return "application/vnd.rar";
-        case "gzip": return "application/gzip";
-        case "7z": return "application/x-7z-compressed";
-        case "xls": return "application/msexcel";
-        case "xlsx": return "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
-        case "doc": return "application/msword";
-        case "docx": return "application/vnd.openxmlformats-officedocument.wordprocessingml.document";
-        case "ppt": return "application/vnd.ms-powerpoint";
-        case "pptx": return "application/vnd.openxmlformats-officedocument.presentationml.presentation";
-        case "odp": return "application/vnd.oasis.opendocument.presentation";
-        case "ods": return "application/vnd.oasis.opendocument.spreadsheet";
-        case "odt": return "application/vnd.oasis.opendocument.text";
-        case "csv": return "application/csv";
-        case "txt": return "application/text";
-        case "json": return "application/json";
-        case "rtf": return "application/rtf";
-        case "xml": return "application/xml";
-        case "mpeg": return "video/mpeg";
-        case "mp4": return "video/mp4";
-        case "mpv": return "video/mpv";
-        case "mov": return "video/quicktime";
-        case "avi": return "video/x-msvideo";
-        case "wmv": return "video/x-ms-wmv";
-        case "webm": return "video/webm";
-        case "ogv": return "video/ogg";
-        case "ogx": return "application/ogg";
-        case "aac": return "audio/aac";
-        case "mp3": return "audio/mpeg";
-        case "oga": return "audio/ogg";
-        case "wav": return "audio/wav";
-        case "weba": return "audio/webm";
-        default: return "application/octet-stream";
-    }
+
+const mimeTypes = {
+    jpeg: "image/jpeg",
+    png: "image/png",
+    apng: "image/apng",
+    gif: "image/gif",
+    tiff: "image/tiff",
+    bmp: "image/bmp",
+    ico: "image/x-ico",
+    svg: "image/svg+xml",
+    webp: "image/webp",
+    heif: "image/heif",
+    heic: "image/heic",
+    pdf: "application/pdf",
+    zip: "application/zip",
+    tar: "application/x-tar",
+    rar: "application/x-rar-compressed",
+    gzip: "application/gzip",
+    "7z": "application/x-7z-compressed",
+    xls: "application/msexcel",
+    xlsx: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    doc: "application/msword",
+    docx: "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+    ppt: "application/vnd.ms-powerpoint",
+    pptx: "application/vnd.openxmlformats-officedocument.presentationml.presentation",
+    odp: "application/vnd.oasis.opendocument.presentation",
+    ods: "application/vnd.oasis.opendocument.spreadsheet",
+    odt: "application/vnd.oasis.opendocument.text",
+    csv: "text/csv",
+    txt: "text/plain",
+    rtf: "application/rtf",
+    xml: "application/xml",
+    mpeg: "video/mpeg",
+    mp4: "video/mp4",
+    mpv: "video/mpv",
+    mov: "video/quicktime",
+    avi: "video/x-msvideo",
+    wmv: "video/x-ms-wmv",
+    webm: "video/webm",
+    ogv: "video/ogg",
+    ogx: "application/ogg",
+    aac: "audio/aac",
+    mp3: "audio/mpeg",
+    oga: "audio/ogg",
+    wav: "audio/wav",
+    weba: "audio/webm",
+    default: "application/octet-stream",
+} as const;
+
+export type AssetType = keyof typeof mimeTypes;
+
+export type SupportedMimeType = (typeof mimeTypes)[AssetType];
+
+export function getMimeType(asset: AssetReference): string {
+    if (mimeTypes[asset.type]) return mimeTypes[asset.type];
+    return mimeTypes.default;
 }
 
 export function isImage(type: AssetType): boolean {
-    const mimeType = getMimeType(type);
-    return mimeType.lastIndexOf("image", 0) === 0;
+    return mimeTypes[type] ?
+        mimeTypes[type].lastIndexOf("image", 0) === 0
+        : false;
 }
 
 export function getMaximumSize(size: PreviewSize): number {
