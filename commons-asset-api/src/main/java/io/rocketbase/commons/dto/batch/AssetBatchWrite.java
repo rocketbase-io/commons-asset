@@ -1,5 +1,6 @@
 package io.rocketbase.commons.dto.batch;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -15,15 +16,18 @@ import java.util.List;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
+@Schema(description = "batch instruction wrapper")
 public class AssetBatchWrite implements Serializable {
 
     /**
      * when enabled pre check if downloadUrl has already been downloaded - then take it
      */
     @Nullable
+    @Schema(description = "when enabled pre check if downloadUrl has already been downloaded - then take it")
     private Boolean useCache;
 
     @NotNull
+    @Schema(description = "list of urls with additional information that will be stored in succeeded case.")
     private List<AssetBatchWriteEntry> entries;
 
     public AssetBatchWrite withEntry(AssetBatchWriteEntry entry) {

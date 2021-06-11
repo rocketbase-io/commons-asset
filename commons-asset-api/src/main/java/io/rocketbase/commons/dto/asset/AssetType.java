@@ -2,6 +2,7 @@ package io.rocketbase.commons.dto.asset;
 
 import com.fasterxml.jackson.annotation.JsonValue;
 import io.rocketbase.commons.util.Nulls;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 
 import java.util.Arrays;
@@ -9,6 +10,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+@Schema(enumAsRef = true)
 public enum AssetType {
 
     // images
@@ -65,9 +67,12 @@ public enum AssetType {
     WAV("wav", "audio/wav"),
     WEBA("weba", "audio/webm");
 
-    @Getter
-    @JsonValue
     private final String value;
+
+    @JsonValue
+    public String getValue() {
+        return value;
+    }
 
     @Getter
     private final String contentType;

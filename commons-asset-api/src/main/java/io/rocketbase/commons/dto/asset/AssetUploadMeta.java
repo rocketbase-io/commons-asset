@@ -1,6 +1,6 @@
 package io.rocketbase.commons.dto.asset;
 
-import org.springframework.lang.Nullable;
+import javax.annotation.Nullable;
 
 import java.io.Serializable;
 import java.time.Instant;

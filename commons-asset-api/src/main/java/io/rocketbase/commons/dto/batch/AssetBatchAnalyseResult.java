@@ -2,6 +2,7 @@ package io.rocketbase.commons.dto.batch;
 
 import io.rocketbase.commons.dto.asset.AssetAnalyse;
 import io.rocketbase.commons.exception.AssetErrorCodes;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -15,16 +16,19 @@ import java.util.Map;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
+@Schema(description = "wrapped batch results for analyse service")
 public class AssetBatchAnalyseResult implements Serializable {
 
     /**
-     * key holds the given url
+     * key holds the given url. value the result.
      */
+    @Schema(description = "succeeded processing: key holds the given url. value the result.")
     private Map<String, AssetAnalyse> succeeded;
 
     /**
-     * key holds the given url
+     * key holds the given url. value the result.
      */
+    @Schema(description = "failed processing: key holds the given url. value the result.")
     private Map<String, AssetErrorCodes> failed;
 
     public void addSuccess(String url, AssetAnalyse analyse) {

@@ -2,11 +2,12 @@ package io.rocketbase.commons.dto.asset;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.rocketbase.commons.model.HasKeyValue;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
-import org.springframework.lang.Nullable;
+import javax.annotation.Nullable;
 
 import java.time.Instant;
 import java.util.Map;
@@ -14,6 +15,7 @@ import java.util.Map;
 @Data
 @NoArgsConstructor
 @EqualsAndHashCode(callSuper = true)
+@Schema(description = "representation of an AssetEntity with all it's detail.")
 public class AssetRead extends DefaultAssetReference implements HasKeyValue {
 
     private AssetPreviews previews;
@@ -22,12 +24,15 @@ public class AssetRead extends DefaultAssetReference implements HasKeyValue {
      * optional property to receive the downloadUrl
      */
     @Nullable
+    @Schema(description = "optional property to receive the downloadUrl")
     private String download;
 
     @Nullable
+    @Schema(description = "optional keyValuePair that could have been stored related to the asset")
     private Map<String, String> keyValues;
 
     @Nullable
+    @Schema(description = "date after that the asset could be deleted")
     private Instant eol;
 
     private String modifiedBy;

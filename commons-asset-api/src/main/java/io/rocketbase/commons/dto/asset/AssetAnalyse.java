@@ -2,6 +2,7 @@ package io.rocketbase.commons.dto.asset;
 
 
 import com.fasterxml.jackson.annotation.JsonCreator;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -11,6 +12,7 @@ import java.time.Instant;
 
 @Data
 @EqualsAndHashCode(callSuper = true)
+@Schema(description = "results of the analyse service for assets/download-urls")
 public class AssetAnalyse extends AssetMeta {
 
     private AssetType type;
@@ -18,6 +20,7 @@ public class AssetAnalyse extends AssetMeta {
     /**
      * in case of enabeled lqip contain base64 image preview
      */
+    @Schema(description = "in case of enabeled lqip contain base64 image preview")
     private String lqip;
 
     @JsonCreator

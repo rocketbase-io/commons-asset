@@ -2,21 +2,26 @@ package io.rocketbase.commons.dto.asset;
 
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.context.i18n.LocaleContextHolder;
-import org.springframework.lang.Nullable;
+import javax.annotation.Nullable;
 
+import java.beans.Transient;
 import java.io.Serializable;
 
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
+@Schema(description = "resolution of an image in pixels")
 public class Resolution implements Serializable {
 
+    @Schema(description = "width in pixel", example = "800")
     private Integer width;
 
+    @Schema(description = "height in pixel", example = "600")
     private Integer height;
 
     public Resolution(Resolution other) {
@@ -53,7 +58,6 @@ public class Resolution implements Serializable {
      *
      * @return true = bigger then given parameter, false = smaller or null
      */
-    @JsonIgnore
     public boolean isBiggerThan(int maxWidth, int maxHeight) {
         if (width == null || height == null) {
             return false;
@@ -66,7 +70,6 @@ public class Resolution implements Serializable {
      *
      * @return true = bigger then given parameter, false = smaller or null
      */
-    @JsonIgnore
     public boolean isBiggerThan(PreviewSize previewSize) {
         if (previewSize == null) {
             return false;
@@ -79,7 +82,6 @@ public class Resolution implements Serializable {
      *
      * @return true = bigger then given parameter, false = smaller or null
      */
-    @JsonIgnore
     public boolean isBiggerThan(Resolution resolution) {
         if (resolution == null) {
             return false;
@@ -92,7 +94,6 @@ public class Resolution implements Serializable {
      *
      * @return true = thumb should be calculated, false = original file too small
      */
-    @JsonIgnore
     public boolean shouldThumbBeCalculated(PreviewSize previewSize) {
         boolean result = isBiggerThan(previewSize);
         if (!result && previewSize != null && previewSize.ordinal() > 0 ) {
@@ -109,7 +110,6 @@ public class Resolution implements Serializable {
      * new resolution that fit's in given size
      */
     @Nullable
-    @JsonIgnore
     public Resolution calculateWithAspectRatio(int maxWidth, int maxHeight) {
         if (width == null || height == null) {
             return null;

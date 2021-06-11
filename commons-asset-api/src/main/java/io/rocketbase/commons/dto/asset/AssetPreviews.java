@@ -5,12 +5,13 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import io.rocketbase.commons.serializer.AssetPreviewsDeserializer;
 import io.rocketbase.commons.serializer.AssetPreviewsSerializer;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.springframework.lang.Nullable;
 
+import javax.annotation.Nullable;
 import java.io.Serializable;
 import java.util.Map;
 import java.util.TreeMap;
@@ -21,6 +22,7 @@ import java.util.TreeMap;
 @AllArgsConstructor
 @JsonSerialize(using = AssetPreviewsSerializer.class)
 @JsonDeserialize(using = AssetPreviewsDeserializer.class)
+@Schema(description = "holds previews in a map with key PreviewSize and value the url. Additional all details to handle ResponsiveImages.")
 public class AssetPreviews implements Serializable {
 
     /**
@@ -42,7 +44,6 @@ public class AssetPreviews implements Serializable {
      * @param size given size
      * @return url or null
      */
-    @JsonIgnore
     public String getPreview(PreviewSize size) {
         if (previewMap.containsKey(size)) {
             return previewMap.get(size);

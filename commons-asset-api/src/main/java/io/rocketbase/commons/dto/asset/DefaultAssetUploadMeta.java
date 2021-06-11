@@ -1,7 +1,7 @@
 package io.rocketbase.commons.dto.asset;
 
 import lombok.*;
-import org.springframework.lang.Nullable;
+import javax.annotation.Nullable;
 
 import java.time.Instant;
 import java.util.Map;
