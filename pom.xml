@@ -109,15 +109,15 @@ SOFTWARE.
 
         <spring-boot.version>2.5.1</spring-boot.version>
 
-        <commons-rest.version>2.2.2</commons-rest.version>
+        <commons-rest.version>2.2.4</commons-rest.version>
         <guava.version>30.1.1-jre</guava.version>
         <commons-fileupload.version>1.4</commons-fileupload.version>
-        <commons-io.version>2.8.0</commons-io.version>
+        <commons-io.version>2.9.0</commons-io.version>
         <tika-core.version>1.26</tika-core.version>
         <thumbnailator.version>0.4.14</thumbnailator.version>
-        <jacoco.version>0.8.6</jacoco.version>
-        <colors.version>0.5.1</colors.version>
-        <aws-sdk-java.version>1.11.998</aws-sdk-java.version>
+        <jacoco.version>0.8.7</jacoco.version>
+        <colors.version>0.6.0</colors.version>
+        <aws-sdk-java.version>1.12.5</aws-sdk-java.version>
         <imgproxy.version>0.1.0</imgproxy.version>
         <im4java.version>1.4.2</im4java.version>
     </properties>
