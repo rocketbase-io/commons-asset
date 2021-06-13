@@ -7,8 +7,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
-import javax.annotation.Nullable;
 
+import javax.annotation.Nullable;
 import java.time.Instant;
 import java.util.Map;
 
@@ -18,6 +18,7 @@ import java.util.Map;
 @Schema(description = "representation of an AssetEntity with all it's detail.")
 public class AssetRead extends DefaultAssetReference implements HasKeyValue {
 
+    @Nullable
     private AssetPreviews previews;
 
     /**

@@ -1,41 +1,99 @@
-// Generated using typescript-generator version 2.27.744 on 2020-12-11 21:00:38.
-
 import * as rest from "./commons-rest-api.d.ts";
 
+/**
+ * results of the analyse service for assets/download-urls
+ */
 export interface AssetAnalyse extends AssetMeta {
     type: AssetType;
-    lqip: string;
+    /**
+     * in case of enabeled lqip contain base64 image preview"
+     */
+    lqip?: string;
 }
 
 export interface AssetMeta {
     created: string;
+    /**
+     * name of the file during upload-process
+     */
     originalFilename: string;
+    /**
+     * original file size in bytes
+     */
     fileSize: number;
+    /**
+     * only filled in case of image asset
+     */
     resolution?: Resolution;
+    /**
+     * only filled in case of image asset
+     */
     colorPalette?: ColorPalette;
+    /**
+     * only filled in case of batch downloaded image
+     */
     referenceUrl?: string;
+    /**
+     * example 1.5Mb
+     */
     fileSizeHumanReadable: string;
 }
 
 export interface ResponsiveImage {
+    /**
+     * layout example: (max-width: 640px) 100vw, 640px
+     */
     sizes?: string;
+    /**
+     * layout example: https://preview/abc_w_300.png 300w, https://preview/abc_w_600.png 600w,  https://preview/abc_w.png 640w
+     */
     srcset?: string;
+    /**
+     * contains the tallest preview url as default src (browser will detect best fitting preview from srcset)
+     */
     src: string;
 }
 
 export interface AssetPreviews {
+    /**
+     * 150x150 pixels"
+     */
     xs?: string;
+    /**
+     * 300x300 pixels
+     */
     s?: string;
+    /**
+     * 600x600 pixels
+     */
     m?: string;
+    /**
+     * 1200x1200 pixels
+     */
     l?: string;
+    /**
+     * 1900x1900 pixels
+     */
     xl?: string;
+    /**
+     * calculated Responsive Image Breakpoints
+     */
     responsive?: ResponsiveImage;
 }
 
 export interface AssetRead extends AssetReference, rest.HasKeyValue {
-    previews: AssetPreviews;
+    previews?: AssetPreviews;
+    /**
+     * optional property to receive the downloadUrl
+     */
     download?: string;
+    /**
+     * optional keyValuePair that could have been stored related to the asset
+     */
     keyValues?: Record<string, string>;
+    /**
+     * date after that the asset could be deleted
+     */
     eol?: string;
     created: string;
     modifiedBy: string;
@@ -46,11 +104,29 @@ export interface AssetRead extends AssetReference, rest.HasKeyValue {
  * a short representation of {@link AssetRead} in order to reduce response values for rendering an asset within an application
  */
 export interface AssetDisplay {
+    /**
+     * unique id of asset
+     */
     id: string;
+    /**
+     * type of asset
+     */
     type: AssetType;
+    /**
+     * additional information to asset
+     */
     meta: AssetMeta;
+    /**
+     * values to render imag
+     */
     image?: ResponsiveImage;
+    /**
+     * url to download original file -  in case of disabled download this value could be null
+     */
     download?: string;
+    /**
+     * Low Quality Image Placeholder (LQIP) that is a base64 preview in ultra low-res + quality
+     */
     lqip?: string;
 }
 
@@ -93,8 +169,19 @@ export interface AssetReference {
  * null properties mean let value as it is
  */
 export interface AssetUpdate {
+    /**
+     * update it with care - needs to get updated in AssetReferences if stored anywhere...
+     */
     systemRefId?: string;
+    /**
+     * will removed key that have value of null
+     * will only add/replace new/existing key values
+     * not mentioned key will still stay the same
+     */
     keyValues?: Record<string, string>;
+    /**
+     * after this time the asset could get deleted within a cleanup job
+     */
     eol?: string;
 }
 
@@ -121,8 +208,17 @@ export interface AssetUploadMeta {
     systemRefId?: string;
 }
 
+/**
+ * detection results of colors within an image
+ */
 export interface ColorPalette {
+    /**
+     * dominant color
+     */
     primary: string;
+    /**
+     * other colors ordered by priority (not containing primary)
+     */
     colors: string[];
 }
 
@@ -131,46 +227,126 @@ export interface QueryAsset {
     after?: string;
     originalFilename?: string;
     systemRefId?: string;
+    /**
+     * in mongo-implementation it's a regex "like" search<br>
+     * in mysql it's an exact hash compare (limitations within mysql of column/index length)
+     */
     referenceUrl?: string;
+    /**
+     * search exact match
+     */
     context?: string;
     types?: AssetType[];
+    /**
+     * true: queries all assets that has an eol value<br>
+     * false: all without<br>
+     * null means ignore
+     */
     hasEolValue?: boolean;
+    /**
+     * true: queries all assets that has an eol value that is expired<br>
+     * false: all without or newer then now<br>
+     * null means ignore
+     */
     isEol?: boolean;
+    /**
+     * search for given key and value with exact match ignore cases
+     */
     keyValues?: Record<string, string>;
 }
 
+/**
+ * resolution of an image in pixels
+ */
 export interface Resolution {
+    /**
+     * width in pixel
+     */
     width: number;
+    /**
+     * height in pixel
+     */
     height: number;
 }
 
+/**
+ * calculated Responsive Image Breakpoints
+ */
 export interface ResponsiveImage {
+    /**
+     * layout example: (max-width: 640px) 100vw, 640px
+     */
     sizes?: string;
+    /**
+     * layout example: https://preview/abc_w_300.png 300w, https://preview/abc_w_600.png 600w,  https://preview/abc_w.png 640w
+     */
     srcset?: string;
+    /**
+     * contains the tallest preview url as default src (browser will detect best fitting preview from srcset)
+     */
     src: string;
 }
 
+/**
+ * wrapped batch results for analyse service
+ */
 export interface AssetBatchAnalyseResult {
+    /**
+     * key holds the given url. value the result.
+     */
     succeeded: Record<string, AssetAnalyse>;
+    /**
+     * key holds the given url. value the result.
+     */
     failed: Record<string, AssetErrorCodes>;
 }
 
+/**
+ * wrapped batch results for store service
+ */
 export interface AssetBatchResult {
+    /**
+     * key holds the given url. value the result.
+     */
     succeeded: Record<string, AssetRead>;
+    /**
+     * key holds the given url. value the result.
+     */
     failed: Record<string, AssetErrorCodes>;
 }
 
+/**
+ * wrapped batch results for store service without previews
+ */
 export interface AssetBatchResultWithoutPreviews {
+    /**
+     * key holds the given url. value the result.
+     */
     succeeded: Record<string, AssetReference>;
+    /**
+     * key holds the given url. value the result.
+     */
     failed: Record<string, AssetErrorCodes>;
 }
 
 export interface AssetBatchWrite {
+    /**
+     * when enabled pre check if downloadUrl has already been downloaded - then take it
+     */
     useCache?: boolean;
+    /**
+     * list of urls with additional information that will be stored in succeeded case.
+     */
     entries: AssetBatchWriteEntry[];
 }
 
+/**
+ * detailed instruction for each url
+ */
 export interface AssetBatchWriteEntry extends AssetUploadMeta {
+    /**
+     * full qualified url to the asset that should been analysed/stored
+     */
     url: string;
 }
 

@@ -9,6 +9,9 @@ import javax.annotation.Nullable;
 
 import java.io.Serializable;
 
+/**
+ * calculated Responsive Image Breakpoints
+ */
 @Data
 @Builder
 @NoArgsConstructor

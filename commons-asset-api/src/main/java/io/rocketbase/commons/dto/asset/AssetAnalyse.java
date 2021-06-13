@@ -7,6 +7,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
+import javax.annotation.Nullable;
 import java.beans.ConstructorProperties;
 import java.time.Instant;
 
@@ -21,6 +22,7 @@ public class AssetAnalyse extends AssetMeta {
      * in case of enabeled lqip contain base64 image preview
      */
     @Schema(description = "in case of enabeled lqip contain base64 image preview")
+    @Nullable
     private String lqip;
 
     @JsonCreator

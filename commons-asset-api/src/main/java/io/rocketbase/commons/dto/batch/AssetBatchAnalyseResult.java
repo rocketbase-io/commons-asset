@@ -12,6 +12,9 @@ import java.io.Serializable;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+/**
+ * wrapped batch results for analyse service
+ */
 @Data
 @Builder
 @NoArgsConstructor

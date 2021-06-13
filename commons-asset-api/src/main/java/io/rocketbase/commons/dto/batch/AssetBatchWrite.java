@@ -12,6 +12,9 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * batch instruction wrapper
+ */
 @Data
 @Builder
 @NoArgsConstructor
@@ -26,6 +29,9 @@ public class AssetBatchWrite implements Serializable {
     @Schema(description = "when enabled pre check if downloadUrl has already been downloaded - then take it")
     private Boolean useCache;
 
+    /**
+     * list of urls with additional information that will be stored in succeeded case.
+     */
     @NotNull
     @Schema(description = "list of urls with additional information that will be stored in succeeded case.")
     private List<AssetBatchWriteEntry> entries;

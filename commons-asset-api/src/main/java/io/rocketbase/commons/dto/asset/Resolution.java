@@ -12,15 +12,24 @@ import javax.annotation.Nullable;
 import java.beans.Transient;
 import java.io.Serializable;
 
+/**
+ * resolution of an image in pixels
+ */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Schema(description = "resolution of an image in pixels")
 public class Resolution implements Serializable {
 
+    /**
+     * width in pixel
+     */
     @Schema(description = "width in pixel", example = "800")
     private Integer width;
 
+    /**
+     * height in pixel
+     */
     @Schema(description = "height in pixel", example = "600")
     private Integer height;
 
