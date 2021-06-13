@@ -55,6 +55,7 @@ SOFTWARE.
         <module>commons-asset-storage-fs</module>
         <module>commons-asset-server-filepond</module>
         <module>schema-generation</module>
+        <module>coverage</module>
     </modules>
 
     <licenses>
