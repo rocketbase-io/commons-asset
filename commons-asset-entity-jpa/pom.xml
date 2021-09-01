@@ -54,7 +54,7 @@
         <dependency>
             <groupId>org.hibernate</groupId>
             <artifactId>hibernate-jpamodelgen</artifactId>
-            <version>5.4.30.Final</version>
+            <version>5.5.5.Final</version>
             <scope>provided</scope>
         </dependency>
 
