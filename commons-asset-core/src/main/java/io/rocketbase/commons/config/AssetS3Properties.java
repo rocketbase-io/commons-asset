@@ -11,6 +11,7 @@ import org.springframework.validation.annotation.Validated;
 
 import javax.validation.constraints.NotEmpty;
 import java.io.Serializable;
+import java.time.Duration;
 
 @Data
 @Validated
@@ -39,7 +40,7 @@ public class AssetS3Properties implements Serializable {
      * expire for pre-signed URL in minutes (AWS/Minio max 7 days)<br>
      * 0 means object should be public accessible
      */
-    private int downloadExpire = 0;
+    private Duration downloadExpire = Duration.ofDays(3);
 
     /**
      * when enabled for each uploaded object the acl will get set CannedAccessControlList.PublicRead<br>

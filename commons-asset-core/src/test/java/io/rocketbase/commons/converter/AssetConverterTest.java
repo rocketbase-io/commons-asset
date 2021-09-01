@@ -184,6 +184,34 @@ public class AssetConverterTest {
         assertThat(responsive.getSrcset(), containsString(String.format("download.jpg %dw", reference.getMeta().getResolution().getWidth())));
     }
 
+    @Test
+    public void toReadTinyOriginal() {
+        // given
+        AssetConverter converter = new AssetConverter(new AssetApiProperties(), new TestAssetPreviewService());
+        // when
+        DefaultAssetReference reference = DefaultAssetReference.builder()
+                .id("1234")
+                .type(AssetType.JPEG)
+                .meta(AssetMeta.builder()
+                        .resolution(new Resolution(102, 80))
+                        .build())
+                .build();
+
+        AssetRead result = converter.toRead(reference, Arrays.asList(PreviewSize.values()));
+        // then
+        assertThat(result, notNullValue());
+        assertThat(result.getId(), equalTo(reference.getId()));
+        assertThat(result.getType(), equalTo(reference.getType()));
+        assertThat(result.getMeta(), equalTo(reference.getMeta()));
+        assertThat(result.getPreviews(), notNullValue());
+        assertThat(result.getPreviews().getPreviewMap().size(), equalTo(0));
+        ResponsiveImage responsive = result.getPreviews().getResponsive();
+        assertThat(responsive, notNullValue());
+        assertThat(responsive.getSrc(), equalTo(reference.getId() + "-download.jpg"));
+        assertThat(responsive.getSizes(), containsString(reference.getMeta().getResolution().getWidth() + "px"));
+        assertThat(responsive.getSrcset(), containsString(String.format("download.jpg %dw", reference.getMeta().getResolution().getWidth())));
+    }
+
     public static class TestAssetPreviewService implements AssetPreviewService {
 
         @Override

@@ -205,7 +205,9 @@ Containing a communication layer with s3 in order to use it as file storage. Use
 | asset.s3.region                    | **required** |                                                              |
 | asset.s3.endpoint                  | *optional*   | allow to connect to replacements of aws s3<br />by for example  [minio](https://www.minio.io/) you can specify the endpoint |
 | asset.s3.path-style-access-enabled | *optional*   | property to configure aws-java-sdk                           |
-| asset.s3.signer-override           | *optional*   | property to configure aws-java-sdk                           |
+| asset.s3.signer-override           | *optional*   | property to configure aws-java-sdk                           |   |
+| asset.s3.download-expire          | "3d" *(3 days)* <br /> (max 7 for AWS and Minio) <br /> [simple duration layout](https://docs.spring.io/spring-boot/docs/2.1.12.RELEASE/reference/html/boot-features-external-config.html#boot-features-external-config-conversion-duration)  | property to configure expiration of presigned urls in case no public-url                          |
+| asset.s3.public-read-object           | false   | property to configure how original file is accessable                           |   |
 
 ### example configs
 

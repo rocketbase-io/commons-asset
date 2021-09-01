@@ -112,8 +112,8 @@ public class S3FileStoreService implements FileStorageService {
     }
 
     protected String getDownloadUrl(AssetReference reference, String url) {
-        if (assetS3Properties.getDownloadExpire() > 0) {
-            Date expiration = new Date(new Date().getTime() + 1000 * 60 * assetS3Properties.getDownloadExpire());
+        if (!assetS3Properties.isPublicReadObject()) {
+            Date expiration = new Date(new Date().getTime() + assetS3Properties.getDownloadExpire().toMillis());
             return amazonS3.generatePresignedUrl(bucketResolver.resolveBucketName(reference), url, expiration).toString();
         }
         return buildPublicUrl(reference, url);
