@@ -17,6 +17,7 @@ import org.springframework.core.io.InputStreamResource;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.net.URL;
+import java.time.Duration;
 import java.time.Instant;
 import java.util.HashMap;
 import java.util.Map;
@@ -138,7 +139,7 @@ public class S3FileStoreServiceTest {
                 .pathStyleAccessEnabled(true)
                 .signerOverride("AWSS3V4SignerType")
                 .region("eu-central-1")
-                .downloadExpire(0)
+                .downloadExpire(Duration.ofDays(0))
                 .publicReadObject(true)
                 .build();
         DefaultS3ClientProvider s3ClientProvider = new DefaultS3ClientProvider(properties);
