@@ -3,7 +3,7 @@
 ![logo](assets/commons-logo.svg)
 
 
-[![Build Status](https://travis-ci.com/rocketbase-io/commons-asset.svg?branch=master)](https://travis-ci.com/rocketbase-io/commons-asset)
+[![Build Status](https://travis-ci.com/rocketbase-io/commons-asset.svg?branch=master)](https://app.travis-ci.com/rocketbase-io/commons-asset)
 [![Maven Central](https://maven-badges.herokuapp.com/maven-central/io.rocketbase.commons/commons-asset/badge.svg)](https://maven-badges.herokuapp.com/maven-central/io.rocketbase.commons/commons-asset)
 [![Maintainability](https://api.codeclimate.com/v1/badges/f09af44278b226f1f54c/maintainability)](https://codeclimate.com/github/rocketbase-io/commons-asset/maintainability)
 [![Test Coverage](https://api.codeclimate.com/v1/badges/f09af44278b226f1f54c/test_coverage)](https://codeclimate.com/github/rocketbase-io/commons-asset/test_coverage)
