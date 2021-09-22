@@ -1,14 +1,16 @@
 package io.rocketbase.commons.dto.asset;
 
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import io.swagger.v3.oas.annotations.media.Schema;
-import javax.annotation.Nullable;
 
+import javax.annotation.Nullable;
 import java.io.Serializable;
 
 /**
  * used to store reference in db or elsewhere<br>
  * could be converted to AssetRead without database access
  */
+@JsonDeserialize(as = DefaultAssetReference.class)
 public interface AssetReference extends Serializable {
 
     /**

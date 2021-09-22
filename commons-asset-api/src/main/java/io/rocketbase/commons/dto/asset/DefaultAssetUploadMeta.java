@@ -1,5 +1,6 @@
 package io.rocketbase.commons.dto.asset;
 
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import lombok.*;
 import javax.annotation.Nullable;
 
@@ -10,6 +11,7 @@ import java.util.Map;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
+@JsonDeserialize
 public class DefaultAssetUploadMeta implements AssetUploadMeta {
 
     @Nullable

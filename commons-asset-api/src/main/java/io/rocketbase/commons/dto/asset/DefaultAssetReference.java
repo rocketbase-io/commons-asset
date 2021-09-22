@@ -1,5 +1,6 @@
 package io.rocketbase.commons.dto.asset;
 
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import lombok.*;
 
 
@@ -11,6 +12,7 @@ import lombok.*;
 @AllArgsConstructor
 @NoArgsConstructor
 @ToString(exclude = "lqip")
+@JsonDeserialize
 public class DefaultAssetReference implements AssetReference {
 
     private String id;

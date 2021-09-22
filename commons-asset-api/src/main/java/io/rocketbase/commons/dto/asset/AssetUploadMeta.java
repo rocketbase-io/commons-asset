@@ -1,11 +1,14 @@
 package io.rocketbase.commons.dto.asset;
 
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+
 import javax.annotation.Nullable;
 
 import java.io.Serializable;
 import java.time.Instant;
 import java.util.Map;
 
+@JsonDeserialize(as = DefaultAssetUploadMeta.class)
 public interface AssetUploadMeta extends Serializable {
 
     /**
