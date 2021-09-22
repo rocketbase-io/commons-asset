@@ -118,7 +118,7 @@ SOFTWARE.
         <thumbnailator.version>0.4.14</thumbnailator.version>
         <jacoco.version>0.8.7</jacoco.version>
         <colors.version>0.6.0</colors.version>
-        <aws-sdk-java.version>1.12.53</aws-sdk-java.version>
+        <aws-sdk-java.version>1.12.70</aws-sdk-java.version>
         <imgproxy.version>0.1.0</imgproxy.version>
         <im4java.version>1.4.2</im4java.version>
     </properties>
