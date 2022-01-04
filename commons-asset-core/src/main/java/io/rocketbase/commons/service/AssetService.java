@@ -1,6 +1,7 @@
 package io.rocketbase.commons.service;
 
 import com.google.common.base.Stopwatch;
+import com.google.common.io.Files;
 import io.rocketbase.commons.config.AssetApiProperties;
 import io.rocketbase.commons.dto.asset.*;
 import io.rocketbase.commons.event.*;
@@ -127,10 +128,17 @@ public class AssetService {
     }
 
     private AssetType detectAssetTypeWithChecks(File file, String originalFilename, long size, String referenceUrl, AssetUploadMeta uploadMeta) throws IOException {
-        String contentType = tika.detect(file);
-        AssetType assetType = AssetType.findByContentType(contentType);
+        AssetType assetType;
+        String contentType = null;
+        String fileExtension = Files.getFileExtension(file.getPath());
+        if (AssetType.GLB.equals(AssetType.findByFileExtension(fileExtension))) {
+            assetType = AssetType.GLB;
+        } else {
+            contentType = tika.detect(file);
+            assetType = AssetType.findByContentType(contentType);
+        }
         if (assetType == null) {
-            log.info("detected contentType: {}", contentType);
+            log.info("detected fileExtension: {}, contentType: {}",fileExtension, contentType);
             throw new InvalidContentTypeException(contentType);
         } else if (!assetTypeFilterService.isAllowed(assetType, new AssetUploadDetail(file, originalFilename, size, referenceUrl, uploadMeta))) {
             log.info("got assetType: {} that is not within allowed list: {}", assetType, assetTypeFilterService.getAllowedAssetTypes());

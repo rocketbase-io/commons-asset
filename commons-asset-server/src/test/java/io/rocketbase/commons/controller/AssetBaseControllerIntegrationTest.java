@@ -42,8 +42,7 @@ public class AssetBaseControllerIntegrationTest extends BaseIntegrationTest {
         AssetResource assetResource = new AssetResource(baseUrl);
 
         // when
-        File uploadFile = resourceLoader.getResource("classpath:assets/sample.png")
-                .getFile();
+        File uploadFile = resourceLoader.getResource("classpath:assets/sample.png").getFile();
         AssetRead result = assetResource.uploadFile(new FileInputStream(uploadFile), uploadFile.getName());
 
         // then
@@ -57,13 +56,30 @@ public class AssetBaseControllerIntegrationTest extends BaseIntegrationTest {
 
     @SneakyThrows
     @Test
+    public void testUploadGlb() {
+        // given
+        AssetResource assetResource = new AssetResource(baseUrl);
+
+        // when
+        File uploadFile = resourceLoader.getResource("classpath:assets/sample.glb").getFile();
+
+        AssetRead result = assetResource.uploadFile(new FileInputStream(uploadFile), uploadFile.getName());
+
+        // then
+        assertThat(result, notNullValue());
+        assertThat(result.getType(), equalTo(AssetType.GLB));
+        assertThat(result.getMeta().getFileSize(), equalTo(6683040L));
+        assertThat(result.getDownload(), startsWith(baseUrl));
+    }
+
+    @SneakyThrows
+    @Test
     public void testUploadJpg() {
         // given
         AssetResource assetResource = new AssetResource(baseUrl);
 
         // when
-        File uploadFile = resourceLoader.getResource("classpath:assets/sample.jpg")
-                .getFile();
+        File uploadFile = resourceLoader.getResource("classpath:assets/sample.jpg").getFile();
         AssetRead result = assetResource.uploadFile(new FileInputStream(uploadFile), uploadFile.getName());
 
         // then
@@ -81,8 +97,7 @@ public class AssetBaseControllerIntegrationTest extends BaseIntegrationTest {
         AssetResource assetResource = new AssetResource(baseUrl);
 
         // when
-        File uploadFile = resourceLoader.getResource("classpath:assets/sample.jpg")
-                .getFile();
+        File uploadFile = resourceLoader.getResource("classpath:assets/sample.jpg").getFile();
         Map<String, String> keyValues = new HashMap<>();
         String _client = "client";
         String _clientValue = "1";
@@ -94,10 +109,7 @@ public class AssetBaseControllerIntegrationTest extends BaseIntegrationTest {
         String _hiddenValue = "secret";
         keyValues.put(_hidden, _hiddenValue);
         String context = "context";
-        AssetRead result = assetResource.uploadFile(new FileInputStream(uploadFile), uploadFile.getName(), DefaultAssetUploadMeta.builder()
-                .context(context)
-                .keyValues(keyValues)
-                .build());
+        AssetRead result = assetResource.uploadFile(new FileInputStream(uploadFile), uploadFile.getName(), DefaultAssetUploadMeta.builder().context(context).keyValues(keyValues).build());
 
         // then
         assertThat(result, notNullValue());
@@ -123,8 +135,7 @@ public class AssetBaseControllerIntegrationTest extends BaseIntegrationTest {
         AssetResource assetResource = new AssetResource(baseUrl);
 
         // when
-        File uploadFile = resourceLoader.getResource("classpath:assets/sample.gif")
-                .getFile();
+        File uploadFile = resourceLoader.getResource("classpath:assets/sample.gif").getFile();
         AssetRead result = assetResource.uploadFile(new FileInputStream(uploadFile), uploadFile.getName());
 
         // then
@@ -142,8 +153,7 @@ public class AssetBaseControllerIntegrationTest extends BaseIntegrationTest {
         AssetResource assetResource = new AssetResource(baseUrl);
 
         // when
-        File uploadFile = resourceLoader.getResource("classpath:assets/sample.pdf")
-                .getFile();
+        File uploadFile = resourceLoader.getResource("classpath:assets/sample.pdf").getFile();
         AssetRead result = assetResource.uploadFile(new FileInputStream(uploadFile), uploadFile.getName());
 
         // then
@@ -161,8 +171,7 @@ public class AssetBaseControllerIntegrationTest extends BaseIntegrationTest {
         AssetResource assetResource = new AssetResource(baseUrl);
 
         // when
-        File uploadFile = resourceLoader.getResource("classpath:assets/sample.zip")
-                .getFile();
+        File uploadFile = resourceLoader.getResource("classpath:assets/sample.zip").getFile();
         AssetRead result = assetResource.uploadFile(new FileInputStream(uploadFile), uploadFile.getName());
 
         // then
@@ -178,8 +187,7 @@ public class AssetBaseControllerIntegrationTest extends BaseIntegrationTest {
     public void testDelete() {
         // given
         AssetResource assetResource = new AssetResource(baseUrl);
-        File uploadFile = resourceLoader.getResource("classpath:assets/sample.zip")
-                .getFile();
+        File uploadFile = resourceLoader.getResource("classpath:assets/sample.zip").getFile();
         AssetRead result = assetResource.uploadFile(new FileInputStream(uploadFile), uploadFile.getName());
 
         // when
@@ -197,8 +205,7 @@ public class AssetBaseControllerIntegrationTest extends BaseIntegrationTest {
         AssetResource assetResource = new AssetResource(baseUrl);
 
         // when
-        File uploadFile = resourceLoader.getResource("classpath:assets/invalid-sample.txt")
-                .getFile();
+        File uploadFile = resourceLoader.getResource("classpath:assets/invalid-sample.txt").getFile();
         try {
             // then
             AssetRead result = assetResource.uploadFile(new FileInputStream(uploadFile), uploadFile.getName());
@@ -217,9 +224,7 @@ public class AssetBaseControllerIntegrationTest extends BaseIntegrationTest {
         String failure = "https://gitlab.com/notfound.jpg";
 
         // when
-        AssetBatchResult result = assetResource.processBatchFileUrls(new AssetBatchWrite()
-                .withEntry(new AssetBatchWriteEntry(success))
-                .withEntry(new AssetBatchWriteEntry(failure)));
+        AssetBatchResult result = assetResource.processBatchFileUrls(new AssetBatchWrite().withEntry(new AssetBatchWriteEntry(success)).withEntry(new AssetBatchWriteEntry(failure)));
         //
         assertThat(result, notNullValue());
         assertThat(result.getSucceeded().size(), equalTo(1));
@@ -279,8 +284,7 @@ public class AssetBaseControllerIntegrationTest extends BaseIntegrationTest {
         AssetResource assetResource = new AssetResource(baseUrl);
 
         // when
-        File uploadFile = resourceLoader.getResource("classpath:assets/pierre-bamin-X16N5J0uRD4-unsplash.jpg")
-                .getFile();
+        File uploadFile = resourceLoader.getResource("classpath:assets/pierre-bamin-X16N5J0uRD4-unsplash.jpg").getFile();
         AssetRead result = assetResource.uploadFile(new FileInputStream(uploadFile), uploadFile.getName());
 
         // then
@@ -298,8 +302,7 @@ public class AssetBaseControllerIntegrationTest extends BaseIntegrationTest {
         AssetResource assetResource = new AssetResource(baseUrl);
 
         // when
-        File uploadFile = resourceLoader.getResource("classpath:assets/jpeg.webp")
-                .getFile();
+        File uploadFile = resourceLoader.getResource("classpath:assets/jpeg.webp").getFile();
         AssetRead result = assetResource.uploadFile(new FileInputStream(uploadFile), uploadFile.getName());
 
         // then
@@ -317,8 +320,7 @@ public class AssetBaseControllerIntegrationTest extends BaseIntegrationTest {
         AssetResource assetResource = new AssetResource(baseUrl);
 
         // when
-        File uploadFile = resourceLoader.getResource("classpath:assets/sample.heic")
-                .getFile();
+        File uploadFile = resourceLoader.getResource("classpath:assets/sample.heic").getFile();
         AssetRead result = assetResource.uploadFile(new FileInputStream(uploadFile), uploadFile.getName());
 
         // then
@@ -336,8 +338,7 @@ public class AssetBaseControllerIntegrationTest extends BaseIntegrationTest {
         AssetResource assetResource = new AssetResource(baseUrl);
 
         // when
-        File uploadFile = resourceLoader.getResource("classpath:assets/png.webp")
-                .getFile();
+        File uploadFile = resourceLoader.getResource("classpath:assets/png.webp").getFile();
         AssetRead result = assetResource.uploadFile(new FileInputStream(uploadFile), uploadFile.getName());
 
         // then

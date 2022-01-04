@@ -65,7 +65,9 @@ public enum AssetType {
     MP3("mp3", "audio/mpeg"),
     OGA("oga", "audio/ogg"),
     WAV("wav", "audio/wav"),
-    WEBA("weba", "audio/webm");
+    WEBA("weba", "audio/webm"),
+    // 3d files
+    GLB("glb","model/gltf-binary");
 
     private final String value;
 
