@@ -1,4 +1,4 @@
-import * as rest from "./commons-rest-api.d.ts";
+import * as rest from "./commons-rest-api";
 
 /**
  * results of the analyse service for assets/download-urls
@@ -406,6 +406,7 @@ const mimeTypes = {
     oga: "audio/ogg",
     wav: "audio/wav",
     weba: "audio/webm",
+    glb: "model/gltf-binary",
     default: "application/octet-stream",
 } as const;
 
@@ -426,11 +427,17 @@ export function isImage(type: AssetType): boolean {
 
 export function getMaximumSize(size: PreviewSize): number {
     switch (size) {
-        case "xs": return 150;
-        case "s": return 300;
-        case "m": return 600;
-        case "l": return 1200;
-        case "xl": return 1900;
-        default: return -1;
+        case "xs":
+            return 150;
+        case "s":
+            return 300;
+        case "m":
+            return 600;
+        case "l":
+            return 1200;
+        case "xl":
+            return 1900;
+        default:
+            return -1;
     }
 }
