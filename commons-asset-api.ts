@@ -373,6 +373,7 @@ const mimeTypes = {
     webp: "image/webp",
     heif: "image/heif",
     heic: "image/heic",
+    avif: "image/avif",
     pdf: "application/pdf",
     zip: "application/zip",
     tar: "application/x-tar",
