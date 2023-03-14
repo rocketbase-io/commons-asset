@@ -9,7 +9,6 @@ import io.rocketbase.commons.model.AssetFileEntity;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import org.apache.commons.io.IOUtils;
-import org.hibernate.engine.jdbc.BlobProxy;
 import org.springframework.core.io.InputStreamResource;
 
 import javax.persistence.EntityManager;
@@ -17,6 +16,7 @@ import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaDelete;
 import javax.persistence.criteria.Root;
 import javax.transaction.Transactional;
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -33,7 +33,7 @@ public class JpaFileStorageService implements FileStorageService {
     public void upload(AssetEntity entity, File file) {
         AssetFileEntity assetFileEntity = AssetFileEntity.builder()
                 .id(entity.getId())
-                .binary(BlobProxy.generateProxy(new FileInputStream(file), file.length()))
+                .binary(new FileInputStream(file).readAllBytes())
                 .build();
         entityManager.persist(assetFileEntity);
         entity.setUrlPath(entity.getId());
@@ -44,7 +44,7 @@ public class JpaFileStorageService implements FileStorageService {
     public void storePreview(AssetReference reference, File file, PreviewSize previewSize) {
         AssetFileEntity assetFileEntity = AssetFileEntity.builder()
                 .id(buildPreviewSizeId(reference, previewSize))
-                .binary(BlobProxy.generateProxy(new FileInputStream(file), file.length()))
+                .binary(new FileInputStream(file).readAllBytes())
                 .build();
         entityManager.persist(assetFileEntity);
     }
@@ -60,7 +60,7 @@ public class JpaFileStorageService implements FileStorageService {
         if (assetFileEntity == null) {
             throw new NotFoundException("asset with id: " + entity.getId() + " not found");
         }
-        return new InputStreamResource(assetFileEntity.getBinary().getBinaryStream());
+        return new InputStreamResource(new ByteArrayInputStream(assetFileEntity.getBinary()));
     }
 
     @SneakyThrows
@@ -70,7 +70,7 @@ public class JpaFileStorageService implements FileStorageService {
         if (assetFileEntity == null) {
             throw new NotFoundException("asset with id: " + reference.getId() + " not found");
         }
-        return new InputStreamResource(assetFileEntity.getBinary().getBinaryStream());
+        return new InputStreamResource(new ByteArrayInputStream(assetFileEntity.getBinary()));
     }
 
     @Override

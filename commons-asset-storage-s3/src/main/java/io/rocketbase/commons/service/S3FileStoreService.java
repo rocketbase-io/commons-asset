@@ -47,9 +47,9 @@ public class S3FileStoreService implements FileStorageService {
 
         ObjectMetadata objectMetadata = generateObjectMeta(entity);
         transferManager.upload(new PutObjectRequest(bucketResolver.resolveBucketName(entity),
-                entity.getUrlPath(), file)
-                .withMetadata(objectMetadata)
-                .withCannedAcl(assetS3Properties.isPublicReadObject() ? CannedAccessControlList.PublicRead : CannedAccessControlList.BucketOwnerRead))
+                        entity.getUrlPath(), file)
+                        .withMetadata(objectMetadata)
+                        .withCannedAcl(assetS3Properties.isPublicReadObject() ? CannedAccessControlList.PublicRead : CannedAccessControlList.BucketOwnerRead))
                 .waitForUploadResult();
     }
 
@@ -60,9 +60,9 @@ public class S3FileStoreService implements FileStorageService {
 
         ObjectMetadata objectMetadata = generateObjectMeta(reference);
         transferManager.upload(new PutObjectRequest(bucketResolver.resolveBucketName(reference),
-                buildPreviewPart(reference, previewSize), file)
-                .withMetadata(objectMetadata)
-                .withCannedAcl(assetS3Properties.isPublicReadObject() ? CannedAccessControlList.PublicRead : CannedAccessControlList.BucketOwnerRead))
+                        buildPreviewPart(reference, previewSize), file)
+                        .withMetadata(objectMetadata)
+                        .withCannedAcl(assetS3Properties.isPublicReadObject() ? CannedAccessControlList.PublicRead : CannedAccessControlList.BucketOwnerRead))
                 .waitForUploadResult();
     }
 

@@ -7,7 +7,6 @@ import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
-import java.sql.Blob;
 
 
 @Entity
@@ -28,5 +27,5 @@ public class AssetFileEntity {
     @Lob
     @NotNull
     @Column(name = "file_binary", nullable = false)
-    private Blob binary;
+    private byte[] binary;
 }

@@ -25,6 +25,7 @@ public enum AssetType {
     WEBP("webp", "image/webp"),
     HEIF("heif", "image/heif"),
     HEIC("heic", "image/heic"),
+    AVIF("avif", "image/avif"),
     // pdf
     PDF("pdf", "application/pdf"),
     // compressed files
@@ -67,7 +68,7 @@ public enum AssetType {
     WAV("wav", "audio/wav"),
     WEBA("weba", "audio/webm"),
     // 3d files
-    GLB("glb","model/gltf-binary");
+    GLB("glb", "model/gltf-binary");
 
     private final String value;
 

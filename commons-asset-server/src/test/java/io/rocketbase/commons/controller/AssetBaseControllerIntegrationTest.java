@@ -56,6 +56,25 @@ public class AssetBaseControllerIntegrationTest extends BaseIntegrationTest {
 
     @SneakyThrows
     @Test
+    public void testUploadAvif() {
+        // given
+        AssetResource assetResource = new AssetResource(baseUrl);
+
+        // when
+        File uploadFile = resourceLoader.getResource("classpath:assets/sample.avif").getFile();
+        AssetRead result = assetResource.uploadFile(new FileInputStream(uploadFile), uploadFile.getName());
+
+        // then
+        assertThat(result, notNullValue());
+        assertThat(result.getType(), equalTo(AssetType.AVIF));
+        assertThat(result.getMeta().getFileSize(), equalTo(77930L));
+        assertThat(result.getMeta().getResolution(), nullValue());
+        assertThat(result.getMeta().getOriginalFilename(), equalTo(uploadFile.getName()));
+        assertThat(result.getDownload(), startsWith(baseUrl));
+    }
+
+    @SneakyThrows
+    @Test
     public void testUploadGlb() {
         // given
         AssetResource assetResource = new AssetResource(baseUrl);

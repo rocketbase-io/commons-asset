@@ -108,19 +108,21 @@ SOFTWARE.
         <maven.compiler.target>1.8</maven.compiler.target>
         <maven.javadoc.failOnError>false</maven.javadoc.failOnError>
 
-        <spring-boot.version>2.5.7</spring-boot.version>
+        <spring-boot.version>2.7.9</spring-boot.version>
 
-        <commons-rest.version>2.2.4</commons-rest.version>
-        <guava.version>31.0.1-jre</guava.version>
+        <commons-rest.version>2.5.4</commons-rest.version>
+        <guava.version>31.1-jre</guava.version>
         <commons-fileupload.version>1.4</commons-fileupload.version>
-        <commons-io.version>2.9.0</commons-io.version>
-        <tika-core.version>2.2.1</tika-core.version>
-        <thumbnailator.version>0.4.14</thumbnailator.version>
+        <commons-io.version>2.11.0</commons-io.version>
+        <tika-core.version>2.7.0</tika-core.version>
+        <thumbnailator.version>0.4.19</thumbnailator.version>
         <jacoco.version>0.8.7</jacoco.version>
         <colors.version>0.6.0</colors.version>
-        <aws-sdk-java.version>1.12.132</aws-sdk-java.version>
+        <aws-sdk-java.version>1.12.426</aws-sdk-java.version>
         <imgproxy.version>0.1.0</imgproxy.version>
         <im4java.version>1.4.2</im4java.version>
+
+        <testcontainers.version>1.17.6</testcontainers.version>
     </properties>
 
     <dependencyManagement>
@@ -169,7 +171,7 @@ SOFTWARE.
             <plugins>
                 <plugin>
                     <artifactId>maven-surefire-plugin</artifactId>
-                    <version>3.0.0-M5</version>
+                    <version>3.0.0-M9</version>
                 </plugin>
                 <plugin>
                     <groupId>org.jacoco</groupId>
@@ -220,11 +222,11 @@ SOFTWARE.
                     <plugin>
                         <groupId>org.sonatype.plugins</groupId>
                         <artifactId>nexus-staging-maven-plugin</artifactId>
-                        <version>1.6.8</version>
+                        <version>1.6.13</version>
                         <extensions>true</extensions>
                         <configuration>
                             <serverId>ossrh</serverId>
-                            <nexusUrl>https://oss.sonatype.org/</nexusUrl>
+                            <nexusUrl>https://s01.oss.sonatype.org/</nexusUrl>
                             <autoReleaseAfterClose>true</autoReleaseAfterClose>
                         </configuration>
                     </plugin>
@@ -244,14 +246,14 @@ SOFTWARE.
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-javadoc-plugin</artifactId>
-                        <version>3.3.0</version>
+                        <version>3.4.1</version>
                         <executions>
                             <execution>
                                 <id>attach-javadocs</id>
                                 <goals>
                                     <goal>jar</goal>
                                 </goals>
-                                <configuration>
+                                <configuration> <!-- add this to disable checking -->
                                     <doclint>none</doclint>
                                 </configuration>
                             </execution>
@@ -260,7 +262,7 @@ SOFTWARE.
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-gpg-plugin</artifactId>
-                        <version>1.6</version>
+                        <version>3.0.1</version>
                         <executions>
                             <execution>
                                 <id>sign-artifacts</id>
