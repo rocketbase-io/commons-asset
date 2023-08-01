@@ -108,13 +108,13 @@ SOFTWARE.
         <maven.compiler.target>11</maven.compiler.target>
         <maven.javadoc.failOnError>false</maven.javadoc.failOnError>
 
-        <spring-boot.version>2.7.9</spring-boot.version>
+        <spring-boot.version>2.7.13</spring-boot.version>
 
         <commons-rest.version>2.5.4</commons-rest.version>
-        <guava.version>31.1-jre</guava.version>
+        <guava.version>32.1.1-jre</guava.version>
         <commons-fileupload.version>1.4</commons-fileupload.version>
         <commons-io.version>2.11.0</commons-io.version>
-        <tika-core.version>2.7.0</tika-core.version>
+        <tika-core.version>2.8.0</tika-core.version>
         <thumbnailator.version>0.4.19</thumbnailator.version>
         <jacoco.version>0.8.7</jacoco.version>
         <colors.version>0.6.0</colors.version>

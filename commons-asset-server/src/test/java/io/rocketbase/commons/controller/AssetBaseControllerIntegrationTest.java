@@ -75,6 +75,44 @@ public class AssetBaseControllerIntegrationTest extends BaseIntegrationTest {
 
     @SneakyThrows
     @Test
+    public void testUploadXls() {
+        // given
+        AssetResource assetResource = new AssetResource(baseUrl);
+
+        // when
+        File uploadFile = resourceLoader.getResource("classpath:assets/sample.xls").getFile();
+        AssetRead result = assetResource.uploadFile(new FileInputStream(uploadFile), uploadFile.getName());
+
+        // then
+        assertThat(result, notNullValue());
+        assertThat(result.getType(), equalTo(AssetType.XLS));
+        assertThat(result.getMeta().getFileSize(), equalTo(25600L));
+        assertThat(result.getMeta().getResolution(), nullValue());
+        assertThat(result.getMeta().getOriginalFilename(), equalTo(uploadFile.getName()));
+        assertThat(result.getDownload(), startsWith(baseUrl));
+    }
+
+    @SneakyThrows
+    @Test
+    public void testUploadDoc() {
+        // given
+        AssetResource assetResource = new AssetResource(baseUrl);
+
+        // when
+        File uploadFile = resourceLoader.getResource("classpath:assets/sample.doc").getFile();
+        AssetRead result = assetResource.uploadFile(new FileInputStream(uploadFile), uploadFile.getName());
+
+        // then
+        assertThat(result, notNullValue());
+        assertThat(result.getType(), equalTo(AssetType.DOC));
+        assertThat(result.getMeta().getFileSize(), equalTo(22528L));
+        assertThat(result.getMeta().getResolution(), nullValue());
+        assertThat(result.getMeta().getOriginalFilename(), equalTo(uploadFile.getName()));
+        assertThat(result.getDownload(), startsWith(baseUrl));
+    }
+
+    @SneakyThrows
+    @Test
     public void testUploadGlb() {
         // given
         AssetResource assetResource = new AssetResource(baseUrl);

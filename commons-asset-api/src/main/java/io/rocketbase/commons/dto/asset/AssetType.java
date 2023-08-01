@@ -35,9 +35,9 @@ public enum AssetType {
     GZIP("gzip", "application/gzip"),
     _7z("7z", "application/x-7z-compressed"),
     // microsoft office
-    XLS("xls", "application/msexcel"),
+    XLS("xls", List.of("application/msexcel", "application/vnd.ms-excel")),
     XLSX("xlsx", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"),
-    DOC("doc", "application/msword"),
+    DOC("doc", List.of("application/msword", "application/vnd.ms-word")),
     DOCX("docx", "application/vnd.openxmlformats-officedocument.wordprocessingml.document"),
     PPT("ppt", "application/vnd.ms-powerpoint"),
     PPTX("pptx", "application/vnd.openxmlformats-officedocument.presentationml.presentation"),
@@ -78,7 +78,7 @@ public enum AssetType {
     }
 
     @Getter
-    private final String contentType;
+    private final List<String> contentTypes;
 
     @Getter
     private final String fileExtension;
@@ -87,10 +87,20 @@ public enum AssetType {
         this(value, contentType, null);
     }
 
+    AssetType(String value, List<String> contentTypes) {
+        this.value = value;
+        this.contentTypes = contentTypes;
+        this.fileExtension = null;
+    }
+
     AssetType(String value, String contentType, String fileExtension) {
         this.value = value;
-        this.contentType = contentType;
+        this.contentTypes = List.of(contentType);
         this.fileExtension = fileExtension;
+    }
+
+    public String getContentType() {
+        return contentTypes.get(0);
     }
 
     public static Set<String> getSupportedContentTypes() {
@@ -108,7 +118,7 @@ public enum AssetType {
     public static AssetType findByContentType(String contentType) {
         if (contentType != null) {
             for (AssetType type : values()) {
-                if (contentType.equalsIgnoreCase(type.getContentType())) {
+                if (type.getContentTypes().contains(contentType.toLowerCase())) {
                     return type;
                 }
             }
