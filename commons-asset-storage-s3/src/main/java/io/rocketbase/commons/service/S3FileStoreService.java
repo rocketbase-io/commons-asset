@@ -1,13 +1,5 @@
 package io.rocketbase.commons.service;
 
-import com.amazonaws.services.s3.AmazonS3;
-import com.amazonaws.services.s3.model.CannedAccessControlList;
-import com.amazonaws.services.s3.model.DeleteObjectsRequest;
-import com.amazonaws.services.s3.model.ObjectMetadata;
-import com.amazonaws.services.s3.model.PutObjectRequest;
-import com.amazonaws.services.s3.transfer.Download;
-import com.amazonaws.services.s3.transfer.TransferManager;
-import com.amazonaws.services.s3.transfer.TransferManagerBuilder;
 import io.rocketbase.commons.config.AssetS3Properties;
 import io.rocketbase.commons.dto.asset.AssetReference;
 import io.rocketbase.commons.dto.asset.PreviewSize;
@@ -16,60 +8,63 @@ import io.rocketbase.commons.util.Nulls;
 import io.rocketbase.commons.util.UrlParts;
 import lombok.SneakyThrows;
 import org.springframework.core.io.InputStreamResource;
+import software.amazon.awssdk.core.ResponseBytes;
+import software.amazon.awssdk.services.s3.S3Client;
+import software.amazon.awssdk.services.s3.model.*;
+import software.amazon.awssdk.services.s3.presigner.S3Presigner;
+import software.amazon.awssdk.services.s3.presigner.model.GetObjectPresignRequest;
+import software.amazon.awssdk.services.s3.presigner.model.PresignedGetObjectRequest;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.text.Normalizer;
+import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Date;
-import java.util.stream.Collectors;
+import java.util.HashMap;
+import java.util.Map;
 
 public class S3FileStoreService implements FileStorageService {
 
     private final AssetS3Properties assetS3Properties;
     private final BucketResolver bucketResolver;
     private final PathResolver pathResolver;
-    private final AmazonS3 amazonS3;
+    private final S3Client s3Client;
+    private final S3Presigner s3Presigner;
 
-    public S3FileStoreService(AssetS3Properties assetS3Properties, BucketResolver bucketResolver, PathResolver pathResolver, AmazonS3 amazonS3) {
+    public S3FileStoreService(AssetS3Properties assetS3Properties, BucketResolver bucketResolver, PathResolver pathResolver, S3Client s3Client, S3Presigner s3Presigner) {
         this.assetS3Properties = assetS3Properties;
         this.bucketResolver = bucketResolver;
         this.pathResolver = pathResolver;
-        this.amazonS3 = amazonS3;
+        this.s3Client = s3Client;
+        this.s3Presigner = s3Presigner;
     }
 
     @SneakyThrows
     @Override
     public void upload(AssetEntity entity, File file) {
         entity.setUrlPath(pathResolver.getAbsolutePath(entity));
+        PutObjectRequest putObjectRequest = PutObjectRequest.builder()
+                .bucket(this.bucketResolver.resolveBucketName(entity))
+                .key(entity.getUrlPath())
+                .metadata(generateObjectMeta(entity))
+                .contentType(entity.getType().getContentType())
+                .acl(assetS3Properties.isPublicReadObject() ? ObjectCannedACL.PUBLIC_READ : ObjectCannedACL.BUCKET_OWNER_READ)
+                .build();
 
-        TransferManager transferManager = getTransferManager();
-
-        ObjectMetadata objectMetadata = generateObjectMeta(entity);
-        transferManager.upload(new PutObjectRequest(bucketResolver.resolveBucketName(entity),
-                        entity.getUrlPath(), file)
-                        .withMetadata(objectMetadata)
-                        .withCannedAcl(assetS3Properties.isPublicReadObject() ? CannedAccessControlList.PublicRead : CannedAccessControlList.BucketOwnerRead))
-                .waitForUploadResult();
+        s3Client.putObject(putObjectRequest, file.toPath());
     }
 
     @SneakyThrows
     @Override
     public void storePreview(AssetReference reference, File file, PreviewSize previewSize) {
-        TransferManager transferManager = getTransferManager();
-
-        ObjectMetadata objectMetadata = generateObjectMeta(reference);
-        transferManager.upload(new PutObjectRequest(bucketResolver.resolveBucketName(reference),
-                        buildPreviewPart(reference, previewSize), file)
-                        .withMetadata(objectMetadata)
-                        .withCannedAcl(assetS3Properties.isPublicReadObject() ? CannedAccessControlList.PublicRead : CannedAccessControlList.BucketOwnerRead))
-                .waitForUploadResult();
-    }
-
-    protected TransferManager getTransferManager() {
-        return TransferManagerBuilder.standard()
-                .withS3Client(amazonS3)
+        PutObjectRequest putObjectRequest = PutObjectRequest.builder()
+                .bucket(this.bucketResolver.resolveBucketName(reference))
+                .key(buildPreviewPart(reference, previewSize))
+                .metadata(generateReferenceMeta(reference))
+                .contentType(reference.getType().getContentType())
+                .acl(assetS3Properties.isPublicReadObject() ? ObjectCannedACL.PUBLIC_READ : ObjectCannedACL.BUCKET_OWNER_READ)
                 .build();
+
+        s3Client.putObject(putObjectRequest, file.toPath());
     }
 
     @SneakyThrows
@@ -89,11 +84,13 @@ public class S3FileStoreService implements FileStorageService {
         // not the best cleanup...
         tempFile.deleteOnExit();
 
-        TransferManager transferManager = getTransferManager();
-        Download download = transferManager.download(bucketResolver.resolveBucketName(reference), url, tempFile);
-        download.waitForCompletion();
+        GetObjectRequest objectRequest = GetObjectRequest.builder()
+                .bucket(bucketResolver.resolveBucketName(reference))
+                .key(url)
+                .build();
 
-        return new InputStreamResource(new FileInputStream(tempFile));
+        ResponseBytes<GetObjectResponse> responseBytes = s3Client.getObjectAsBytes(objectRequest);
+        return new InputStreamResource(responseBytes.asInputStream());
     }
 
     @SneakyThrows
@@ -113,8 +110,19 @@ public class S3FileStoreService implements FileStorageService {
 
     protected String getDownloadUrl(AssetReference reference, String url) {
         if (!assetS3Properties.isPublicReadObject()) {
-            Date expiration = new Date(new Date().getTime() + assetS3Properties.getDownloadExpire().toMillis());
-            return amazonS3.generatePresignedUrl(bucketResolver.resolveBucketName(reference), url, expiration).toString();
+            GetObjectRequest objectRequest = GetObjectRequest.builder()
+                    .bucket(bucketResolver.resolveBucketName(reference))
+                    .key(url)
+                    .build();
+
+            GetObjectPresignRequest presignRequest = GetObjectPresignRequest.builder()
+                    .signatureDuration(assetS3Properties.getDownloadExpire())
+                    .getObjectRequest(objectRequest)
+                    .build();
+
+
+            PresignedGetObjectRequest presignedGetObjectRequest = s3Presigner.presignGetObject(presignRequest);
+            return presignedGetObjectRequest.url().toExternalForm();
         }
         return buildPublicUrl(reference, url);
     }
@@ -125,42 +133,49 @@ public class S3FileStoreService implements FileStorageService {
 
     @Override
     public void delete(AssetEntity entity) {
-        amazonS3.deleteObject(bucketResolver.resolveBucketName(entity), entity.getUrlPath());
+        ArrayList<ObjectIdentifier> toDelete = new ArrayList<ObjectIdentifier>();
+        toDelete.add(ObjectIdentifier.builder().key(entity.getUrlPath()).build());
+        Arrays.stream(PreviewSize.values()).forEach(size -> toDelete.add(ObjectIdentifier.builder().key(buildPreviewPart(entity, size)).build()));
 
-        DeleteObjectsRequest objectsRequest = new DeleteObjectsRequest(bucketResolver.resolveBucketName(entity));
-        objectsRequest.setKeys(Arrays.stream(PreviewSize.values())
-                .map(size -> new DeleteObjectsRequest.KeyVersion(buildPreviewPart(entity, size)))
-                .collect(Collectors.toList()));
-        objectsRequest.setQuiet(true);
-        amazonS3.deleteObjects(objectsRequest);
+        s3Client.deleteObjects(DeleteObjectsRequest.builder()
+                .bucket(bucketResolver.resolveBucketName(entity))
+                        .delete(Delete.builder().objects(toDelete).build())
+                .build());
     }
 
     @Override
     public void copy(AssetEntity source, AssetEntity target) {
         target.setUrlPath(pathResolver.getAbsolutePath(target));
-        amazonS3.copyObject(bucketResolver.resolveBucketName(source), source.getUrlPath(), bucketResolver.resolveBucketName(target), target.getUrlPath());
+        s3Client.copyObject(CopyObjectRequest.builder()
+                        .sourceBucket(bucketResolver.resolveBucketName(source))
+                        .sourceKey(source.getUrlPath())
+                        .destinationBucket(bucketResolver.resolveBucketName(target))
+                        .destinationKey(target.getUrlPath())
+                        .build());
     }
 
-    private ObjectMetadata generateObjectMeta(AssetReference reference) {
-        ObjectMetadata objectMetadata = new ObjectMetadata();
-        objectMetadata.setContentType(reference.getType().getContentType());
-        objectMetadata.setHeader("type", reference.getType().name());
-        objectMetadata.setHeader("context", Nulls.notNull(reference.getContext()));
-        objectMetadata.setHeader("originalFilename", cleanString(Nulls.notNull(reference.getMeta().getOriginalFilename())));
-        objectMetadata.setHeader("created", reference.getMeta().getCreated().toString());
-        return objectMetadata;
-    }
+private Map<String, String> generateReferenceMeta(AssetReference entity) {
+    Map<String, String> objectMetadata = new HashMap<>();
 
-    private ObjectMetadata generateObjectMeta(AssetEntity entity) {
-        ObjectMetadata objectMetadata = generateObjectMeta((AssetReference) entity);
-        if (entity.getSystemRefId() != null) {
-            objectMetadata.setHeader("systemRefId", entity.getSystemRefId());
-        }
-        if (entity.getReferenceUrl() != null) {
-            objectMetadata.setHeader("referenceUrl", cleanString(entity.getReferenceUrl()));
-        }
-        return objectMetadata;
+    objectMetadata.put("type", entity.getType().name());
+    objectMetadata.put("context", Nulls.notNull(entity.getContext()));
+    objectMetadata.put("originalFilename", cleanString(Nulls.notNull(entity.getMeta().getOriginalFilename())));
+    objectMetadata.put("created", entity.getMeta().getCreated().toString());
+
+    if (entity.getSystemRefId() != null) {
+        objectMetadata.put("systemRefId", entity.getSystemRefId());
     }
+    return objectMetadata;
+}
+
+private Map<String, String> generateObjectMeta(AssetEntity entity) {
+    Map<String, String> objectMetadata = generateReferenceMeta((AssetReference) entity);
+
+    if (entity.getReferenceUrl() != null) {
+        objectMetadata.put("referenceUrl", cleanString(entity.getReferenceUrl()));
+    }
+    return objectMetadata;
+}
 
     @Override
     public boolean useDownloadPreviewUrl() {
